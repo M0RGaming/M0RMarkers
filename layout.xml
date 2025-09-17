@@ -1,0 +1,11 @@
+<GuiXml>
+    <Controls>
+        <TopLevelControl name="M0RMarkersToplevel" layer="0">
+            <Controls>
+                <Control name="$(parent)Camera" />
+            </Controls>
+        </TopLevelControl>
+
+        <Texture name="M0RMarkersControls" virtual="true"/>
+    </Controls>
+</GuiXml>
