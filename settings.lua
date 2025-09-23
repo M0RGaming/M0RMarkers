@@ -44,6 +44,8 @@ function settings.createSettings()
 		textureSearchup[v] = displayChoices[#displayChoices]
 	end
 
+	a = displayChoices
+
 
 	local exportString = ""
 	local importString = ""
