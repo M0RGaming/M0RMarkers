@@ -52,7 +52,88 @@ end
 
 
 
-local builtInTextureList = {
+MM.builtInTextureList = {
+
+	"M0RMarkers/textures/circles/blank.dds",
+	"M0RMarkers/textures/circles/0.dds",
+	"M0RMarkers/textures/circles/1.dds",
+	"M0RMarkers/textures/circles/2.dds",
+	"M0RMarkers/textures/circles/3.dds",
+	"M0RMarkers/textures/circles/4.dds",
+	"M0RMarkers/textures/circles/5.dds",
+	"M0RMarkers/textures/circles/6.dds",
+	"M0RMarkers/textures/circles/7.dds",
+	"M0RMarkers/textures/circles/8.dds",
+	"M0RMarkers/textures/circles/9.dds",
+	"M0RMarkers/textures/circles/10.dds",
+	"M0RMarkers/textures/circles/11.dds",
+	"M0RMarkers/textures/circles/12.dds",
+
+	"M0RMarkers/textures/hexagons/blank.dds",
+	"M0RMarkers/textures/hexagons/0.dds",
+	"M0RMarkers/textures/hexagons/1.dds",
+	"M0RMarkers/textures/hexagons/2.dds",
+	"M0RMarkers/textures/hexagons/3.dds",
+	"M0RMarkers/textures/hexagons/4.dds",
+	"M0RMarkers/textures/hexagons/5.dds",
+	"M0RMarkers/textures/hexagons/6.dds",
+	"M0RMarkers/textures/hexagons/7.dds",
+	"M0RMarkers/textures/hexagons/8.dds",
+	"M0RMarkers/textures/hexagons/9.dds",
+	"M0RMarkers/textures/hexagons/10.dds",
+	"M0RMarkers/textures/hexagons/11.dds",
+	"M0RMarkers/textures/hexagons/12.dds",
+
+	"M0RMarkers/textures/squares/blank.dds",
+	"M0RMarkers/textures/squares/0.dds",
+	"M0RMarkers/textures/squares/1.dds",
+	"M0RMarkers/textures/squares/2.dds",
+	"M0RMarkers/textures/squares/3.dds",
+	"M0RMarkers/textures/squares/4.dds",
+	"M0RMarkers/textures/squares/5.dds",
+	"M0RMarkers/textures/squares/6.dds",
+	"M0RMarkers/textures/squares/7.dds",
+	"M0RMarkers/textures/squares/8.dds",
+	"M0RMarkers/textures/squares/9.dds",
+	"M0RMarkers/textures/squares/10.dds",
+	"M0RMarkers/textures/squares/11.dds",
+	"M0RMarkers/textures/squares/12.dds",
+
+	"M0RMarkers/textures/diamonds/blank.dds",
+	"M0RMarkers/textures/diamonds/0.dds",
+	"M0RMarkers/textures/diamonds/1.dds",
+	"M0RMarkers/textures/diamonds/2.dds",
+	"M0RMarkers/textures/diamonds/3.dds",
+	"M0RMarkers/textures/diamonds/4.dds",
+	"M0RMarkers/textures/diamonds/5.dds",
+	"M0RMarkers/textures/diamonds/6.dds",
+	"M0RMarkers/textures/diamonds/7.dds",
+	"M0RMarkers/textures/diamonds/8.dds",
+	"M0RMarkers/textures/diamonds/9.dds",
+
+	"M0RMarkers/textures/octagons/blank.dds",
+	"M0RMarkers/textures/octagons/A.dds",
+	"M0RMarkers/textures/octagons/B.dds",
+	"M0RMarkers/textures/octagons/C.dds",
+
+	"M0RMarkers/textures/octagons/L.dds",
+	"M0RMarkers/textures/octagons/M.dds",
+	"M0RMarkers/textures/octagons/R.dds",
+
+	"M0RMarkers/textures/octagons/MT.dds",
+	"M0RMarkers/textures/octagons/OT.dds",
+
+	"M0RMarkers/textures/octagons/N.dds",
+	"M0RMarkers/textures/octagons/E.dds",
+	"M0RMarkers/textures/octagons/S.dds",
+	"M0RMarkers/textures/octagons/W.dds",
+
+	"M0RMarkers/textures/octagons/NE.dds",
+	"M0RMarkers/textures/octagons/SE.dds",
+	"M0RMarkers/textures/octagons/SW.dds",
+	"M0RMarkers/textures/octagons/NW.dds",
+
+
 	"esoui/art/stats/alliancebadge_aldmeri.dds",
 	"esoui/art/stats/alliancebadge_ebonheart.dds",
 	"esoui/art/stats/alliancebadge_daggerfall.dds",
@@ -65,11 +146,14 @@ local builtInTextureList = {
 	"esoui/art/icons/class/gamepad/gp_class_warden.dds",
 	"esoui/art/icons/class/gamepad/gp_class_necromancer.dds",
 	"esoui/art/icons/class/gamepad/gp_class_templar.dds",
-	"esoui/art/icons/class/gamepad/gp_class_arcanist.dds"
+	"esoui/art/icons/class/gamepad/gp_class_arcanist.dds",
 }
-for i,v in pairs(builtInTextureList) do
-	builtInTextureList[tostring(i)] = v
-	builtInTextureList[v] = i
+
+
+local textureLookup = {}
+for i,v in pairs(MM.builtInTextureList) do
+	textureLookup[tostring(i)] = v
+	textureLookup[v] = i
 end
 
 
@@ -87,7 +171,7 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 	local textures = {}
 	local pitches = {}
 	local yaws = {}
-	local floatings = {}
+	local sizes = {}
 	
 
 	local mergedTables = {}
@@ -113,6 +197,9 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 		if not colours[v.colourHex] then colours[v.colourHex] = {} end
 		table.insert(colours[v.colourHex], i)
 
+		if not sizes[v.size] then sizes[v.size] = {} end
+		table.insert(sizes[v.size], i)
+
 		if v.orientation then
 			local pitch = zo_floor(zo_deg(v.orientation[1]))
 			if not pitches[pitch] then pitches[pitch] = {} end
@@ -121,8 +208,6 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 			local yaw = zo_floor(zo_deg(v.orientation[2]))
 			if not yaws[yaw] then yaws[yaw] = {} end
 			table.insert(yaws[yaw], i)
-		else
-			table.insert(floatings, i)
 		end
 
 		if not textures[v.texture] then textures[v.texture] = {} end
@@ -139,11 +224,20 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 	local secondPart = table.concat(currentConcat, ",") or ""
 
 	currentConcat = {}
-	local out = tostring(zone).."]"
-	out = out .. string.format("%x:%x:%x]", minX,minY,minZ) .. table.concat(floatings, ",") .. "]"
+	local out = tostring(zone) .. "]" .. string.format("%x:%x:%x]", minX,minY,minZ)
 
+
+	currentConcat = {}
+	for i,v in pairs(sizes) do
+		if tostring(i) ~= "1" then -- skip default size
+			currentConcat[#currentConcat+1] = tostring(i) .. ":".. table.concat(v, ",")
+		end
+	end
+	out = out..table.concat(currentConcat, ";").."]"
+
+
+	currentConcat = {}
 	for i,v in pairs(pitches) do
-		--out = out .. i .. "=".. table.concat(v, ",").."]"
 		currentConcat[#currentConcat+1] = tostring(i) .. ":".. table.concat(v, ",")
 	end
 	out = out..table.concat(currentConcat, ";").."]"
@@ -162,8 +256,8 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 
 	currentConcat = {}
 	for i,v in pairs(textures) do
-		if builtInTextureList[i] then
-			i = "^"..builtInTextureList[i]
+		if textureLookup[i] then
+			i = "^"..textureLookup[i]
 		end
 		currentConcat[#currentConcat+1] = tostring(i) .. ":".. table.concat(v, ",")
 	end
@@ -177,9 +271,9 @@ end
 
 
 function MM.decompressString(exportString) -- 10 ms to load 206 textures + render
-	local _,_, zone, mins, floating, pitch, yaw, colour, texture, positions = string.find(exportString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
+	local _,_, zone, mins, sizes, pitch, yaw, colour, texture, positions = string.find(exportString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
 	local currentZone = GetUnitRawWorldPosition('player')
-	print(zone)
+	--print(zone)
 	if zone ~= tostring(currentZone) then d("These markers are for a different zone!") return end
 
 	local minXH, minYH, minZH = zo_strsplit(":", mins)
@@ -199,25 +293,33 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 			y=cY,
 			z=cZ,
 			depthBuffer=cDepth,
-			width = 1, -- temp
-			height = 1, -- temp
+			size = 1, -- to be overwritten
+			texture = "", -- to be overwritten
+			colour = {1,1,1,1}, -- to be overwritten
 		}
+	end
+
+	for i in zo_strgmatch(sizes, "[^;]+") do
+		local currentSize, indexes = zo_strsplit(":", i)
+		for j in zo_strgmatch(indexes, "[^,]+") do
+			icons[tonumber(j)].size = currentSize
+		end
 	end
 	
 
-	print("\nTEXTURES:")
+	--print("\nTEXTURES:")
 	for i in zo_strgmatch(texture, "[^;]+") do
 		local currentTexture, indexes = zo_strsplit(":", i)
-		print(currentTexture)
+		--print(currentTexture)
 		if zo_strfind(currentTexture, "%^") then
-			currentTexture = builtInTextureList[zo_strsplit("^", currentTexture)] or ""
+			currentTexture = textureLookup[zo_strsplit("^", currentTexture)] or ""
 		end
-		print(currentTexture)
+		--print(currentTexture)
 		for j in zo_strgmatch(indexes, "[^,]+") do
 			--print(j)
 			icons[tonumber(j)].texture = currentTexture
 		end
-		print("")
+		--print("")
 	end
 
 	-- floating, pitch, yaw, colour
@@ -270,7 +372,6 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 		MM.createIcon(v)
 	end
 
-	a = icons
 
 end
 
@@ -358,15 +459,15 @@ function MM.placeIcon()
 		orientation = orientation,
 		colour = currentSelections.rgba or {1,1,1,1},
 		depthBuffer = currentSelections.depth or false,
-		width = currentSelections.width or 1, -- meters
-		height = currentSelections.height or 1, -- meters
+		size = currentSelections.size or 1, -- meters
 	}
 	MM.createIcon(icon)
-	MM.saveIcons()
+
+	local zoneString = MM.compressLoaded()
+	MM.saveIcons(zoneString)
 end
 
-function MM.saveIcons()
-	local zoneString = MM.compressLoaded()
+function MM.saveIcons(zoneString)
 
 	local currentZone = GetUnitRawWorldPosition('player')
 	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
@@ -378,6 +479,72 @@ function MM.saveIcons()
 		}
 	end
 end
+
+
+
+
+SLASH_COMMANDS['/mmplace'] = function()
+	MM.placeIcon()
+end
+
+SLASH_COMMANDS['/mmremove'] = function()
+	MM.removeClosestIcon()
+end
+
+
+
+
+
+
+
+
+function MM.loadZone(currentZone)
+	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
+	local zoneString = nil
+	print("Loading zone: "..tostring(currentZone).." with profile name: "..currentProfileName)
+	if MM.vars.Profiles[currentZone] then
+		zoneString = MM.vars.Profiles[currentZone][currentProfileName]
+	end
+	print(tostring(zoneString))
+	if zoneString then
+		MM.decompressString(zoneString)
+	end
+end
+
+
+function MM.importIcons(zoneString, overwrite)
+	if overwrite then
+		MM.unloadEverything()
+	end
+	MM.decompressString(zoneString)
+	if not overwrite then
+		zoneString = MM.compressLoaded()
+	end
+	MM.saveIcons(zoneString)
+	return zoneString
+	
+end
+
+
+function MM.emptyCurrentZone()
+	MM.unloadEverything()
+	MM.saveIcons()
+end
+
+
+
+
+local oldZone = 0
+function MM.playerActivated()
+	local currentZone = GetUnitRawWorldPosition('player')
+	if oldZone ~= currentZone then
+		oldZone = currentZone
+		MM.unloadEverything()
+		MM.loadZone(currentZone)
+	end
+end
+
+
 
 
 
@@ -408,6 +575,8 @@ function MM:Initialize()
 		MM.filter = LibFilteredChatPanel:CreateFilter("M0RMarkers", "/esoui/art/crowncrates/psijic/crowncrate_psijic_back.dds", {0, 0.8, 0.8}, false)
 	end
 
+
+	EVENT_MANAGER:RegisterForEvent(MM.name, EVENT_PLAYER_ACTIVATED, MM.playerActivated)
 
 	MM.Settings.createSettings()
 	EVENT_MANAGER:UnregisterForEvent(MM.name, EVENT_ADD_ON_LOADED)

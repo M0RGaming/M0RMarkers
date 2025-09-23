@@ -91,7 +91,7 @@ function MM.createIcon(icon)
 	icon.control:Set3DRenderSpaceOrigin(WorldPositionToGuiRender3DPosition(icon.x, icon.y, icon.z))
 
 	--local texWidth, texHeight = icon.control:GetTextureFileDimensions()
-    icon.control:Set3DLocalDimensions(icon.width, icon.height)
+    icon.control:Set3DLocalDimensions(icon.size, icon.size)
     icon.control:Set3DRenderSpaceUsesDepthBuffer(icon.depthBuffer)
 
     local orientation = icon.orientation
@@ -136,6 +136,19 @@ function MM.removeClosestIcon()
 		table.remove(groundIcons, closestIcon)
 	end
 	
-
+	local zoneString = MM.compressLoaded()
 	MM.saveIcons() -- Update Saved icons
+end
+
+
+
+function MM.unloadEverything()
+	for i,v in pairs(facingIcons) do
+		destroyControl(v)
+	end
+	ZO_ClearNumericallyIndexedTable(facingIcons)
+	for i,v in pairs(groundIcons) do
+		destroyControl(v)
+	end
+	ZO_ClearNumericallyIndexedTable(groundIcons)
 end
