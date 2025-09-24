@@ -138,15 +138,14 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 			table.insert(yaws[yaw], i)
 		end
 
-		if not textures[v.texture] then textures[v.texture] = {} end
-		table.insert(textures[v.texture], i)
+		if not textures[v.bgTexture] then textures[v.bgTexture] = {} end
+		table.insert(textures[v.bgTexture], i)
 
 		local x = v.x-minX
 		local y = v.y-minY
 		local z = v.z-minZ
 
-		currentConcat[#currentConcat+1] = string.format("%x:%x:%x:%d", x,y,z,(v.depthBuffer and 1 or 0))
-		--secondPart = secondPart..x..":"..y..":"..z..":"..(v.depthBuffer and "1" or "0")..","
+		currentConcat[#currentConcat+1] = string.format("%x:%x:%x:%d", x,y,z,(v.text))
 	end
 
 	local secondPart = table.concat(currentConcat, ",") or ""
@@ -211,18 +210,18 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 
 	local icons = {}
 	for i in zo_strgmatch(positions, "[^,]+") do
-		local cXH, cYH, cZH, cDepth = zo_strsplit(":", i)
+		local cXH, cYH, cZH, cText = zo_strsplit(":", i)
 		local cX = tonumber(cXH,16)+minX
 		local cY = tonumber(cYH,16)+minY
 		local cZ = tonumber(cZH,16)+minZ
-		if cDepth == "1" then cDepth = true else cDepth = false end
 		icons[#icons+1] = {
 			x=cX,
 			y=cY,
 			z=cZ,
-			depthBuffer=cDepth,
+			text=cText,
 			size = 1, -- to be overwritten
-			texture = "", -- to be overwritten
+			bgTexture = nil,
+			iconTexture = nil,
 			colour = {1,1,1,1}, -- to be overwritten
 		}
 	end
@@ -245,7 +244,7 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 		--print(currentTexture)
 		for j in zo_strgmatch(indexes, "[^,]+") do
 			--print(j)
-			icons[tonumber(j)].texture = currentTexture
+			icons[tonumber(j)].bgTexture = currentTexture
 		end
 		--print("")
 	end
@@ -383,7 +382,7 @@ function MM.placeIcon()
 		x = x or 0,
 		y = y+currentSelections.offsetY+defaultOffset or 0,
 		z = z or 0,
-		texture = currentSelections.texture,
+		bgTexture = currentSelections.texture,
 		orientation = orientation,
 		colour = currentSelections.rgba or {1,1,1,1},
 		depthBuffer = currentSelections.depth or false,
@@ -406,6 +405,8 @@ function MM.saveIcons(zoneString)
 			[currentProfileName] = zoneString
 		}
 	end
+
+	MM.updateMarkerPositions()
 end
 
 
@@ -470,6 +471,7 @@ function MM.playerActivated()
 		MM.unloadEverything()
 		MM.loadZone(currentZone)
 	end
+	MM.updateMarkerPositions()
 end
 
 

@@ -19,12 +19,36 @@ marker = {
 	control = ,
 }
 
+{
+	x
+	y
+	z 
+	texture
+	orientation
+	colour
+	depthBuffer
+	size
+}
+
+
+{
+	x
+	y
+	z 
+	bgTexture
+	iconTexture
+	text
+	orientation
+	colour
+	depthBuffer
+	size
+}
+
+
 ]]
 
 
-local controlPool = ZO_ControlPool:New("M0RMarkersControls", M0RMarkersToplevel)
-local cameraControl = M0RMarkersToplevelCamera
-cameraControl:Create3DRenderSpace()
+local controlPool = ZO_ControlPool:New("M0RMarkersTemplate", M0RMarkersToplevel)
 
 
 local currentlyUpdating = false
@@ -37,29 +61,45 @@ local function updateMarkers() -- IF CRUTCH OR CODES ARE LOADED, USE THEM INSTEA
 		return
 	end
 
-	Set3DRenderSpaceToCurrentCamera("M0RMarkersToplevelCamera")
-
-	local fX, fY, fZ = cameraControl:Get3DRenderSpaceForward()
-	local rX, rY, rZ = cameraControl:Get3DRenderSpaceRight()
-	local uX, uY, uZ = cameraControl:Get3DRenderSpaceUp()
-	local cX, cY, cZ = GuiRender3DPositionToWorldPosition(cameraControl:Get3DRenderSpaceOrigin())
+	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
+    local yaw = zo_atan2(fX, fZ) - math.pi
+    local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
 
 
 	for i,v in pairs(facingIcons) do
-		v.control:Set3DRenderSpaceForward(fX, fY, fZ)
-		v.control:Set3DRenderSpaceRight(rX, rY, rZ)
-		v.control:Set3DRenderSpaceUp(uX, uY, uZ)
-
+		v.control:SetTransformRotation(pitch,yaw,0)
+		--[[ -- might not be needed
 		local distance = zo_floor(zo_distance3D(cX, cY, cZ, v.x, v.y, v.z))
 		v.control:SetDrawLevel(-distance)
+		--]]
+	end
+end
+
+function MM.updateMarkerPositions()
+	local sx, sy, sz = GuiRender3DPositionToWorldPosition(0,0,0)
+	for i,v in pairs(facingIcons) do
+		local x = (v.x - sx)/100
+		local y = v.y/100
+		local z = (v.z - sz)/100
+		v.control:SetTransformOffset(x,y,z)
+	end
+	for i,v in pairs(groundIcons) do
+		local x = (v.x - sx)/100
+		local y = v.y/100
+		local z = (v.z - sz)/100
+		v.control:SetTransformOffset(x,y,z)
 	end
 end
 
 
+
 local function createControl(icon)
 	local control, key = controlPool:AcquireObject()
-	control:Create3DRenderSpace()
 	control:SetHidden(false)
+	control:SetScale(icon.size/100)
+	control.bgLayer = control:GetNamedChild("Background")
+	control.iconLayer = control:GetNamedChild("Icon")
+	control.textLayer = control:GetNamedChild("Text")
 	--control:SetColor(1,1,1,1)
 	icon.control = control
 	icon.key = key
@@ -67,8 +107,11 @@ local function createControl(icon)
 end
 
 local function destroyControl(icon)
-	icon.control:Destroy3DRenderSpace()
 	icon.control:SetHidden(true)
+	icon.control.bgLayer:SetHidden(true)
+	icon.control.iconLayer:SetHidden(true)
+	icon.control.textLayer:SetHidden(true)
+
 	controlPool:ReleaseObject(icon.key)
 	icon.control = nil
 	icon.key = nil
@@ -76,7 +119,7 @@ end
 
 local function startUpdating()
 	if not currentlyUpdating then
-		EVENT_MANAGER:RegisterForUpdate("M0RMarkersUpdateTick", 50, updateMarkers)
+		EVENT_MANAGER:RegisterForUpdate("M0RMarkersUpdateTick", 0, updateMarkers)
 		currentlyUpdating = true
 	end
 end
@@ -85,19 +128,27 @@ end
 
 function MM.createIcon(icon)
 	icon = createControl(icon)
-	icon.control:SetTexture(icon.texture)
-	icon.control:SetColor(unpack(icon.colour))
 
-	icon.control:Set3DRenderSpaceOrigin(WorldPositionToGuiRender3DPosition(icon.x, icon.y, icon.z))
+	if icon.bgTexture then
+		icon.control.bgLayer:SetHidden(false)
+		icon.control.bgLayer:SetTexture(icon.bgTexture)
+		icon.control.bgLayer:SetColor(unpack(icon.colour))
+	end
+	if icon.iconTexture then
+		icon.control.iconLayer:SetHidden(false)
+		icon.control.iconLayer:SetTexture(icon.iconTexture)
+	end
+	if icon.text then
+		icon.control.textLayer:SetHidden(false)
+		icon.control.textLayer:SetText(icon.text)
+	end
 
-	--local texWidth, texHeight = icon.control:GetTextureFileDimensions()
-    icon.control:Set3DLocalDimensions(icon.size, icon.size)
-    icon.control:Set3DRenderSpaceUsesDepthBuffer(icon.depthBuffer)
+
 
     local orientation = icon.orientation
 
 	if orientation then -- ground icon
-		icon.control:Set3DRenderSpaceOrientation(orientation[1], orientation[2], 0)
+		icon.control:SetTransformRotation(orientation[1], orientation[2], 0)
 		table.insert(groundIcons, icon)
 	else -- facing
 		table.insert(facingIcons, icon)

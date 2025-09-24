@@ -6,6 +6,30 @@
             </Controls>
         </TopLevelControl>
 
-        <Texture name="M0RMarkersControls" virtual="true"/>
+        <Control name="M0RMarkersTemplate" virtual="true" space="WORLD">
+            <Dimensions x="100" y="100" />
+            <Anchor point="CENTER" relativePoint="CENTER" relativeTo="GuiRoot"/>
+            <Controls>
+                <Texture name="$(parent)Background" hidden="true">
+                    <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
+                    <Dimensions x="100" y="100" />
+                </Texture>
+                <Texture name="$(parent)Icon" hidden="true">
+                    <AnchorFill />
+                </Texture>
+                <Label name="$(parent)Text" font="$(GAMEPAD_BOLD_FONT)|$(GP_20)|thick-outline" horizontalAlignment="1" verticalAlignment="1" hidden="true" scale="4">
+                    <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)" offsetY="15"/>
+                    <Dimensions x="200" y="100" />
+                    <!-- For debug
+                    <Controls>
+                        <Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="000000">
+                            <AnchorFill />
+                            <Edge edgeSize="3"/>
+                        </Backdrop>
+                    </Controls>
+                    -->
+                </Label>
+            </Controls>
+        </Control>
     </Controls>
 </GuiXml>
