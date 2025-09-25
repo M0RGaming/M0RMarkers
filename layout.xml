@@ -1,34 +1,222 @@
 <GuiXml>
-    <Controls>
-        <TopLevelControl name="M0RMarkersToplevel" layer="0">
-        </TopLevelControl>
+	<Controls>
+		<TopLevelControl name="M0RMarkersToplevel" layer="0">
+		</TopLevelControl>
 
-        <Control name="M0RMarkersTemplate" virtual="true">
-            <Dimensions x="100" y="100" />
-            <Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="0"/>
-            <Controls>
-                <Texture name="$(parent)Background" hidden="true">
-                    <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
-                    <Dimensions x="100" y="100" />
-                </Texture>
-                <!--
-                <Texture name="$(parent)Icon" hidden="true">
-                    <AnchorFill />
-                </Texture>
-                -->
-                <Label name="$(parent)Text" font="$(GAMEPAD_BOLD_FONT)|$(GP_20)|thick-outline" horizontalAlignment="1" verticalAlignment="1" hidden="true" scale="4">
-                    <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)" offsetY="15"/>
-                    <Dimensions x="200" y="100" />
-                    <!-- For debug
-                    <Controls>
-                        <Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="000000">
-                            <AnchorFill />
-                            <Edge edgeSize="3"/>
-                        </Backdrop>
-                    </Controls>
-                    -->
-                </Label>
-            </Controls>
-        </Control>
-    </Controls>
+		<Control name="M0RMarkersTemplate" virtual="true" space="WORLD">
+			<Dimensions x="100" y="100" />
+			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER"/>
+			<Controls>
+				<Texture name="$(parent)Background" hidden="true">
+					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
+					<Dimensions x="100" y="100" />
+				</Texture>
+				<!--
+				<Texture name="$(parent)Icon" hidden="true">
+					<AnchorFill />
+				</Texture>
+				-->
+				<Label name="$(parent)Text" font="$(GAMEPAD_BOLD_FONT)|$(GP_20)|thick-outline" horizontalAlignment="1" verticalAlignment="1" hidden="true" scale="4">
+					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)" offsetY="15"/>
+					<Dimensions x="200" y="100" />
+					<!-- For debug
+					<Controls>
+						<Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="000000">
+							<AnchorFill />
+							<Edge edgeSize="3"/>
+						</Backdrop>
+					</Controls>
+					-->
+				</Label>
+			</Controls>
+		</Control>
+
+
+		<!--
+		Colour X
+		Texture X
+		Size
+		Text
+
+		-->
+
+		<TopLevelControl name="M0RMarkerPlaceToplevel" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="true">
+			<Dimensions x="320" y="180" />
+			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="0"/>
+			<Controls>
+				<Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="000000">
+					<AnchorFill />
+					<Edge edgeSize="3"/>
+				</Backdrop>
+
+				<Label name="$(parent)Texture" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Texture">
+					<Anchor point="TOPRIGHT" relativePoint="TOP" relativeTo="$(parent)" offsetX="-12.5" offsetY="10" />
+					<Dimensions x="120" y="25" />
+					<Controls>
+						<Control name="$(parent)Picker" inherits="ZO_ScrollableComboBox" mouseEnabled="true" tier="HIGH" >
+							<Dimensions x="135" y="25" />
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="0" />
+
+							<OnInitialized>
+								local comboBox = ZO_ComboBox:New(self)
+								comboBox:SetSortsItems(false)
+
+								local firstTime = true
+								for i,v in ipairs(M0RMarkers.Settings.displayChoices) do
+									local entry = comboBox:CreateItemEntry(v, function()
+										M0RMarkers.print("Selected "..M0RMarkers.Settings.textureSearchup[v])
+										M0RMarkers.Settings.quickSelections.texture = M0RMarkers.Settings.textureSearchup[v]
+									end, true)
+									comboBox:AddItem(entry)
+
+									if firstTime then
+										comboBox:ItemSelectedClickHelper(entry)
+										firstTime = false
+									end
+								end
+							</OnInitialized>
+						</Control>
+					</Controls>
+				</Label>
+				
+				<Label name="$(parent)Colour" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Colour">
+					<Anchor point="TOPLEFT" relativePoint="TOP" relativeTo="$(parent)" offsetX="12.5" offsetY="10" />
+					<Dimensions x="120" y="25" />
+					<Controls>
+						<Control name="$(parent)Picker" inherits="ZO_ScrollableComboBox" mouseEnabled="true" tier="HIGH" >
+							<Dimensions x="135" y="25" />
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="0" />
+							
+							<OnInitialized>
+								local comboBox = ZO_ComboBox:New(self)
+								comboBox:SetSortsItems(false)
+
+								local firstTime = true
+								-- ZO_ComboBox_ObjectFromContainer(self)
+								for i,v in ipairs(M0RMarkers.Settings.colourPresets) do
+									local entry = comboBox:CreateItemEntry(v, function()
+										M0RMarkers.print("Selected "..v)
+										M0RMarkers.Settings.quickSelections.rgba = M0RMarkers.Settings.colourLookup[v]
+									end, true)
+									comboBox:AddItem(entry)
+
+									if firstTime then
+										comboBox:ItemSelectedClickHelper(entry)
+										firstTime = false
+									end
+								end
+							</OnInitialized>
+						</Control>
+					</Controls>
+				</Label>
+
+				<Label name="$(parent)Size" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Size (1m)">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)TexturePicker" offsetY="10" />
+					<Dimensions x="120" y="25" />
+				</Label>
+
+				<Slider name="$(parent)SizeSlider" inherits="ZO_Slider" step="2">
+					<Dimensions x="135" y="25" />
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)ColourPicker" offsetY="10" />
+					<Limits min="2" max="50" />
+					<OnInitialized>
+						self:SetValue(10)
+					</OnInitialized>
+					<OnValueChanged>
+						local value = self:GetValue()
+						self:GetParent():GetNamedChild("Size"):SetText("Size ("..(value/10).."m)")
+						M0RMarkers.print("Size changed to: "..value/10)
+						M0RMarkers.Settings.quickSelections.size = value/10
+					</OnValueChanged>
+				</Slider>
+
+
+				<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Text">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Size" offsetY="10" />
+					<Dimensions x="120" y="25" />
+				</Label>
+
+				<EditBox name="$(parent)TextEdit" inherits="ZO_DefaultEdit">
+					<Dimensions x="135" y="25" />
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)SizeSlider" offsetY="10" />
+					<Controls>
+						<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+							<AnchorFill />
+						</Backdrop>
+					</Controls>
+					<OnTextChanged>
+						local value = self:GetText()
+						M0RMarkers.print("Text changed to: "..value)
+						M0RMarkers.Settings.quickSelections.text = value
+					</OnTextChanged>
+				</EditBox>
+
+				<Button name="$(parent)Remove" inherits="ZO_DefaultButton" text="|cFFB6C1Remove|r">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Text" offsetY="10" />
+					<Dimensions x="120" y="25" />
+					<OnClicked>
+						M0RMarkers.removeClosestIcon()
+					</OnClicked>
+				</Button>
+				<Button name="$(parent)Place" inherits="ZO_DefaultButton" text="|c98FB98Place|r">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)TextEdit" offsetY="10" />
+					<Dimensions x="120" y="25" />
+					<OnClicked>
+						
+						M0RMarkers.placeQuickMenuIcon()
+					</OnClicked>
+				</Button>
+
+
+
+				<Label name="$(parent)Name" font="ZoFontGamepadBookTabletTitle" horizontalAlignment="1" verticalAlignment="1" text="M0R Markers">
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)" offsetY="10" />
+					<Dimensions x="320" y="45" />
+				</Label>
+
+				<!--
+
+				<Control name="$(parent)_Marker_Dropdown_Panel">
+		          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Title" offsetX="4" offsetY="2" />
+				  <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)_Title" offsetX="-4" offsetY="150" />
+		          <Controls>
+		           <Control name="$(parent)_Marker_Dropdown" inherits="ZO_ScrollableComboBox" mouseEnabled="true" tier="HIGH" >
+		              <Dimensions x="200" y="29" />
+		              <Anchor point="CENTER" relativePoint="CENTER" offsetY="-25" />
+		            </Control>
+		            <Texture name="$(parent)_Marker_Icon">
+		              <Anchor point="BOTTOM" relativeTo="$(parent)" relativePoint="BOTTOM" offsetY="0" />
+		              <Dimensions x="80" y="80"/>
+		            </Texture>
+		          </Controls>
+		        </Control>
+		        <Control name="$(parent)_Button_Group">
+		          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Marker_Dropdown_Panel"/>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" offsetX="-8" offsetY="-8" />
+		          <Controls>
+		            <Button name="$(parent)_Place_Button" text="Place" inherits="ZO_DefaultButton" >
+									<Anchor point="LEFT" relativePoint="LEFT" offsetY="-26" offsetX="-4" />
+		            </Button>
+		            <Button name="$(parent)_Place_Publish_Button" text="Place, Publish" inherits="ZO_DefaultButton">
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Place_Button" offsetY="6"/>
+		            </Button>
+		            <Button name="$(parent)_Remove_Button" text="Remove" inherits="ZO_DefaultButton" >
+									<Anchor point="RIGHT" relativePoint="RIGHT" offsetY="-26" offsetX="4"/>
+		            </Button>
+								<Button name="$(parent)_Remove_Publish_Button" text="Remove, Publish" inherits="ZO_DefaultButton">
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Remove_Button" offsetY="6"/>
+		            </Button>
+		          </Controls>
+		        </Control>
+
+
+				-->
+
+
+
+
+
+			</Controls>
+		</TopLevelControl>
+	</Controls>
 </GuiXml>

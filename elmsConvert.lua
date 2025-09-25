@@ -356,9 +356,8 @@ MM.elmsMap = {
 
 
 	[71] = { -- Shark Pog Equivalent
-		bgTexture = "esoui/art/icons/class/gamepad/gp_class_arcanist.dds",
-		colour = {0, 1, 1, 1},
-		text = "!",
+		bgTexture = "M0RMarkers/textures/sharkpog.dds",
+		colour = {1, 1, 1, 1},
 	},
 
 

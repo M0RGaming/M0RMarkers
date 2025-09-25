@@ -50,7 +50,12 @@ marker = {
 ]]
 
 
-local controlPool = ZO_ControlPool:New("M0RMarkersTemplate", M0RMarkersToplevel)
+local controlPool = nil
+
+function MM.initUtil3D()
+	controlPool = ZO_ControlPool:New("M0RMarkersTemplate", M0RMarkersToplevel) -- place in init func
+end
+
 
 
 local currentlyUpdating = false
@@ -100,12 +105,14 @@ local function createControl(icon)
 	local control, key = controlPool:AcquireObject()
 	control:SetHidden(false)
 	control:SetSpace(SPACE_WORLD)
-	control:SetScale(icon.size/100)
+	--control:SetScale(icon.size/100) -- set transform scale to icon.size instead of scale
+	control:SetScale(1/100) -- 1m
 	control.bgLayer = control:GetNamedChild("Background")
 	--control.iconLayer = control:GetNamedChild("Icon")
 	control.textLayer = control:GetNamedChild("Text")
 	--control:SetColor(1,1,1,1)
-	--control:SetTransformNormalizedOriginPoint(0.5,0.5)
+	control:SetTransformNormalizedOriginPoint(0.5,0.5)
+	control:SetTransformScale(icon.size)
 
 	icon.control = control
 	icon.key = key

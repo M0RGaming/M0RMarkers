@@ -1,0 +1,9 @@
+<Bindings>
+	<Layer name="General">
+		<Category name="|cFFD700M0R Markers|r">
+			<Action name="M0RMARKERS_TOGGLE_QUICK_MENU">
+				<Down>M0RMarkers.toggleQuickMenu()</Down>
+			</Action>
+		</Category>
+	</Layer>
+</Bindings>

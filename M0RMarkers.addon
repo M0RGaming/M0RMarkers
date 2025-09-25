@@ -7,9 +7,11 @@
 ## SavedVariables: Markers
 ## DependsOn: LibAddonMenu-2.0>=40
 
-layout.xml
 
 main.lua
 util3d.lua
 elmsConvert.lua
 settings.lua
+
+layout.xml
+bindings.xml

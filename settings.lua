@@ -3,6 +3,84 @@ MM.Settings = {}
 local settings = MM.Settings
 local print = MM.print
 
+
+settings.colourPresets = {
+	"|cffffffWhite|r", -- 1,1,1,1
+	"|c0000ffBlue|r", -- 0, 0, 1, 1
+	"|c00ff00Green|r", -- 0, 1, 0, 1
+	"|cff8000Orange|r", -- 1, 0.5, 0, 1
+	"|cff00e6Pink|r", -- 1, 0, 0.9, 1
+	"|cff0000Red|r", -- 1, 0, 0, 1
+	"|cffcc00Yellow|r", -- 1, 0.8, 0, 1
+	"|c00ffa6Lime Green|r", -- 0, 1, 0.65, 1
+}
+local colourPresets = settings.colourPresets
+
+settings.colourLookup = {
+	["|cffffffWhite|r"] = {1, 1, 1, 1},
+	["|c0000ffBlue|r"] = {0, 0, 1, 1},
+	["|c00ff00Green|r"] = {0, 1, 0, 1},
+	["|cff8000Orange|r"] = {1, 0.5, 0, 1},
+	["|cff00e6Pink|r"] = {1, 0, 0.9, 1},
+	["|cff0000Red|r"] = {1, 0, 0, 1},
+	["|cffcc00Yellow|r"] = {1, 0.8, 0, 1},
+	["|c00ffa6Lime Green|r"] = {0, 1, 0.65, 1},
+
+	["ffffff"] = "|cffffffWhite|r",
+	["0000ff"] = "|c0000ffBlue|r",
+	["00ff00"] = "|c00ff00Green|r",
+	["ff8000"] = "|cff8000Orange|r",
+	["ff00e6"] = "|cff00e6Pink|r",
+	["ff0000"] = "|cff0000Red|r",
+	["ffcc00"] = "|cffcc00Yellow|r",
+	["00ffa6"] = "|c00ffa6Lime Green|r",
+}
+
+local colourLookup = settings.colourLookup
+settings.displayChoices = {}
+settings.textureSearchup = {}
+local displayChoices = settings.displayChoices
+
+local textureChoices = MM.builtInTextureList
+
+local textureSearchup = settings.textureSearchup
+for i,v in pairs(textureChoices) do
+	local textureName = string.match(v:reverse(), "sdd.(.-)/"):reverse() or "" --string.match(v, "/(.-).dds")
+
+	displayChoices[#displayChoices+1] = "|t24:24:"..v.."|t ("..textureName..")"
+	textureSearchup[displayChoices[#displayChoices]] = v
+	textureSearchup[v] = displayChoices[#displayChoices]
+end
+
+
+settings.currentSelections = {
+	text = "",
+	offsetY=0,
+	texture=textureChoices[1],
+	floating=true,
+	rgba={1,1,1,1},
+	size=1,
+	yaw=0,
+	pitch=-90,
+}
+
+
+settings.quickSelections = { -- seperate to avoid needing to update the menu (also now can remove it when porting to console)
+	text = "",
+	offsetY=0,
+	texture=textureChoices[1],
+	floating=true,
+	rgba={1,1,1,1},
+	size=1,
+	yaw=0,
+	pitch=-90,
+}
+
+
+
+
+
+
 function settings.createSettings()
 	--local vars = AD.vars
 
@@ -15,53 +93,17 @@ function settings.createSettings()
 	}
 
 
-	local textureChoices = MM.builtInTextureList
 
 
 
-	settings.currentSelections = {
-		text = "",
-		offsetY=0,
-		texture=textureChoices[1],
-		floating=true,
-		rgba={1,1,1,1},
-		size=1,
-	}
+	
 	
 	local currentSelections = settings.currentSelections
 
 
+	
 
-	local colourPresets = {
-		"|cffffffWhite|r", -- 1,1,1,1
-		"|c0000ffBlue|r", -- 0, 0, 1, 1
-		"|c00ff00Green|r", -- 0, 1, 0, 1
-		"|cff8000Orange|r", -- 1, 0.5, 0, 1
-		"|cff00e6Pink|r", -- 1, 0, 0.9, 1
-		"|cff0000Red|r", -- 1, 0, 0, 1
-		"|cffcc00Yellow|r", -- 1, 0.8, 0, 1
-		"|c00ffa6Lime Green|r", -- 0, 1, 0.65, 1
-	}
-
-	local colourLookup = {
-		["|cffffffWhite|r"] = {1, 1, 1, 1},
-		["|c0000ffBlue|r"] = {0, 0, 1, 1},
-		["|c00ff00Green|r"] = {0, 1, 0, 1},
-		["|cff8000Orange|r"] = {1, 0.5, 0, 1},
-		["|cff00e6Pink|r"] = {1, 0, 0.9, 1},
-		["|cff0000Red|r"] = {1, 0, 0, 1},
-		["|cffcc00Yellow|r"] = {1, 0.8, 0, 1},
-		["|c00ffa6Lime Green|r"] = {0, 1, 0.65, 1},
-
-		["ffffff"] = "|cffffffWhite|r",
-		["0000ff"] = "|c0000ffBlue|r",
-		["00ff00"] = "|c00ff00Green|r",
-		["ff8000"] = "|cff8000Orange|r",
-		["ff00e6"] = "|cff00e6Pink|r",
-		["ff0000"] = "|cff0000Red|r",
-		["ffcc00"] = "|cffcc00Yellow|r",
-		["00ffa6"] = "|c00ffa6Lime Green|r",
-	}
+	
 
 
 	
@@ -70,17 +112,9 @@ function settings.createSettings()
 
 	
 
-	local displayChoices = {}
-	local textureSearchup = {}
-	for i,v in pairs(textureChoices) do
-		local textureName = string.match(v:reverse(), "sdd.(.-)/"):reverse() or "" --string.match(v, "/(.-).dds")
+	
 
-		displayChoices[#displayChoices+1] = "|t24:24:"..v.."|t ("..textureName..")"
-		textureSearchup[displayChoices[#displayChoices]] = v
-		textureSearchup[v] = displayChoices[#displayChoices]
-	end
-
-	a = displayChoices
+	--a = displayChoices
 
 
 	local exportString = ""
@@ -100,16 +134,7 @@ function settings.createSettings()
 
 		-- PLACE PRESET MARKERS HERE
 		--[[
-		{
-			type = "slider",
-			name = "Vertical Offset",
-			tooltip = "",
-			min = -100,
-			max = 100,
-			step = 1,
-			getFunc = function() return currentSelections.offsetY end,
-			setFunc = function(value) currentSelections.offsetY = value end,
-		},
+		
 		--]]
 
 		{
@@ -119,22 +144,6 @@ function settings.createSettings()
 			tooltip = "",
 			getFunc = function() return textureSearchup[currentSelections.texture] end,
 			setFunc = function(value) currentSelections.texture = textureSearchup[value] end,
-		},
-		--[[
-		{
-			type = "editbox",
-			name = "[Advanced] Custom Texture",
-			tooltip = "",
-			getFunc = function() return currentSelections.texture end,
-			setFunc = function(value) currentSelections.texture = value end,
-		},
-		--]]
-		{
-			type = "checkbox",
-			name = "Facing User",
-			tooltip = "",
-			getFunc = function() return currentSelections.floating end,
-			setFunc = function(value) currentSelections.floating = value end,
 		},
 
 
@@ -163,6 +172,7 @@ function settings.createSettings()
 	        min = 0.1,
 	        max = 10,
 	        step = 0.1,	--(optional)
+	        width = "half",
 	        getFunc = function() return currentSelections.size end,
 	        setFunc = function(value) currentSelections.size = value end,
 	    },
@@ -171,10 +181,66 @@ function settings.createSettings()
 			type = "editbox",
 			name = "Text",
 			tooltip = "",
-			width = "full",
+			width = "half",
 			isMultiline = true,
 			getFunc = function() return currentSelections.text end,
     		setFunc = function(text) currentSelections.text = text end,
+		},
+		{
+			type = "submenu",
+			name = "[Advanced Placing]",
+			tooltip = "",
+			controls = {
+
+				{
+					type = "checkbox",
+					name = "Facing User",
+					tooltip = "",
+					getFunc = function() return currentSelections.floating end,
+					setFunc = function(value) currentSelections.floating = value end,
+				},
+
+				{
+			        type = "slider",
+			        name = "Yaw",
+			        tooltip = "",
+			        min = 0,
+			        max = 360,
+			        step = 1,	--(optional)
+			        width = "half",
+			        getFunc = function() return currentSelections.yaw end,
+			        setFunc = function(value) currentSelections.yaw = value end,
+			    },
+
+				{
+			        type = "slider",
+			        name = "Pitch",
+			        tooltip = "",
+			        min = 0,
+			        max = 180,
+			        step = 1,	--(optional)
+			        width = "half",
+			        getFunc = function() return currentSelections.pitch end,
+			        setFunc = function(value) currentSelections.pitch = value end,
+			    },
+				{
+					type = "editbox",
+					name = "Custom Texture",
+					tooltip = "",
+					getFunc = function() return currentSelections.texture end,
+					setFunc = function(value) currentSelections.texture = value end,
+				},
+				{
+					type = "slider",
+					name = "Vertical Offset",
+					tooltip = "",
+					min = -100,
+					max = 100,
+					step = 1,
+					getFunc = function() return currentSelections.offsetY end,
+					setFunc = function(value) currentSelections.offsetY = value end,
+				},
+			}
 		},
 	    {
 			type = "button",

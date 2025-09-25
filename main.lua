@@ -61,6 +61,7 @@ MM.builtInTextureList = {
 	"M0RMarkers/textures/octagon.dds",
 	"M0RMarkers/textures/chevron.dds",
 	"M0RMarkers/textures/blank.dds",
+	"M0RMarkers/textures/sharkpog.dds",
 
 
 	"esoui/art/stats/alliancebadge_aldmeri.dds",
@@ -383,7 +384,15 @@ function MM.placeIcon()
 	local _, x, y, z = GetUnitRawWorldPosition('player')
 	local orientation = nil
 	local currentSelections = MM.Settings.currentSelections
-	if not currentSelections.floating then orientation = {-math.pi/2,0} end
+	if not currentSelections.floating then
+		orientation = {-math.pi/2,0}
+		if currentSelections.pitch then
+			orientation[1] = zo_rad(currentSelections.pitch)
+		end
+		if currentSelections.yaw then
+			orientation[2] = zo_rad(currentSelections.yaw)
+		end
+	end
 	local icon = {
 		x = x or 0,
 		y = y+currentSelections.offsetY+defaultOffset or 0,
@@ -426,7 +435,6 @@ end
 
 
 
-
 SLASH_COMMANDS['/mmplace'] = function()
 	MM.placeIcon()
 end
@@ -434,6 +442,31 @@ end
 SLASH_COMMANDS['/mmremove'] = function()
 	MM.removeClosestIcon()
 end
+
+
+
+-- QUICK MENU PLACE
+function MM.placeQuickMenuIcon()
+	local _, x, y, z = GetUnitRawWorldPosition('player')
+	local currentSelections = MM.Settings.quickSelections
+	local icon = {
+		x = x or 0,
+		y = y or 0,
+		z = z or 0,
+		bgTexture = currentSelections.texture,
+		colour = currentSelections.rgba or {1,1,1,1},
+		text = currentSelections.text or "",
+		size = currentSelections.size or 1, -- meters
+	}
+	print("Placing Icon")
+	MM.createIcon(icon)
+
+	local zoneString = MM.compressLoaded()
+	MM.saveIcons(zoneString)
+end
+
+
+
 
 
 
@@ -492,10 +525,12 @@ function MM.playerActivated()
 	MM.updateMarkerPositions()
 end
 
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_TOGGLE_QUICK_MENU", "Toggle Quick Menu Visiblity")
+function MM.toggleQuickMenu()
+	M0RMarkerPlaceToplevel:SetHidden(not M0RMarkerPlaceToplevel:IsHidden())
+end
 
-
-
-
+SLASH_COMMANDS['/mmmenu'] = MM.toggleQuickMenu
 
 
 
@@ -516,11 +551,14 @@ end
 --  Initialize Function --
 -------------------------------------------------------------------------------------------------
 function MM:Initialize()
+
+	MM.initUtil3D()
+
 	-- Addon Settings Menu
 	MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars)
 
 	if LibFilteredChatPanel then
-		MM.filter = LibFilteredChatPanel:CreateFilter("M0RMarkers", "/esoui/art/crowncrates/psijic/crowncrate_psijic_back.dds", {0, 0.8, 0.8}, false)
+		MM.filter = LibFilteredChatPanel:CreateFilter("M0RMarkers", "/M0RMarkers/textures/chevron.dds", {0, 0.8, 0.8}, false)
 	end
 
 
