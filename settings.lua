@@ -1,6 +1,7 @@
 local MM = M0RMarkers
 MM.Settings = {}
 local settings = MM.Settings
+local print = MM.print
 
 function settings.createSettings()
 	--local vars = AD.vars
@@ -19,7 +20,7 @@ function settings.createSettings()
 
 
 	settings.currentSelections = {
-		depth=false,
+		text = "",
 		offsetY=0,
 		texture=textureChoices[1],
 		floating=true,
@@ -28,6 +29,39 @@ function settings.createSettings()
 	}
 	
 	local currentSelections = settings.currentSelections
+
+
+
+	local colourPresets = {
+		"|cffffffWhite|r", -- 1,1,1,1
+		"|c0000ffBlue|r", -- 0, 0, 1, 1
+		"|c00ff00Green|r", -- 0, 1, 0, 1
+		"|cff8000Orange|r", -- 1, 0.5, 0, 1
+		"|cff00e6Pink|r", -- 1, 0, 0.9, 1
+		"|cff0000Red|r", -- 1, 0, 0, 1
+		"|cffcc00Yellow|r", -- 1, 0.8, 0, 1
+		"|c00ffa6Lime Green|r", -- 0, 1, 0.65, 1
+	}
+
+	local colourLookup = {
+		["|cffffffWhite|r"] = {1, 1, 1, 1},
+		["|c0000ffBlue|r"] = {0, 0, 1, 1},
+		["|c00ff00Green|r"] = {0, 1, 0, 1},
+		["|cff8000Orange|r"] = {1, 0.5, 0, 1},
+		["|cff00e6Pink|r"] = {1, 0, 0.9, 1},
+		["|cff0000Red|r"] = {1, 0, 0, 1},
+		["|cffcc00Yellow|r"] = {1, 0.8, 0, 1},
+		["|c00ffa6Lime Green|r"] = {0, 1, 0.65, 1},
+
+		["ffffff"] = "|cffffffWhite|r",
+		["0000ff"] = "|c0000ffBlue|r",
+		["00ff00"] = "|c00ff00Green|r",
+		["ff8000"] = "|cff8000Orange|r",
+		["ff00e6"] = "|cff00e6Pink|r",
+		["ff0000"] = "|cff0000Red|r",
+		["ffcc00"] = "|cffcc00Yellow|r",
+		["00ffa6"] = "|c00ffa6Lime Green|r",
+	}
 
 
 	
@@ -39,7 +73,9 @@ function settings.createSettings()
 	local displayChoices = {}
 	local textureSearchup = {}
 	for i,v in pairs(textureChoices) do
-		displayChoices[#displayChoices+1] = "|t32:32:"..v.."|t"
+		local textureName = string.match(v:reverse(), "sdd.(.-)/"):reverse() or "" --string.match(v, "/(.-).dds")
+
+		displayChoices[#displayChoices+1] = "|t24:24:"..v.."|t ("..textureName..")"
 		textureSearchup[displayChoices[#displayChoices]] = v
 		textureSearchup[v] = displayChoices[#displayChoices]
 	end
@@ -50,31 +86,11 @@ function settings.createSettings()
 	local exportString = ""
 	local importString = ""
 
+	local elmsImportString = ""
+
 
 	local optionsTable = {
-		{
-			type = "description",
-			title = "|cFFD700[M0R Markers]|r",
-			text = "Hello, and thank you for using M0R Markers! If you have any errors or complaints, please reach out to me either on discord (@m0r) or at the link below!",
-			width = "full",
-		},
-		{ -- TODO: SWAP THIS TO BE M0R MARKERS, NOT ARTAEUM
-			type = "button",
-			name = "Contact Me\n(QR Code)",
-			tooltip = "Click this button to be directed to a QR Code which opens the ArtaeumGroupTool esoui page where you can reach out to me!",
-			width = "half",
-			func = function() RequestOpenUnsafeURL("https://m0rgaming.github.io/create-qr-code/?url=https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
-		},
-		{
-			type = "button",
-			name = "Contact Me\n(Direct Link)",
-			tooltip = "Click this button to be directed to the ArtaeumGroupTool esoui page where you can reach out to me!",
-			width = "half",
-			func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
-		},
-		{
-			type = "divider",
-		},
+		
 
 		{
 			type = "description",
@@ -83,14 +99,7 @@ function settings.createSettings()
 		},
 
 		-- PLACE PRESET MARKERS HERE
-		{
-			type = "checkbox",
-			name = "Enable Depth Buffer",
-			tooltip = "",
-			getFunc = function() return currentSelections.depth end,
-			setFunc = function(value) currentSelections.depth = value end,
-		},
-		
+		--[[
 		{
 			type = "slider",
 			name = "Vertical Offset",
@@ -101,6 +110,7 @@ function settings.createSettings()
 			getFunc = function() return currentSelections.offsetY end,
 			setFunc = function(value) currentSelections.offsetY = value end,
 		},
+		--]]
 
 		{
 			type = "dropdown",
@@ -110,6 +120,7 @@ function settings.createSettings()
 			getFunc = function() return textureSearchup[currentSelections.texture] end,
 			setFunc = function(value) currentSelections.texture = textureSearchup[value] end,
 		},
+		--[[
 		{
 			type = "editbox",
 			name = "[Advanced] Custom Texture",
@@ -117,6 +128,7 @@ function settings.createSettings()
 			getFunc = function() return currentSelections.texture end,
 			setFunc = function(value) currentSelections.texture = value end,
 		},
+		--]]
 		{
 			type = "checkbox",
 			name = "Facing User",
@@ -130,18 +142,20 @@ function settings.createSettings()
 	        type = "colorpicker",
 	        name = "Colour",
 	        tooltip = "",
+	        width = "half",
 	        getFunc = function() return unpack(currentSelections.rgba) end,
 	        setFunc = function(r,g,b,a) currentSelections.rgba = {r,g,b,a} end,
 	    },
-	    --[[
+	    
 		{
 			type = "dropdown",
 			name = "Preset Colours",
-			--choices = ,
-			getFunc = function() return currentSelections.rgba end,
-			setFunc = function(value) currentSelections.rgba = value end,
+	        width = "half",
+			choices = colourPresets,
+			getFunc = function() return colourLookup[ZO_ColorDef.FloatsToHex(unpack(currentSelections.rgba))] end,
+			setFunc = function(value) currentSelections.rgba = colourLookup[value] end,
 		},
-		--]]
+		
 		{
 	        type = "slider",
 	        name = "Size",
@@ -152,6 +166,16 @@ function settings.createSettings()
 	        getFunc = function() return currentSelections.size end,
 	        setFunc = function(value) currentSelections.size = value end,
 	    },
+
+		{
+			type = "editbox",
+			name = "Text",
+			tooltip = "",
+			width = "full",
+			isMultiline = true,
+			getFunc = function() return currentSelections.text end,
+    		setFunc = function(text) currentSelections.text = text end,
+		},
 	    {
 			type = "button",
 			name = "Place Icon",
@@ -229,6 +253,9 @@ function settings.createSettings()
 			width = "half",
 			func = function() MM.importIcons(importString, true); exportString = importString; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end end,
 		},
+
+
+		
 		{
 			type = "button",
 			name = "Empty Zone",
@@ -238,7 +265,85 @@ function settings.createSettings()
 			func = function() MM.emptyCurrentZone(); exportString = ""; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end end,
 		},
 
+
+		{
+			type = "divider",
+		},
+		
+		{
+			type = "editbox",
+			name = "Elms Markers Import",
+			tooltip = "",
+			width = "full",
+			isMultiline = true,
+			maxChars = 10000,
+			isExtraWide = true,
+			getFunc = function() return elmsImportString end,
+    		setFunc = function(text) elmsImportString = text end,
+		},
+
+		{
+			type = "button",
+			name = "Append to Profile",
+			tooltip = "",
+			width = "half",
+			func = function()
+				local amountLoaded, zoneString = MM.parseElmsString(elmsImportString)
+				print("Parsed ".. tostring(amountLoaded).. " markers.")
+				exportString = zoneString
+				if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+			end,
+		},
+		{
+			type = "button",
+			name = "Overwrite Profile",
+			tooltip = "",
+			width = "half",
+			func = function()
+				MM.emptyCurrentZone()
+				local amountLoaded, zoneString = MM.parseElmsString(elmsImportString)
+				print("Parsed ".. tostring(amountLoaded).. " markers.")
+				exportString = zoneString
+				if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+			end,
+		},
+
 	}
+
+
+	if IsConsoleUI() then
+		local toInsert = {
+			{
+				type = "description",
+				title = "|cFFD700[M0R Markers]|r",
+				text = "Hello, and thank you for using M0R Markers! If you have any errors or complaints, please reach out to me either on discord (@m0r) or at the link below!",
+				width = "full",
+			},
+			{ -- TODO: SWAP THIS TO BE M0R MARKERS, NOT ARTAEUM
+				type = "button",
+				name = "Contact Me \n(QR Code)",
+				tooltip = "Click this button to be directed to a QR Code which opens the ArtaeumGroupTool esoui page where you can reach out to me!",
+				width = "half",
+				func = function() RequestOpenUnsafeURL("https://m0rgaming.github.io/create-qr-code/?url=https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
+			},
+			{
+				type = "button",
+				name = "Contact Me \n(Direct Link)",
+				tooltip = "Click this button to be directed to the ArtaeumGroupTool esoui page where you can reach out to me!",
+				width = "half",
+				func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
+			},
+			{
+				type = "divider",
+			},
+		}
+
+		local mergedTables = {}
+
+		ZO_CombineNumericallyIndexedTables(mergedTables, toInsert, optionsTable)
+
+		optionsTable = mergedTables
+	end
 
 
 	local panel = LibAddonMenu2:RegisterAddonPanel(panelName, panelData)

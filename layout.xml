@@ -1,22 +1,21 @@
 <GuiXml>
     <Controls>
         <TopLevelControl name="M0RMarkersToplevel" layer="0">
-            <Controls>
-                <Control name="$(parent)Camera" />
-            </Controls>
         </TopLevelControl>
 
-        <Control name="M0RMarkersTemplate" virtual="true" space="WORLD">
+        <Control name="M0RMarkersTemplate" virtual="true">
             <Dimensions x="100" y="100" />
-            <Anchor point="CENTER" relativePoint="CENTER" relativeTo="GuiRoot"/>
+            <Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="0"/>
             <Controls>
                 <Texture name="$(parent)Background" hidden="true">
                     <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
                     <Dimensions x="100" y="100" />
                 </Texture>
+                <!--
                 <Texture name="$(parent)Icon" hidden="true">
                     <AnchorFill />
                 </Texture>
+                -->
                 <Label name="$(parent)Text" font="$(GAMEPAD_BOLD_FONT)|$(GP_20)|thick-outline" horizontalAlignment="1" verticalAlignment="1" hidden="true" scale="4">
                     <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)" offsetY="15"/>
                     <Dimensions x="200" y="100" />

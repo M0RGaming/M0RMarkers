@@ -60,6 +60,7 @@ MM.builtInTextureList = {
 	"M0RMarkers/textures/diamond.dds",
 	"M0RMarkers/textures/octagon.dds",
 	"M0RMarkers/textures/chevron.dds",
+	"M0RMarkers/textures/blank.dds",
 
 
 	"esoui/art/stats/alliancebadge_aldmeri.dds",
@@ -145,7 +146,9 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 		local y = v.y-minY
 		local z = v.z-minZ
 
-		currentConcat[#currentConcat+1] = string.format("%x:%x:%x:%d", x,y,z,(v.text))
+		local escapedText = string.gsub(v.text, "\n", "\\n")
+
+		currentConcat[#currentConcat+1] = string.format("%x:%x:%x:%s", x,y,z,escapedText)
 	end
 
 	local secondPart = table.concat(currentConcat, ",") or ""
@@ -214,14 +217,17 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 		local cX = tonumber(cXH,16)+minX
 		local cY = tonumber(cYH,16)+minY
 		local cZ = tonumber(cZH,16)+minZ
+
+		local unescapedText = ""
+		if cText then unescapedText = string.gsub(cText, "\\n", "\n") end
+
 		icons[#icons+1] = {
 			x=cX,
 			y=cY,
 			z=cZ,
-			text=cText,
+			text=unescapedText,
 			size = 1, -- to be overwritten
 			bgTexture = nil,
-			iconTexture = nil,
 			colour = {1,1,1,1}, -- to be overwritten
 		}
 	end
@@ -371,7 +377,7 @@ Profiles = {
 
 
 
-local defaultOffset = 10
+local defaultOffset = 0 -- 10
 
 function MM.placeIcon()
 	local _, x, y, z = GetUnitRawWorldPosition('player')
@@ -385,7 +391,7 @@ function MM.placeIcon()
 		bgTexture = currentSelections.texture,
 		orientation = orientation,
 		colour = currentSelections.rgba or {1,1,1,1},
-		depthBuffer = currentSelections.depth or false,
+		text = currentSelections.text or "",
 		size = currentSelections.size or 1, -- meters
 	}
 	MM.createIcon(icon)
@@ -398,15 +404,24 @@ function MM.saveIcons(zoneString)
 
 	local currentZone = GetUnitRawWorldPosition('player')
 	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
+	local strings = {}
+	if zoneString == nil then zoneString = "" end
+	for i=1,10 do -- split into 1900 length strings
+		local currentString = string.sub(zoneString, (i-1)*1900+1, i*1900)
+		if (currentString == "") or (currentString == nil) then
+			break
+		else
+			strings[#strings+1] = currentString
+		end
+	end
+	if zoneString == "" then zoneString = nil end
 	if MM.vars.Profiles[currentZone] then
-		MM.vars.Profiles[currentZone][currentProfileName] = zoneString
+		MM.vars.Profiles[currentZone][currentProfileName] = strings
 	else
 		MM.vars.Profiles[currentZone] = {
-			[currentProfileName] = zoneString
+			[currentProfileName] = strings
 		}
 	end
-
-	MM.updateMarkerPositions()
 end
 
 
@@ -432,10 +447,13 @@ function MM.loadZone(currentZone)
 	local zoneString = nil
 	print("Loading zone: "..tostring(currentZone).." with profile name: "..currentProfileName)
 	if MM.vars.Profiles[currentZone] then
-		zoneString = MM.vars.Profiles[currentZone][currentProfileName]
+		local zoneStrings = MM.vars.Profiles[currentZone][currentProfileName]
+		if zoneStrings then
+			zoneString = table.concat(zoneStrings, "")
+		end
 	end
 	print(tostring(zoneString))
-	if zoneString then
+	if zoneString and zoneString ~= "" then
 		MM.decompressString(zoneString)
 	end
 end
@@ -457,7 +475,7 @@ end
 
 function MM.emptyCurrentZone()
 	MM.unloadEverything()
-	MM.saveIcons()
+	MM.saveIcons("")
 end
 
 

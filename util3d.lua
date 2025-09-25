@@ -8,6 +8,8 @@ loadedMarkers.ground = {}
 local facingIcons = loadedMarkers.facing
 local groundIcons = loadedMarkers.ground
 
+local print = MM.print
+
 --[[
 
 marker = {
@@ -54,7 +56,7 @@ local controlPool = ZO_ControlPool:New("M0RMarkersTemplate", M0RMarkersToplevel)
 local currentlyUpdating = false
 
 
-local function updateMarkers() -- IF CRUTCH OR CODES ARE LOADED, USE THEM INSTEAD. THIS IS FALLBACK (for now).
+local function updateMarkers()
 	if #facingIcons == 0 then
 		EVENT_MANAGER:UnregisterForUpdate("M0RMarkersUpdateTick")
 		currentlyUpdating = false
@@ -68,15 +70,15 @@ local function updateMarkers() -- IF CRUTCH OR CODES ARE LOADED, USE THEM INSTEA
 
 	for i,v in pairs(facingIcons) do
 		v.control:SetTransformRotation(pitch,yaw,0)
-		--[[ -- might not be needed
-		local distance = zo_floor(zo_distance3D(cX, cY, cZ, v.x, v.y, v.z))
-		v.control:SetDrawLevel(-distance)
-		--]]
 	end
 end
 
 function MM.updateMarkerPositions()
 	local sx, sy, sz = GuiRender3DPositionToWorldPosition(0,0,0)
+	print("\nUpdating Markers, Origin:")
+	print(sx)
+	print(sy)
+	print(sz)
 	for i,v in pairs(facingIcons) do
 		local x = (v.x - sx)/100
 		local y = v.y/100
@@ -87,6 +89,7 @@ function MM.updateMarkerPositions()
 		local x = (v.x - sx)/100
 		local y = v.y/100
 		local z = (v.z - sz)/100
+		print("Placing icon: "..v.bgTexture.." at: "..x..", "..y..", "..z)
 		v.control:SetTransformOffset(x,y,z)
 	end
 end
@@ -96,11 +99,14 @@ end
 local function createControl(icon)
 	local control, key = controlPool:AcquireObject()
 	control:SetHidden(false)
+	control:SetSpace(SPACE_WORLD)
 	control:SetScale(icon.size/100)
 	control.bgLayer = control:GetNamedChild("Background")
-	control.iconLayer = control:GetNamedChild("Icon")
+	--control.iconLayer = control:GetNamedChild("Icon")
 	control.textLayer = control:GetNamedChild("Text")
 	--control:SetColor(1,1,1,1)
+	--control:SetTransformNormalizedOriginPoint(0.5,0.5)
+
 	icon.control = control
 	icon.key = key
 	return icon
@@ -109,8 +115,11 @@ end
 local function destroyControl(icon)
 	icon.control:SetHidden(true)
 	icon.control.bgLayer:SetHidden(true)
-	icon.control.iconLayer:SetHidden(true)
+	icon.control.textLayer:SetText("")
 	icon.control.textLayer:SetHidden(true)
+	--icon.control:SetTransformOffset(0,0,0)
+	--icon.control:SetScale(1)
+	--icon.control:SetSpace(SPACE_INTERFACE)
 
 	controlPool:ReleaseObject(icon.key)
 	icon.control = nil
@@ -134,15 +143,20 @@ function MM.createIcon(icon)
 		icon.control.bgLayer:SetTexture(icon.bgTexture)
 		icon.control.bgLayer:SetColor(unpack(icon.colour))
 	end
+	--[[
 	if icon.iconTexture then
 		icon.control.iconLayer:SetHidden(false)
 		icon.control.iconLayer:SetTexture(icon.iconTexture)
 	end
+	--]]
 	if icon.text then
 		icon.control.textLayer:SetHidden(false)
 		icon.control.textLayer:SetText(icon.text)
 	end
 
+
+	local x,y,z = WorldPositionToGuiRender3DPosition(icon.x, icon.y, icon.z)
+	icon.control:SetTransformOffset(x,y,z)
 
 
     local orientation = icon.orientation
