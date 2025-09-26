@@ -55,19 +55,22 @@ end
 
 settings.currentSelections = {
 	text = "",
-	offsetY=0,
+	offsetYPercent=50,
 	texture=textureChoices[1],
 	floating=true,
 	rgba={1,1,1,1},
 	size=1,
 	yaw=0,
 	pitch=-90,
+	offsetX = 0,
+	offsetY = 0,
+	offsetZ = 0,
 }
 
 
 settings.quickSelections = { -- seperate to avoid needing to update the menu (also now can remove it when porting to console)
 	text = "",
-	offsetY=0,
+	offsetY=50,
 	texture=textureChoices[1],
 	floating=true,
 	rgba={1,1,1,1},
@@ -167,14 +170,14 @@ function settings.createSettings()
 		
 		{
 	        type = "slider",
-	        name = "Size",
+	        name = "Size (cm)",
 	        tooltip = "",
-	        min = 0.1,
-	        max = 10,
-	        step = 0.1,	--(optional)
+	        min = 10,
+	        max = 1000,
+	        step = 10,	--(optional)
 	        width = "half",
-	        getFunc = function() return currentSelections.size end,
-	        setFunc = function(value) currentSelections.size = value end,
+	        getFunc = function() return currentSelections.size*100 end,
+	        setFunc = function(value) currentSelections.size = value/100 end,
 	    },
 
 		{
@@ -216,8 +219,8 @@ function settings.createSettings()
 			        type = "slider",
 			        name = "Pitch",
 			        tooltip = "",
-			        min = 0,
-			        max = 180,
+			        min = -90,
+			        max = 90,
 			        step = 1,	--(optional)
 			        width = "half",
 			        getFunc = function() return currentSelections.pitch end,
@@ -237,11 +240,26 @@ function settings.createSettings()
 					min = -100,
 					max = 100,
 					step = 1,
-					getFunc = function() return currentSelections.offsetY end,
-					setFunc = function(value) currentSelections.offsetY = value end,
+					getFunc = function() return currentSelections.offsetYPercent end,
+					setFunc = function(value) currentSelections.offsetYPercent = value end,
 				},
 			}
 		},
+
+	    {
+			type = "button",
+			name = "|cFF5555Remove Icon|r",
+			tooltip = "",
+			width = "half",
+			func = function()
+				MM.ShowDialogue("Warning: Destructive Action",
+					"Are you sure you would like to remove the closest marker on the ground?",
+					"This is a destructive action and cannot be undone.",
+					MM.removeClosestIcon
+				)
+			end
+		},
+
 	    {
 			type = "button",
 			name = "Place Icon",
@@ -250,13 +268,6 @@ function settings.createSettings()
 			func = MM.placeIcon,
 		},
 
-	    {
-			type = "button",
-			name = "Remove Icon",
-			tooltip = "",
-			width = "half",
-			func = MM.removeClosestIcon,
-		},
 
 
 		{
@@ -276,11 +287,25 @@ function settings.createSettings()
     		setFunc = function(text) end,
 		},
 
+
+		{
+			type = "button",
+			name = "|cFF5555Empty Zone|r",
+			tooltip = "",
+			warning = "This will delete all markers in the current zone.",
+			width = "half",
+			func = function()
+				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to empty the current zone?", "This is a destructive action and cannot be undone.", function()
+					MM.emptyCurrentZone(); exportString = ""; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+				end)
+			end,
+		},
+
 		{
 			type = "button",
 			name = "Create Export String",
 			tooltip = "",
-			width = "full",
+			width = "half",
 			func = function() exportString = MM.compressLoaded(); if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end end,
 		},
 
@@ -314,22 +339,18 @@ function settings.createSettings()
 		},
 		{
 			type = "button",
-			name = "Overwrite Profile",
+			name = "|cFF5555Overwrite Profile|r",
 			tooltip = "",
 			width = "half",
-			func = function() MM.importIcons(importString, true); exportString = importString; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end end,
+			func = function()
+				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to overwrite the current profile?", "This is a destructive action and cannot be undone.", function()
+					MM.importIcons(importString, true); exportString = importString; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+				end)
+			end,
 		},
 
 
 		
-		{
-			type = "button",
-			name = "Empty Zone",
-			tooltip = "",
-			warning = "This will delete all markers in the current zone.",
-			width = "full",
-			func = function() MM.emptyCurrentZone(); exportString = ""; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end end,
-		},
 
 
 		{
@@ -356,21 +377,25 @@ function settings.createSettings()
 			func = function()
 				local amountLoaded, zoneString = MM.parseElmsString(elmsImportString)
 				print("Parsed ".. tostring(amountLoaded).. " markers.")
+				--MM.ShowDialogue("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Elms!", "", function() end)
 				exportString = zoneString
 				if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 			end,
 		},
 		{
 			type = "button",
-			name = "Overwrite Profile",
+			name = "|cFF5555Overwrite Profile|r",
 			tooltip = "",
 			width = "half",
 			func = function()
-				MM.emptyCurrentZone()
-				local amountLoaded, zoneString = MM.parseElmsString(elmsImportString)
-				print("Parsed ".. tostring(amountLoaded).. " markers.")
-				exportString = zoneString
-				if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to overwrite the current profile?", "This is a destructive action and cannot be undone.", function()
+					MM.emptyCurrentZone()
+					local amountLoaded, zoneString = MM.parseElmsString(elmsImportString)
+					print("Parsed ".. tostring(amountLoaded).. " markers.")
+					--MM.ShowDialogue("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Elms!", "", function() end)
+					exportString = zoneString
+					if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+				end)
 			end,
 		},
 

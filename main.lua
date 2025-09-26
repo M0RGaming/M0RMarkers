@@ -147,7 +147,20 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 		local y = v.y-minY
 		local z = v.z-minZ
 
+		--[[
+			Private use areas:
+			e000 = :
+			e001 = ,
+			e002 = ]
+			e003 = ;
+			e004 = >
+		]]
 		local escapedText = string.gsub(v.text, "\n", "\\n")
+		escapedText = string.gsub(escapedText, ":", "") -- e000
+		escapedText = string.gsub(escapedText, ",", "") -- e001
+		escapedText = string.gsub(escapedText, "]", "") -- e002
+		escapedText = string.gsub(escapedText, ";", "") -- e003
+		escapedText = string.gsub(escapedText, ">", "") -- e004
 
 		currentConcat[#currentConcat+1] = string.format("%x:%x:%x:%s", x,y,z,escapedText)
 	end
@@ -220,7 +233,23 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 		local cZ = tonumber(cZH,16)+minZ
 
 		local unescapedText = ""
-		if cText then unescapedText = string.gsub(cText, "\\n", "\n") end
+		if cText then
+			unescapedText = string.gsub(cText, "\\n", "\n")
+
+			--[[
+				Private use areas:
+				e000 = :
+				e001 = ,
+				e002 = ]
+				e003 = ;
+				e004 = >
+			]]
+			unescapedText = string.gsub(unescapedText, "", ":") -- e000
+			unescapedText = string.gsub(unescapedText, "", ",") -- e001
+			unescapedText = string.gsub(unescapedText, "", "]") -- e002
+			unescapedText = string.gsub(unescapedText, "", ";") -- e003
+			unescapedText = string.gsub(unescapedText, "", ">") -- e004
+		end
 
 		icons[#icons+1] = {
 			x=cX,
@@ -393,9 +422,15 @@ function MM.placeIcon()
 			orientation[2] = zo_rad(currentSelections.yaw)
 		end
 	end
+
+	local offsetY = 0
+	if currentSelections.offsetYPercent and currentSelections.size then
+		offsetY = currentSelections.offsetYPercent*currentSelections.size
+	end
+
 	local icon = {
 		x = x or 0,
-		y = y+currentSelections.offsetY+defaultOffset or 0,
+		y = y+offsetY+defaultOffset or 0,
 		z = z or 0,
 		bgTexture = currentSelections.texture,
 		orientation = orientation,
@@ -423,7 +458,6 @@ function MM.saveIcons(zoneString)
 			strings[#strings+1] = currentString
 		end
 	end
-	if zoneString == "" then zoneString = nil end
 	if MM.vars.Profiles[currentZone] then
 		MM.vars.Profiles[currentZone][currentProfileName] = strings
 	else
@@ -449,9 +483,13 @@ end
 function MM.placeQuickMenuIcon()
 	local _, x, y, z = GetUnitRawWorldPosition('player')
 	local currentSelections = MM.Settings.quickSelections
+	local offset = 0
+	if currentSelections.offsetY and currentSelections.size then
+		offset = currentSelections.offsetY*currentSelections.size
+	end
 	local icon = {
 		x = x or 0,
-		y = y or 0,
+		y = y+offset or 0,
 		z = z or 0,
 		bgTexture = currentSelections.texture,
 		colour = currentSelections.rgba or {1,1,1,1},

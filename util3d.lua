@@ -209,7 +209,7 @@ function MM.removeClosestIcon()
 	end
 	
 	local zoneString = MM.compressLoaded()
-	MM.saveIcons() -- Update Saved icons
+	MM.saveIcons(zoneString) -- Update Saved icons
 end
 
 
