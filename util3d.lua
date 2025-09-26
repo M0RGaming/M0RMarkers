@@ -54,6 +54,21 @@ local controlPool = nil
 
 function MM.initUtil3D()
 	controlPool = ZO_ControlPool:New("M0RMarkersTemplate", M0RMarkersToplevel) -- place in init func
+
+
+	-- add fragment to HUD, UI, GAME_MENU_SCENE
+	local iconFragment = ZO_HUDFadeSceneFragment:New(M0RMarkersToplevel, DEFAULT_SCENE_TRANSITION_TIME, 0)
+	HUD_SCENE:AddFragment(iconFragment)
+	HUD_UI_SCENE:AddFragment(iconFragment)
+	GAME_MENU_SCENE:AddFragment(iconFragment)
+
+	local function sceneChanged(scene, oldState, newState)
+		if scene.name ~= "hud" and scene.name ~= "hudui" and newState == "showing" then
+			--print("No longer showing hud/hudui")
+			M0RMarkerPlaceToplevel:SetHidden(true)
+		end
+	end
+	SCENE_MANAGER:RegisterCallback("SceneStateChanged", sceneChanged)
 end
 
 
@@ -94,7 +109,7 @@ function MM.updateMarkerPositions()
 		local x = (v.x - sx)/100
 		local y = v.y/100
 		local z = (v.z - sz)/100
-		print("Placing icon: "..v.bgTexture.." at: "..x..", "..y..", "..z)
+		--print("Placing icon: "..v.bgTexture.." at: "..x..", "..y..", "..z)
 		v.control:SetTransformOffset(x,y,z)
 	end
 end

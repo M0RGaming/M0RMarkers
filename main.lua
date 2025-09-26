@@ -527,6 +527,8 @@ function MM.loadZone(currentZone)
 	if zoneString and zoneString ~= "" then
 		MM.decompressString(zoneString)
 	end
+
+	return zoneString
 end
 
 
@@ -560,6 +562,7 @@ function MM.playerActivated()
 		MM.unloadEverything()
 		MM.loadZone(currentZone)
 	end
+	MM.updateProfileDropdown(true)
 	MM.updateMarkerPositions()
 end
 
@@ -569,6 +572,93 @@ function MM.toggleQuickMenu()
 end
 
 SLASH_COMMANDS['/mmmenu'] = MM.toggleQuickMenu
+
+
+
+
+
+
+
+
+
+
+
+function MM.loadProfile(profileName)
+	local currentZone = GetUnitRawWorldPosition('player')
+	MM.vars.loadedProfile[currentZone] = profileName
+	print("Swapping to profile: "..tostring(profileName).." in zone: "..tostring(currentZone))
+	MM.unloadEverything()
+	local zoneString = MM.loadZone(currentZone)
+	if zoneString == nil then
+		MM.saveIcons("")
+	end
+	if M0RMarkersProfileDropdown then
+		M0RMarkersProfileDropdown:UpdateValue()
+	end
+end
+
+function MM.deleteCurrentProfile()
+	local currentZone = GetUnitRawWorldPosition('player')
+	local currentProfileName = MM.vars.loadedProfile[currentZone]
+	if currentProfileName == nil then -- this should never happen / should only happen if profile = default
+		d("Failed to find a profile to delete/Can't delete the default profile.")
+		return
+	end
+	if MM.vars.Profiles[currentZone] then
+		MM.vars.Profiles[currentZone][currentProfileName] = nil
+	end
+	print("Deleted profile: "..tostring(currentProfileName).." in zone: "..tostring(currentZone))
+	MM.vars.loadedProfile[currentZone] = nil
+	MM.unloadEverything()
+	MM.loadZone(currentZone)
+	if M0RMarkersProfileDropdown then
+		M0RMarkersProfileDropdown:UpdateValue()
+	end
+end
+
+function MM.getCurrentZoneProfiles()
+	local currentZone = GetUnitRawWorldPosition('player')
+	local profiles = {}
+	if MM.vars.Profiles[currentZone] then
+	
+		if not MM.vars.Profiles[currentZone]["Default"] then
+			profiles[#profiles+1] = "Default"
+		end
+
+		for i,v in pairs(MM.vars.Profiles[currentZone]) do
+			profiles[#profiles+1] = i
+		end
+	end
+	return profiles
+end
+
+
+function MM.updateProfileDropdown(refresh)
+	if M0RMarkersProfileDropdown then
+		local choices = MM.getCurrentZoneProfiles()
+		M0RMarkersProfileDropdown:UpdateChoices(choices)
+		if refresh then
+			M0RMarkersProfileDropdown:UpdateValue()
+		end
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

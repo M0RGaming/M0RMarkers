@@ -125,9 +125,21 @@ function settings.createSettings()
 
 	local elmsImportString = ""
 
+	MM.currentLoadProfileName = "Default"
+	local currentLoadProfileName = MM.currentLoadProfileName
+
 
 	local optionsTable = {
 		
+		{
+			type = "button",
+			name = "|cFF5555Test|r",
+			tooltip = "",
+			width = "half",
+			func = function()
+				CHAT_SYSTEM:AddTextEntry("test")
+			end
+		},
 
 		{
 			type = "description",
@@ -269,6 +281,78 @@ function settings.createSettings()
 		},
 
 
+
+		{
+			type = "divider",
+		},
+
+
+
+		{
+			type = "submenu",
+			name = "[Profiles]",
+			tooltip = "",
+			controls = {
+				{
+					type = "dropdown",
+					name = "Profile Selection",
+					width = "half",
+					scrollable = 10,
+					reference = "M0RMarkersProfileDropdown",
+					choices = {},
+					getFunc = function()
+						MM.updateProfileDropdown(false)
+						local currentZone = GetUnitRawWorldPosition('player')
+						return MM.vars.loadedProfile[currentZone] or "Default"
+					end,
+					setFunc = function(value) currentLoadProfileName = value; if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end end,
+				},
+
+				{
+					type = "editbox",
+					name = "New Profile Name",
+					tooltip = "",
+					width = "half",
+					isMultiline = false,
+					maxChars = 2000,
+					reference = "M0RMarkersProfileNameEdit",
+					isExtraWide = false,
+					getFunc = function() return currentLoadProfileName or "Default" end,
+					setFunc = function(text) currentLoadProfileName = text; if M0RMarkersProfileDropdown then M0RMarkersProfileDropdown:UpdateValue() end end,
+				},
+
+
+
+				{
+					type = "button",
+					name = "|cFF5555Delete Profile|r",
+					tooltip = "",
+					warning = "This will delete all markers in the current profile.",
+					width = "half",
+					func = function()
+						MM.ShowDialogue("Warning: Destructive Action",
+							"Are you sure you would like to empty the current loaded profile?",
+							"This is a destructive action and cannot be undone.", function()
+							MM.deleteCurrentProfile(); 
+						end)
+					end,
+				},
+
+
+				{
+					type = "button",
+					name = "Load/Create Profile",
+					tooltip = "",
+					width = "half",
+					func = function()
+						MM.loadProfile(currentLoadProfileName or "Default")
+					end,
+				},
+
+
+				-- MM.loadProfile(value)
+			}
+		},
 
 		{
 			type = "divider",
