@@ -69,8 +69,8 @@ local function updateMarkers()
 	end
 
 	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
-    local yaw = zo_atan2(fX, fZ) - math.pi
-    local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
+	local yaw = zo_atan2(fX, fZ) - math.pi
+	local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
 
 
 	for i,v in pairs(facingIcons) do
@@ -166,7 +166,7 @@ function MM.createIcon(icon)
 	icon.control:SetTransformOffset(x,y,z)
 
 
-    local orientation = icon.orientation
+	local orientation = icon.orientation
 
 	if orientation then -- ground icon
 		icon.control:SetTransformRotation(orientation[1], orientation[2], 0)

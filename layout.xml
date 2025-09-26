@@ -203,37 +203,37 @@
 				<!--
 
 				<Control name="$(parent)_Marker_Dropdown_Panel">
-		          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Title" offsetX="4" offsetY="2" />
+				  <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Title" offsetX="4" offsetY="2" />
 				  <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)_Title" offsetX="-4" offsetY="150" />
-		          <Controls>
-		           <Control name="$(parent)_Marker_Dropdown" inherits="ZO_ScrollableComboBox" mouseEnabled="true" tier="HIGH" >
-		              <Dimensions x="200" y="29" />
-		              <Anchor point="CENTER" relativePoint="CENTER" offsetY="-25" />
-		            </Control>
-		            <Texture name="$(parent)_Marker_Icon">
-		              <Anchor point="BOTTOM" relativeTo="$(parent)" relativePoint="BOTTOM" offsetY="0" />
-		              <Dimensions x="80" y="80"/>
-		            </Texture>
-		          </Controls>
-		        </Control>
-		        <Control name="$(parent)_Button_Group">
-		          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Marker_Dropdown_Panel"/>
+				  <Controls>
+				   <Control name="$(parent)_Marker_Dropdown" inherits="ZO_ScrollableComboBox" mouseEnabled="true" tier="HIGH" >
+					  <Dimensions x="200" y="29" />
+					  <Anchor point="CENTER" relativePoint="CENTER" offsetY="-25" />
+					</Control>
+					<Texture name="$(parent)_Marker_Icon">
+					  <Anchor point="BOTTOM" relativeTo="$(parent)" relativePoint="BOTTOM" offsetY="0" />
+					  <Dimensions x="80" y="80"/>
+					</Texture>
+				  </Controls>
+				</Control>
+				<Control name="$(parent)_Button_Group">
+				  <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Marker_Dropdown_Panel"/>
 							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" offsetX="-8" offsetY="-8" />
-		          <Controls>
-		            <Button name="$(parent)_Place_Button" text="Place" inherits="ZO_DefaultButton" >
+				  <Controls>
+					<Button name="$(parent)_Place_Button" text="Place" inherits="ZO_DefaultButton" >
 									<Anchor point="LEFT" relativePoint="LEFT" offsetY="-26" offsetX="-4" />
-		            </Button>
-		            <Button name="$(parent)_Place_Publish_Button" text="Place, Publish" inherits="ZO_DefaultButton">
+					</Button>
+					<Button name="$(parent)_Place_Publish_Button" text="Place, Publish" inherits="ZO_DefaultButton">
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Place_Button" offsetY="6"/>
-		            </Button>
-		            <Button name="$(parent)_Remove_Button" text="Remove" inherits="ZO_DefaultButton" >
+					</Button>
+					<Button name="$(parent)_Remove_Button" text="Remove" inherits="ZO_DefaultButton" >
 									<Anchor point="RIGHT" relativePoint="RIGHT" offsetY="-26" offsetX="4"/>
-		            </Button>
+					</Button>
 								<Button name="$(parent)_Remove_Publish_Button" text="Remove, Publish" inherits="ZO_DefaultButton">
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Remove_Button" offsetY="6"/>
-		            </Button>
-		          </Controls>
-		        </Control>
+					</Button>
+				  </Controls>
+				</Control>
 
 
 				-->

@@ -151,34 +151,34 @@ function settings.createSettings()
 
 
 		{
-	        type = "colorpicker",
-	        name = "Colour",
-	        tooltip = "",
-	        width = "half",
-	        getFunc = function() return unpack(currentSelections.rgba) end,
-	        setFunc = function(r,g,b,a) currentSelections.rgba = {r,g,b,a} end,
-	    },
-	    
+			type = "colorpicker",
+			name = "Colour",
+			tooltip = "",
+			width = "half",
+			getFunc = function() return unpack(currentSelections.rgba) end,
+			setFunc = function(r,g,b,a) currentSelections.rgba = {r,g,b,a} end,
+		},
+		
 		{
 			type = "dropdown",
 			name = "Preset Colours",
-	        width = "half",
+			width = "half",
 			choices = colourPresets,
 			getFunc = function() return colourLookup[ZO_ColorDef.FloatsToHex(unpack(currentSelections.rgba))] end,
 			setFunc = function(value) currentSelections.rgba = colourLookup[value] end,
 		},
 		
 		{
-	        type = "slider",
-	        name = "Size (cm)",
-	        tooltip = "",
-	        min = 10,
-	        max = 1000,
-	        step = 10,	--(optional)
-	        width = "half",
-	        getFunc = function() return currentSelections.size*100 end,
-	        setFunc = function(value) currentSelections.size = value/100 end,
-	    },
+			type = "slider",
+			name = "Size (cm)",
+			tooltip = "",
+			min = 10,
+			max = 1000,
+			step = 10,	--(optional)
+			width = "half",
+			getFunc = function() return currentSelections.size*100 end,
+			setFunc = function(value) currentSelections.size = value/100 end,
+		},
 
 		{
 			type = "editbox",
@@ -187,7 +187,7 @@ function settings.createSettings()
 			width = "half",
 			isMultiline = true,
 			getFunc = function() return currentSelections.text end,
-    		setFunc = function(text) currentSelections.text = text end,
+			setFunc = function(text) currentSelections.text = text end,
 		},
 		{
 			type = "submenu",
@@ -204,28 +204,28 @@ function settings.createSettings()
 				},
 
 				{
-			        type = "slider",
-			        name = "Yaw",
-			        tooltip = "",
-			        min = 0,
-			        max = 360,
-			        step = 1,	--(optional)
-			        width = "half",
-			        getFunc = function() return currentSelections.yaw end,
-			        setFunc = function(value) currentSelections.yaw = value end,
-			    },
+					type = "slider",
+					name = "Yaw",
+					tooltip = "",
+					min = 0,
+					max = 360,
+					step = 1,	--(optional)
+					width = "half",
+					getFunc = function() return currentSelections.yaw end,
+					setFunc = function(value) currentSelections.yaw = value end,
+				},
 
 				{
-			        type = "slider",
-			        name = "Pitch",
-			        tooltip = "",
-			        min = -90,
-			        max = 90,
-			        step = 1,	--(optional)
-			        width = "half",
-			        getFunc = function() return currentSelections.pitch end,
-			        setFunc = function(value) currentSelections.pitch = value end,
-			    },
+					type = "slider",
+					name = "Pitch",
+					tooltip = "",
+					min = -90,
+					max = 90,
+					step = 1,	--(optional)
+					width = "half",
+					getFunc = function() return currentSelections.pitch end,
+					setFunc = function(value) currentSelections.pitch = value end,
+				},
 				{
 					type = "editbox",
 					name = "Custom Texture",
@@ -246,7 +246,7 @@ function settings.createSettings()
 			}
 		},
 
-	    {
+		{
 			type = "button",
 			name = "|cFF5555Remove Icon|r",
 			tooltip = "",
@@ -260,7 +260,7 @@ function settings.createSettings()
 			end
 		},
 
-	    {
+		{
 			type = "button",
 			name = "Place Icon",
 			tooltip = "",
@@ -284,7 +284,7 @@ function settings.createSettings()
 			reference = "M0RMarkersExportEditBox",
 			isExtraWide = true,
 			getFunc = function() return exportString or "" end,
-    		setFunc = function(text) end,
+			setFunc = function(text) end,
 		},
 
 
@@ -323,7 +323,7 @@ function settings.createSettings()
 			reference = "M0RMarkersImportEditBox",
 			isExtraWide = true,
 			getFunc = function() return importString end,
-    		setFunc = function(text) importString = text end,
+			setFunc = function(text) importString = text end,
 		},
 
 		{
@@ -366,7 +366,7 @@ function settings.createSettings()
 			maxChars = 10000,
 			isExtraWide = true,
 			getFunc = function() return elmsImportString end,
-    		setFunc = function(text) elmsImportString = text end,
+			setFunc = function(text) elmsImportString = text end,
 		},
 
 		{
