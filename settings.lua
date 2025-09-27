@@ -95,25 +95,8 @@ function settings.createSettings()
 		slashCommand = "/mmarkers"
 	}
 
-
-
-
-
-	
 	
 	local currentSelections = settings.currentSelections
-
-
-	
-
-	
-
-
-	
-
-
-
-	
 
 	
 
@@ -127,6 +110,71 @@ function settings.createSettings()
 
 	MM.currentLoadProfileName = "Default"
 	local currentLoadProfileName = MM.currentLoadProfileName
+
+
+
+	local toInsert = {}
+
+	local profileSelectButton = {
+		type = "dropdown",
+		name = "Profile Selection",
+		width = "half",
+		scrollable = 10,
+		reference = "M0RMarkersProfileDropdown",
+		choices = {},
+		getFunc = function()
+			MM.updateProfileDropdown(false)
+			local currentZone = GetUnitRawWorldPosition('player')
+			return MM.vars.loadedProfile[currentZone] or "Default"
+		end,
+		setFunc = function(value) currentLoadProfileName = value; if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end MM.loadProfile(value) end,
+	}
+
+
+	if IsConsoleUI() then
+			toInsert = {
+				{
+					type = "description",
+					title = "|cFFD700[M0R Markers]|r",
+					text = "Hello, and thank you for using M0R Markers! If you have any errors or complaints, please reach out to me either on discord (@m0r) or at the link below!",
+					width = "full",
+				},
+				{ -- TODO: SWAP THIS TO BE M0R MARKERS, NOT ARTAEUM
+					type = "button",
+					name = "Contact Me \n(QR Code)",
+					tooltip = "Click this button to be directed to a QR Code which opens the ArtaeumGroupTool esoui page where you can reach out to me!",
+					width = "half",
+					func = function() RequestOpenUnsafeURL("https://m0rgaming.github.io/create-qr-code/?url=https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
+				},
+				{
+					type = "button",
+					name = "Contact Me \n(Direct Link)",
+					tooltip = "Click this button to be directed to the ArtaeumGroupTool esoui page where you can reach out to me!",
+					width = "half",
+					func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
+				},
+				{
+					type = "divider",
+				},
+			}
+
+			profileSelectButton = {
+				type = "button",
+				name = "Select Profile",
+				tooltip = "Click this button to change profiles!",
+				func = function() MM.ShowProfileSelect() end,
+			}
+
+			
+		end
+
+
+
+
+
+
+
+
 
 
 	local optionsTable = {
@@ -286,20 +334,7 @@ function settings.createSettings()
 			name = "[Profiles]",
 			tooltip = "",
 			controls = {
-				{
-					type = "dropdown",
-					name = "Profile Selection",
-					width = "half",
-					scrollable = 10,
-					reference = "M0RMarkersProfileDropdown",
-					choices = {},
-					getFunc = function()
-						MM.updateProfileDropdown(false)
-						local currentZone = GetUnitRawWorldPosition('player')
-						return MM.vars.loadedProfile[currentZone] or "Default"
-					end,
-					setFunc = function(value) currentLoadProfileName = value; if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end MM.loadProfile(value) end,
-				},
+				profileSelectButton,
 
 				{
 					type = "editbox",
@@ -480,49 +515,15 @@ function settings.createSettings()
 	}
 
 
-	if IsConsoleUI() then
-		local toInsert = {
-			{
-				type = "description",
-				title = "|cFFD700[M0R Markers]|r",
-				text = "Hello, and thank you for using M0R Markers! If you have any errors or complaints, please reach out to me either on discord (@m0r) or at the link below!",
-				width = "full",
-			},
-			{ -- TODO: SWAP THIS TO BE M0R MARKERS, NOT ARTAEUM
-				type = "button",
-				name = "Contact Me \n(QR Code)",
-				tooltip = "Click this button to be directed to a QR Code which opens the ArtaeumGroupTool esoui page where you can reach out to me!",
-				width = "half",
-				func = function() RequestOpenUnsafeURL("https://m0rgaming.github.io/create-qr-code/?url=https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
-			},
-			{
-				type = "button",
-				name = "Contact Me \n(Direct Link)",
-				tooltip = "Click this button to be directed to the ArtaeumGroupTool esoui page where you can reach out to me!",
-				width = "half",
-				func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
-			},
-			{
-				type = "divider",
-			},
-		}
+	
 
-		optionsTable[11].controls[1] = {
-			type = "button",
-			name = "Select Profile",
-			tooltip = "Click this button to change profiles!",
-			func = function() MM.ShowProfileSelect() end,
-		}
+	local mergedTables = {}
 
-		local mergedTables = {}
+	ZO_CombineNumericallyIndexedTables(mergedTables, toInsert, optionsTable)
 
-		ZO_CombineNumericallyIndexedTables(mergedTables, toInsert, optionsTable)
-
-		optionsTable = mergedTables
-	end
 
 
 	local panel = LibAddonMenu2:RegisterAddonPanel(panelName, panelData)
-	LibAddonMenu2:RegisterOptionControls(panelName, optionsTable)
+	LibAddonMenu2:RegisterOptionControls(panelName, mergedTables)
 
 end
