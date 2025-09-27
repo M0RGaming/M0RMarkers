@@ -628,6 +628,8 @@ function MM.getCurrentZoneProfiles()
 		for i,v in pairs(MM.vars.Profiles[currentZone]) do
 			profiles[#profiles+1] = i
 		end
+	else
+		profiles = {"Default"}
 	end
 	return profiles
 end

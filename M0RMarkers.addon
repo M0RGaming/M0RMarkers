@@ -6,6 +6,7 @@
 ## Author: |c0DC1CF@M0R_Gaming|r
 ## SavedVariables: Markers
 ## DependsOn: LibAddonMenu-2.0>=40
+## OptionalDependsOn: LibHarvensAddonSettings
 
 
 main.lua

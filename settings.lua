@@ -130,16 +130,6 @@ function settings.createSettings()
 
 
 	local optionsTable = {
-		
-		{
-			type = "button",
-			name = "|cFF5555Test|r",
-			tooltip = "",
-			width = "half",
-			func = function()
-				CHAT_SYSTEM:AddTextEntry("test")
-			end
-		},
 
 		{
 			type = "description",
@@ -162,6 +152,16 @@ function settings.createSettings()
 		},
 
 
+
+		{
+			type = "dropdown",
+			name = "Preset Colours",
+			width = "half",
+			choices = colourPresets,
+			getFunc = function() return colourLookup[ZO_ColorDef.FloatsToHex(unpack(currentSelections.rgba))] end,
+			setFunc = function(value) currentSelections.rgba = colourLookup[value] end,
+		},
+
 		{
 			type = "colorpicker",
 			name = "Colour",
@@ -171,14 +171,6 @@ function settings.createSettings()
 			setFunc = function(r,g,b,a) currentSelections.rgba = {r,g,b,a} end,
 		},
 		
-		{
-			type = "dropdown",
-			name = "Preset Colours",
-			width = "half",
-			choices = colourPresets,
-			getFunc = function() return colourLookup[ZO_ColorDef.FloatsToHex(unpack(currentSelections.rgba))] end,
-			setFunc = function(value) currentSelections.rgba = colourLookup[value] end,
-		},
 		
 		{
 			type = "slider",
@@ -201,6 +193,29 @@ function settings.createSettings()
 			getFunc = function() return currentSelections.text end,
 			setFunc = function(text) currentSelections.text = text end,
 		},
+
+		{
+			type = "button",
+			name = "|cFF5555Remove Icon|r",
+			tooltip = "",
+			width = "half",
+			func = function()
+				MM.ShowDialogue("Warning: Destructive Action",
+					"Are you sure you would like to remove the closest marker on the ground?",
+					"This is a destructive action and cannot be undone.",
+					MM.removeClosestIcon
+				)
+			end
+		},
+
+		{
+			type = "button",
+			name = "Place Icon",
+			tooltip = "",
+			width = "half",
+			func = MM.placeIcon,
+		},
+
 		{
 			type = "submenu",
 			name = "[Advanced Placing]",
@@ -258,28 +273,6 @@ function settings.createSettings()
 			}
 		},
 
-		{
-			type = "button",
-			name = "|cFF5555Remove Icon|r",
-			tooltip = "",
-			width = "half",
-			func = function()
-				MM.ShowDialogue("Warning: Destructive Action",
-					"Are you sure you would like to remove the closest marker on the ground?",
-					"This is a destructive action and cannot be undone.",
-					MM.removeClosestIcon
-				)
-			end
-		},
-
-		{
-			type = "button",
-			name = "Place Icon",
-			tooltip = "",
-			width = "half",
-			func = MM.placeIcon,
-		},
-
 
 
 		{
@@ -305,7 +298,7 @@ function settings.createSettings()
 						local currentZone = GetUnitRawWorldPosition('player')
 						return MM.vars.loadedProfile[currentZone] or "Default"
 					end,
-					setFunc = function(value) currentLoadProfileName = value; if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end end,
+					setFunc = function(value) currentLoadProfileName = value; if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end MM.loadProfile(value) end,
 				},
 
 				{
@@ -323,6 +316,18 @@ function settings.createSettings()
 
 
 
+
+
+				{
+					type = "button",
+					name = "Create/Load Profile",
+					tooltip = "",
+					width = "half",
+					func = function()
+						MM.loadProfile(currentLoadProfileName or "Default")
+					end,
+				},
+
 				{
 					type = "button",
 					name = "|cFF5555Delete Profile|r",
@@ -335,17 +340,6 @@ function settings.createSettings()
 							"This is a destructive action and cannot be undone.", function()
 							MM.deleteCurrentProfile(); 
 						end)
-					end,
-				},
-
-
-				{
-					type = "button",
-					name = "Load/Create Profile",
-					tooltip = "",
-					width = "half",
-					func = function()
-						MM.loadProfile(currentLoadProfileName or "Default")
 					end,
 				},
 
@@ -511,6 +505,13 @@ function settings.createSettings()
 			{
 				type = "divider",
 			},
+		}
+
+		optionsTable[11].controls[1] = {
+			type = "button",
+			name = "Select Profile",
+			tooltip = "Click this button to change profiles!",
+			func = function() MM.ShowProfileSelect() end,
 		}
 
 		local mergedTables = {}

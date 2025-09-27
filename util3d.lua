@@ -62,13 +62,18 @@ function MM.initUtil3D()
 	HUD_UI_SCENE:AddFragment(iconFragment)
 	GAME_MENU_SCENE:AddFragment(iconFragment)
 
-	local function sceneChanged(scene, oldState, newState)
-		if scene.name ~= "hud" and scene.name ~= "hudui" and newState == "showing" then
-			--print("No longer showing hud/hudui")
-			M0RMarkerPlaceToplevel:SetHidden(true)
+
+	if IsConsoleUI() and LibHarvensAddonSettings then
+		SecurePostHook(LibHarvensAddonSettings, "CreateAddonList", function() b = "created"; LibHarvensAddonSettings.scene:AddFragment(iconFragment) end)
+	else 
+		local function sceneChanged(scene, oldState, newState)
+			if scene.name ~= "hud" and scene.name ~= "hudui" and newState == "showing" then
+				--print("No longer showing hud/hudui")
+				M0RMarkerPlaceToplevel:SetHidden(true)
+			end
 		end
+		SCENE_MANAGER:RegisterCallback("SceneStateChanged", sceneChanged)
 	end
-	SCENE_MANAGER:RegisterCallback("SceneStateChanged", sceneChanged)
 end
 
 
