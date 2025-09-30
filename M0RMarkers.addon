@@ -6,7 +6,7 @@
 ## Author: |c0DC1CF@M0R_Gaming|r
 ## SavedVariables: Markers
 ## DependsOn: LibAddonMenu-2.0>=40
-## OptionalDependsOn: LibHarvensAddonSettings
+## OptionalDependsOn: LibHarvensAddonSettings LibGroupBroadcast
 
 
 main.lua
@@ -14,6 +14,7 @@ util.lua
 util3d.lua
 elmsConvert.lua
 settings.lua
+datasharing.lua
 
 layout.xml
 bindings.xml

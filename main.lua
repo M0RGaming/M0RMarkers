@@ -683,6 +683,7 @@ end
 function MM:Initialize()
 
 	MM.initUtil3D()
+	MM.initSharing()
 
 	-- Addon Settings Menu
 	MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars)
