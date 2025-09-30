@@ -199,49 +199,55 @@
 						</Backdrop>
 					</Controls>
 				</Label>
-
-				<!--
-
-				<Control name="$(parent)_Marker_Dropdown_Panel">
-				  <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Title" offsetX="4" offsetY="2" />
-				  <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)_Title" offsetX="-4" offsetY="150" />
-				  <Controls>
-				   <Control name="$(parent)_Marker_Dropdown" inherits="ZO_ScrollableComboBox" mouseEnabled="true" tier="HIGH" >
-					  <Dimensions x="200" y="29" />
-					  <Anchor point="CENTER" relativePoint="CENTER" offsetY="-25" />
-					</Control>
-					<Texture name="$(parent)_Marker_Icon">
-					  <Anchor point="BOTTOM" relativeTo="$(parent)" relativePoint="BOTTOM" offsetY="0" />
-					  <Dimensions x="80" y="80"/>
-					</Texture>
-				  </Controls>
-				</Control>
-				<Control name="$(parent)_Button_Group">
-				  <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Marker_Dropdown_Panel"/>
-							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" offsetX="-8" offsetY="-8" />
-				  <Controls>
-					<Button name="$(parent)_Place_Button" text="Place" inherits="ZO_DefaultButton" >
-									<Anchor point="LEFT" relativePoint="LEFT" offsetY="-26" offsetX="-4" />
-					</Button>
-					<Button name="$(parent)_Place_Publish_Button" text="Place, Publish" inherits="ZO_DefaultButton">
-									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Place_Button" offsetY="6"/>
-					</Button>
-					<Button name="$(parent)_Remove_Button" text="Remove" inherits="ZO_DefaultButton" >
-									<Anchor point="RIGHT" relativePoint="RIGHT" offsetY="-26" offsetX="4"/>
-					</Button>
-								<Button name="$(parent)_Remove_Publish_Button" text="Remove, Publish" inherits="ZO_DefaultButton">
-									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)_Remove_Button" offsetY="6"/>
-					</Button>
-				  </Controls>
-				</Control>
+			</Controls>
+		</TopLevelControl>
 
 
-				-->
+		<TopLevelControl name="M0RMarkerProgressMeter" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="true">
+			<Dimensions x="320" y="180" />
+			<Anchor point="TOPRIGHT" relativeTo="GuiRoot" relativePoint="TOPRIGHT" offsetX="-150" offsetY="150"/>
+			<Controls>
+				<Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="000000">
+					<AnchorFill />
+					<Edge edgeSize="3"/>
+				</Backdrop>
+
+				<Label name="$(parent)Name" font="ZoFontGamepadBold27" horizontalAlignment="1" verticalAlignment="1" text="Transmission Progress">
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$(parent)" offsetY="10" />
+					<Dimensions x="300" y="45" />
+				</Label>
 
 
+				<StatusBar name="$(parent)Bar" color="00630c">
+					<Dimensions x="300" y="25" />
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Name" offsetX="0" offsetY="15" />
+					<Limits min="0" max="100" />
+					<Controls>
+						<Backdrop name="$(parent)BG" alpha="1" centerColor="222222" edgeColor="000000">
+							<AnchorFill />
+							<Edge edgeSize="1"/>
+						</Backdrop>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Progress (0%)">
+							<Dimensions x="300" y="25" />
+							<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)" offsetX="0" offsetY="0" />
+						</Label>
+					</Controls>
+					<OnValueChanged>
+						self:GetNamedChild("Text"):SetText(string.format("Progress (%.1f%%)",value))
+					</OnValueChanged>
+				</StatusBar>
 
 
+				<Label name="$(parent)Estimated" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Estimated Time Remaining: 27000ms">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Bar" offsetX="0" offsetY="10" />
+					<Dimensions x="300" y="25" />
+				</Label>
+				<Label name="$(parent)Elapsed" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Elapsed Time: 5000ms">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Estimated" offsetX="0" offsetY="10" />
+					<Dimensions x="300" y="25" />
+				</Label>
 
+				
 			</Controls>
 		</TopLevelControl>
 	</Controls>
