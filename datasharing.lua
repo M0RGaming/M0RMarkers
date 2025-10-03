@@ -8,23 +8,34 @@ local handlers = MM.handlers
 
 function MM.initSharing()
 	local LGB = LibGroupBroadcast
-	local handler = LGB:RegisterHandler("M0RMarkers")
-	handler:SetDisplayName("M0R Markers")
-	handler:SetDescription("Tool for placing markers in the 3d world!")
+	if LGB then
+		local handler = LGB:RegisterHandler("M0RMarkers")
+		handler:SetDisplayName("M0R Markers")
+		handler:SetDescription("Tool for placing markers in the 3d world!")
 
-	
-	protocols.header = handler:DeclareProtocol(501, "M0RMarkersHeader")
-	protocols.header:AddField(LGB.CreateOptionalField(LGB.CreateNumericField("length", {numBits=11, trimValues=true})))
-	protocols.header:AddField(LGB.CreateFlagField("sending")) -- either true or false. if true then just started. if false then just ended. true requires length to exist
-	protocols.header:OnData(handlers.onHeader)
-	protocols.header:Finalize({replaceQueuedMessages = false})
-	
+		
+		protocols.header = handler:DeclareProtocol(501, "M0RMarkersHeader")
+		protocols.header:AddField(LGB.CreateOptionalField(LGB.CreateNumericField("length", {numBits=11, trimValues=true})))
+		protocols.header:AddField(LGB.CreateFlagField("sending")) -- either true or false. if true then just started. if false then just ended. true requires length to exist
+		protocols.header:OnData(handlers.onHeader)
+		protocols.header:Finalize({replaceQueuedMessages = false})
+		
 
-	protocols.data = handler:DeclareProtocol(500, "M0RMarkersData")
-	protocols.data:AddField(LGB.CreateNumericField("position", {numBits=11, trimValues=true}))
-	protocols.data:AddField(LGB.CreateStringField("data", {minLength=0, maxLength=26}))
-	protocols.data:OnData(handlers.onData)
-	protocols.data:Finalize({replaceQueuedMessages = false})
+		protocols.data = handler:DeclareProtocol(500, "M0RMarkersData")
+		protocols.data:AddField(LGB.CreateNumericField("position", {numBits=11, trimValues=true}))
+		protocols.data:AddField(LGB.CreateStringField("data", {minLength=0, maxLength=26}))
+		protocols.data:OnData(handlers.onData)
+		protocols.data:Finalize({replaceQueuedMessages = false})
+	else
+		protocols.header = {}
+		function protocols.header:Send()
+			d("You cannot send markers locally without LibGroupBroadcast")
+		end
+		protocols.data = {}
+		function protocols.data:Send()
+			d("You cannot send markers locally without LibGroupBroadcast")
+		end
+	end
 end
 
 function MM.shareCurrentZone()
@@ -44,14 +55,17 @@ local lastTime = 0
 local startTime = 0
 
 function MM.send(zoneString)
-	--if currentlySending then d("Cant start sending, as previous send is in progress") return end
+	if currentlySending then d("Cant start sending, as previous send is in progress") return end
 	if IsUnitGrouped('player') then
+		if not IsUnitGroupLeader('player') then
+			d("You must be the group leader to share markers!")
+		end
 		currentString = zoneString
 
 		length = math.ceil(#zoneString / 25)
 		d("length of "..length)
 
-		
+
 		--protocols.header:Send({
 		--	sending = true,
 		--	length = length
@@ -64,6 +78,13 @@ function MM.send(zoneString)
 		MM.sendTick()
 		lastTime = os.rawclock()
 		startTime = os.rawclock()
+
+		M0RMarkerProgressMeterBar:SetValue(0)
+		M0RMarkerProgressMeterEstimated:SetText(string.format("Estimated Time Remaining: %.1fs", 0))
+		M0RMarkerProgressMeterElapsed:SetText(string.format("Elapsed Time: %.1fs", 0))
+		M0RMarkerProgressMeter:SetHidden(false)
+
+
 	end
 end
 
@@ -90,14 +111,31 @@ end
 
 
 local currentlyListeningTo = ""
-currentData = {} -- todo: add the local back
+local currentData = {} -- todo: add the local back
 local currentlyListening = false
 local expectedDataLength = 0
 function handlers.onHeader(unitTag, data)
+	--d("finished recieving data")
+	--a = data
+
+
+	if AreUnitsEqual('player', unitTag) then
+		currentlySending = false
+		M0RMarkerProgressMeter:SetHidden(true)
+	end
+
+	d("expected length: "..tostring(data.length))
+	for i=1, tonumber(data.length) do
+		if currentData[i] == nil then
+			d("Failed to get data with index: "..i)
+		end
+	end
 	d("finished recieving data")
-	a = data
 	d(table.concat(currentData))
 	d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
+
+	--[[
+
 	--d("Header Recieved")
 	if data.sending and (not currentlyListening) then
 		currentlyListeningTo = GetUnitDisplayName(unitTag)
@@ -107,9 +145,10 @@ function handlers.onHeader(unitTag, data)
 	elseif (not data.sending) and currentlyListening then
 		if GetUnitDisplayName(unitTag) == currentlyListeningTo then
 			-- check expectedDataLength vs the data recieved
-			d("finished recieving data")
+			
 		end
 	end
+	--]]
 end
 
 
@@ -125,10 +164,7 @@ local function average(data)
 end
 
 function handlers.onData(unitTag, data)
-	--d("Data Recieved")
-	--d("Recieved data ".. tostring(data.position).. " from "..unitTag)
-	--if GetUnitDisplayName(unitTag) == currentlyListeningTo then
-		if AreUnitsEqual('player', unitTag) then
+		if AreUnitsEqual('player', unitTag) then -- only transmitter should get a progress bar, as header is not sent before
 			--d("Recieved data ".. tonumber(data.position))
 			times[#times+1] = os.rawclock()-lastTime
 			local averageTime = average(times)

@@ -168,7 +168,13 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 	local secondPart = table.concat(currentConcat, ",") or ""
 
 	currentConcat = {}
-	local out = tostring(zone) .. "]" .. string.format("%x:%x:%x]", minX,minY,minZ)
+
+	local timestamp = MM.loadedMarkers.currentTimestamp
+	if (not timestamp) or (timestamp == -1) then
+		timestamp = os.time()
+	end
+
+	local out = tostring(zone) .. "]" .. string.format("%d]%x:%x:%x]", timestamp,minX,minY,minZ)
 
 
 	currentConcat = {}
@@ -215,7 +221,7 @@ end
 
 
 function MM.decompressString(exportString) -- 10 ms to load 206 textures + render
-	local _,_, zone, mins, sizes, pitch, yaw, colour, texture, positions = string.find(exportString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
+	local _,_, zone, timestamp, mins, sizes, pitch, yaw, colour, texture, positions = string.find(exportString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
 	local currentZone = GetUnitRawWorldPosition('player')
 	--print(zone)
 	if zone ~= tostring(currentZone) then d("These markers are for a different zone!") return end
@@ -334,7 +340,7 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 	for i,v in ipairs(icons) do
 		MM.createIcon(v)
 	end
-
+	MM.loadedMarkers.currentTimestamp = tonumber(timestamp)
 
 end
 
@@ -374,7 +380,6 @@ MM.defaultVars = {
 	loadedProfile = {},
 	Profiles = {}
 }
-
 
 
 
@@ -440,6 +445,7 @@ function MM.placeIcon()
 	}
 	MM.createIcon(icon)
 
+	MM.loadedMarkers.currentTimestamp = os.time()
 	local zoneString = MM.compressLoaded()
 	MM.saveIcons(zoneString)
 end
@@ -499,6 +505,7 @@ function MM.placeQuickMenuIcon()
 	print("Placing Icon")
 	MM.createIcon(icon)
 
+	MM.loadedMarkers.currentTimestamp = os.time()
 	local zoneString = MM.compressLoaded()
 	MM.saveIcons(zoneString)
 end

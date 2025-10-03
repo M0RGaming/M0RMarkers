@@ -8,6 +8,8 @@ loadedMarkers.ground = {}
 local facingIcons = loadedMarkers.facing
 local groundIcons = loadedMarkers.ground
 
+MM.loadedMarkers.currentTimestamp = -1
+
 local print = MM.print
 
 --[[
@@ -227,7 +229,8 @@ function MM.removeClosestIcon()
 		destroyControl(groundIcons[closestIcon]) 
 		table.remove(groundIcons, closestIcon)
 	end
-	
+
+	MM.loadedMarkers.currentTimestamp = os.time()
 	local zoneString = MM.compressLoaded()
 	MM.saveIcons(zoneString) -- Update Saved icons
 end
