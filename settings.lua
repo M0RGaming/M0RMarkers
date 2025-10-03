@@ -127,7 +127,12 @@ function settings.createSettings()
 			local currentZone = GetUnitRawWorldPosition('player')
 			return MM.vars.loadedProfile[currentZone] or "Default"
 		end,
-		setFunc = function(value) currentLoadProfileName = value; if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end MM.loadProfile(value) end,
+		setFunc = function(value)
+			currentLoadProfileName = value;
+			if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end
+			MM.loadProfile(value)
+			if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+		end,
 	}
 
 
@@ -270,14 +275,28 @@ function settings.createSettings()
 			tooltip = "",
 			controls = {
 
+
 				{
 					type = "checkbox",
 					name = "Facing User",
 					tooltip = "",
+					warning = "When turning off 'Facing User' to create flat icons, it is recommended to set your vertical offset to 0%",
+					width = "half",
 					getFunc = function() return currentSelections.floating end,
 					setFunc = function(value) currentSelections.floating = value end,
 				},
-
+				{
+					type = "button",
+					name = "Set Yaw to Camera Yaw",
+					tooltip = "",
+					width = "half",
+					func = function()
+						local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
+						local yaw = zo_atan2(fX, fZ)
+						currentSelections.yaw = zo_floor(zo_deg(yaw+math.pi))
+						if M0RMarkersAdvancedYaw then M0RMarkersAdvancedYaw:UpdateValue() end 
+					end,
+				},
 				{
 					type = "slider",
 					name = "Yaw",
@@ -285,6 +304,7 @@ function settings.createSettings()
 					min = 0,
 					max = 360,
 					step = 1,	--(optional)
+					reference = "M0RMarkersAdvancedYaw",
 					width = "half",
 					getFunc = function() return currentSelections.yaw end,
 					setFunc = function(value) currentSelections.yaw = value end,
@@ -301,6 +321,7 @@ function settings.createSettings()
 					getFunc = function() return currentSelections.pitch end,
 					setFunc = function(value) currentSelections.pitch = value end,
 				},
+
 				{
 					type = "editbox",
 					name = "Custom Texture",
@@ -313,8 +334,8 @@ function settings.createSettings()
 					name = "Vertical Offset",
 					tooltip = "",
 					min = -100,
-					max = 100,
-					step = 1,
+					max = 200,
+					step = 5,
 					getFunc = function() return currentSelections.offsetYPercent end,
 					setFunc = function(value) currentSelections.offsetYPercent = value end,
 				},
@@ -334,6 +355,18 @@ function settings.createSettings()
 			name = "[Profiles]",
 			tooltip = "",
 			controls = {
+
+				{
+					type = "description",
+					title = function()
+						local currentZone = GetUnitRawWorldPosition('player')
+						return string.format("Current Loaded Profile: |cFFD700%s|r", MM.vars.loadedProfile[currentZone] or "Default")
+					end,
+					text = function() return string.format("Last Edited at: |c0DC1CF%s|r", os.date("%a, %b %d %Y - %I:%M %p", MM.loadedMarkers.currentTimestamp)) end,
+					reference = "M0RMarkersProfilesCurrentLoadedProfile",
+					width = "full",
+				},
+
 				profileSelectButton,
 
 				{
@@ -346,7 +379,11 @@ function settings.createSettings()
 					reference = "M0RMarkersProfileNameEdit",
 					isExtraWide = false,
 					getFunc = function() return currentLoadProfileName or "Default" end,
-					setFunc = function(text) currentLoadProfileName = text; if M0RMarkersProfileDropdown then M0RMarkersProfileDropdown:UpdateValue() end end,
+					setFunc = function(text)
+						currentLoadProfileName = text;
+						if M0RMarkersProfileDropdown then M0RMarkersProfileDropdown:UpdateValue() end
+						if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+					end,
 				},
 
 
@@ -378,6 +415,22 @@ function settings.createSettings()
 					end,
 				},
 
+
+
+				{
+					type = "button",
+					name = "Share Profile",
+					tooltip = "",
+					width = "half",
+					func = function()
+						MM.ShowDialogue("Transmitting Profile",
+							"Would you like to share your currently loaded profile to everyone in the group?",
+							"This will open a popup on their screen when the sharing finishes, and should probably not be used in combat.",
+							function()
+								MM.shareCurrentZone() 
+							end)
+					end,
+				},
 
 				-- MM.loadProfile(value)
 			}
@@ -428,14 +481,15 @@ function settings.createSettings()
 		
 		{
 			type = "editbox",
-			name = "Import String",
+			name = "Import M0R Markers String/Convert Elms Markers String",
 			tooltip = "",
 			width = "full",
 			isMultiline = true,
 			maxChars = 10000,
 			reference = "M0RMarkersImportEditBox",
+			default = "Insert either a M0R Markers Profile String here, or insert an Elm's Markers Import String to automatically convert it.",
 			isExtraWide = true,
-			getFunc = function() return importString end,
+			getFunc = function() end, --return importString end,
 			setFunc = function(text) importString = text end,
 		},
 
@@ -445,9 +499,23 @@ function settings.createSettings()
 			tooltip = "",
 			width = "half",
 			func = function()
-				local zoneString = MM.importIcons(importString, false)
-				exportString = zoneString
-				if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+				local foundMMarkers = string.find(importString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
+				if foundMMarkers == nil then
+					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
+					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
+						MM.ShowDialogue("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "", function() end)
+					else 
+						local amountLoaded, zoneString = MM.parseElmsString(importString)
+						print("Parsed ".. tostring(amountLoaded).. " markers.")
+						MM.ShowDialogue("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Elms!", "", function() end)
+						exportString = zoneString
+						if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+					end
+				else
+					local zoneString = MM.importIcons(importString, false)
+					exportString = zoneString
+					if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+				end
 			end,
 		},
 		{
@@ -456,16 +524,36 @@ function settings.createSettings()
 			tooltip = "",
 			width = "half",
 			func = function()
-				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to overwrite the current profile?", "This is a destructive action and cannot be undone.", function()
-					MM.importIcons(importString, true); exportString = importString; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
-				end)
+				local foundMMarkers = string.find(importString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
+				if foundMMarkers == nil then
+					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
+					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
+						MM.ShowDialogue("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "", function() end)
+					else
+						MM.ShowDialogue("Warning: Destructive Action",
+							"Are you sure you would like to overwrite the current profile?",
+							"This is a destructive action and cannot be undone.",
+							function()
+								MM.emptyCurrentZone()
+								local amountLoaded, zoneString = MM.parseElmsString(importString)
+								print("Parsed ".. tostring(amountLoaded).. " markers.")
+								exportString = zoneString
+								if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+							end
+						)
+					end
+				else
+					MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to overwrite the current profile?", "This is a destructive action and cannot be undone.", function()
+						MM.importIcons(importString, true); exportString = importString; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+					end)
+				end
 			end,
 		},
 
 
 		
 
-
+		--[[
 		{
 			type = "divider",
 		},
@@ -511,6 +599,7 @@ function settings.createSettings()
 				end)
 			end,
 		},
+		--]]
 
 	}
 

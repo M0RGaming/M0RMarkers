@@ -570,10 +570,16 @@ function MM.playerActivated()
 		MM.loadZone(currentZone)
 	end
 	MM.updateProfileDropdown(true)
+	if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 	MM.updateMarkerPositions()
 end
 
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_TOGGLE_QUICK_MENU", "Toggle Quick Menu Visiblity")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_REMOVE_MARKER", "Remove Closest Marker")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_MARKER", "Place Marker (Settings Configured)")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_QUICK_MARKER", "Place Marker (Quick Menu Configured)")
+
+
 function MM.toggleQuickMenu()
 	M0RMarkerPlaceToplevel:SetHidden(not M0RMarkerPlaceToplevel:IsHidden())
 end
@@ -621,6 +627,7 @@ function MM.deleteCurrentProfile()
 	if M0RMarkersProfileDropdown then
 		M0RMarkersProfileDropdown:UpdateValue()
 	end
+	if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 end
 
 function MM.getCurrentZoneProfiles()
@@ -650,6 +657,7 @@ function MM.updateProfileDropdown(refresh)
 			M0RMarkersProfileDropdown:UpdateValue()
 		end
 	end
+	
 end
 
 

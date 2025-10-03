@@ -122,17 +122,73 @@ function handlers.onHeader(unitTag, data)
 	if AreUnitsEqual('player', unitTag) then
 		currentlySending = false
 		M0RMarkerProgressMeter:SetHidden(true)
+		d("finished sending data")
+		print(table.concat(currentData))
+		d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
+		--return --TODO: MAKE SURE THIS IS UNCOMMENTED
 	end
 
+	local failed = false
 	d("expected length: "..tostring(data.length))
 	for i=1, tonumber(data.length) do
+		--d(i)
 		if currentData[i] == nil then
 			d("Failed to get data with index: "..i)
+			failed = true
 		end
 	end
+	if failed then
+		d("Something Failed when recieving data")
+		return
+	end
 	d("finished recieving data")
-	d(table.concat(currentData))
+	local parsedString = table.concat(currentData)
+	print(parsedString)
 	d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
+
+	local _,_, zone, timestamp, mins, sizes, pitch, yaw, colour, texture, positions = string.find(parsedString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
+	if (zone == nil) or (timestamp == nil) then
+		d("Something Failed when recieving data")
+		return
+	else
+		local userName = GetUnitDisplayName(unitTag)
+		local newProfileName = string.format("%s Shared: %s", userName, os.date("%Y/%m/%d %I:%M %p", tonumber(timestamp))) --%d/%m/%y %I:%M %p
+		local intZone = tonumber(zone)
+		print(newProfileName)
+
+		MM.ShowDialogue("Recieved Markers from "..userName,
+			string.format("Would you like to import these markers for %s?\nThis will be saved to a profile called: |cFFD700%s|r", GetZoneNameById(intZone), newProfileName),
+			string.format("These Markers were last edited at:\n|c0DC1CF%s|r",os.date("%a, %b %d %Y - %I:%M %p", MM.loadedMarkers.currentTimestamp)),
+			function()
+				MM.vars.loadedProfile[zone] = newProfileName
+				
+
+				local strings = {}
+				--if parsedString == nil then parsedString = "" end
+				for i=1,10 do -- split into 1900 length strings
+					local currentString = string.sub(parsedString, (i-1)*1900+1, i*1900)
+					if (currentString == "") or (currentString == nil) then
+						break
+					else
+						strings[#strings+1] = currentString
+					end
+				end
+				if MM.vars.Profiles[intZone] then
+					MM.vars.Profiles[intZone][newProfileName] = strings
+				else
+					MM.vars.Profiles[intZone] = {
+						[newProfileName] = strings
+					}
+				end
+				if M0RMarkersProfileDropdown then
+					M0RMarkersProfileDropdown:UpdateValue()
+				end
+				if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+				d("Saved Transmitted Markers!")
+			end
+		)
+
+	end
 
 	--[[
 
@@ -156,8 +212,8 @@ local times = {}
 local function average(data)
 	local totalI = 0
 	local totalV = 0
-	for i,v in pairs(data) do
-		totalV = totalV+v
+	for i=1,#data do
+		totalV = totalV+data[i]
 		totalI = totalI+1
 	end
 	return totalV/totalI
@@ -165,12 +221,13 @@ end
 
 function handlers.onData(unitTag, data)
 		if AreUnitsEqual('player', unitTag) then -- only transmitter should get a progress bar, as header is not sent before
-			--d("Recieved data ".. tonumber(data.position))
-			times[#times+1] = os.rawclock()-lastTime
+			table.insert(times, 1, os.rawclock()-lastTime)
+			times[11] = nil
+
 			local averageTime = average(times)
 			lastTime = os.rawclock()
 			--d("Progress: "..tostring(tonumber(data.position)/length*100).."% - Time Taken: "..times[#times]..". Expected time remaining: "..tostring(averageTime*(length-tonumber(data.position))))
-			d(string.format("Progress: %.2f%% - Time Taken: %dms - Expected Time Remaining: %dms", tonumber(data.position)/length*100, times[#times], averageTime*(length-tonumber(data.position))))
+			print(string.format("Progress: %.2f%% - Time Taken: %dms - Expected Time Remaining: %dms", tonumber(data.position)/length*100, times[1], averageTime*(length-tonumber(data.position))))
 			ZO_StatusBar_SmoothTransition(M0RMarkerProgressMeterBar, tonumber(data.position)/length*100, 100)
 			M0RMarkerProgressMeterEstimated:SetText(string.format("Estimated Time Remaining: %.1fs", averageTime*(length-tonumber(data.position))/1000))
 			M0RMarkerProgressMeterElapsed:SetText(string.format("Elapsed Time: %.1fs", (os.rawclock()-startTime)/1000))
