@@ -115,6 +115,10 @@ function settings.createSettings()
 
 	local toInsert = {}
 
+
+	MM.currentAdditionalProfiles = {}
+	MM.multipleProfilesLoaded = false
+
 	local profileSelectButton = {
 		type = "dropdown",
 		name = "Profile Selection",
@@ -132,6 +136,25 @@ function settings.createSettings()
 			if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end
 			MM.loadProfile(value)
 			if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+			MM.currentAdditionalProfiles = {}
+			MM.multipleProfilesLoaded = false
+		end,
+	}
+
+
+
+	local multiProfileLoadButton = {
+		type = "dropdown",
+		name = "Additional Profiles",
+		width = "half",
+		scrollable = 10,
+		reference = "M0RMarkersProfileDropdownAdditional",
+		choices = {},
+		multiSelect = true,
+		getFunc = function() MM.updateProfileDropdown(false, true) return MM.currentAdditionalProfiles end,
+		setFunc = function(value)
+			MM.currentAdditionalProfiles = value
+			MM.loadAdditionalProfiles(MM.currentAdditionalProfiles)
 		end,
 	}
 
@@ -388,18 +411,6 @@ function settings.createSettings()
 
 
 
-
-
-				{
-					type = "button",
-					name = "Create/Load Profile",
-					tooltip = "",
-					width = "half",
-					func = function()
-						MM.loadProfile(currentLoadProfileName or "Default")
-					end,
-				},
-
 				{
 					type = "button",
 					name = "|cFF5555Delete Profile|r",
@@ -416,6 +427,20 @@ function settings.createSettings()
 				},
 
 
+				{
+					type = "button",
+					name = "Create/Load Profile",
+					tooltip = "",
+					width = "half",
+					func = function()
+						MM.loadProfile(currentLoadProfileName or "Default")
+						if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+					end,
+				},
+
+
+
+				multiProfileLoadButton,
 
 				{
 					type = "button",
@@ -431,6 +456,7 @@ function settings.createSettings()
 							end)
 					end,
 				},
+
 
 				-- MM.loadProfile(value)
 			}

@@ -160,7 +160,7 @@ function handlers.onHeader(unitTag, data)
 			string.format("Would you like to import these markers for %s?\nThis will be saved to a profile called: |cFFD700%s|r", GetZoneNameById(intZone), newProfileName),
 			string.format("These Markers were last edited at:\n|c0DC1CF%s|r",os.date("%a, %b %d %Y - %I:%M %p", MM.loadedMarkers.currentTimestamp)),
 			function()
-				MM.vars.loadedProfile[zone] = newProfileName
+				MM.vars.loadedProfile[intZone] = newProfileName
 				
 
 				local strings = {}
@@ -180,6 +180,14 @@ function handlers.onHeader(unitTag, data)
 						[newProfileName] = strings
 					}
 				end
+
+				local currentZone = GetUnitWorldPosition('player')
+				if currentZone == intZone then
+					MM.loadProfile(newProfileName)
+				end
+
+				MM.currentAdditionalProfiles = {}
+				MM.multipleProfilesLoaded = false
 				if M0RMarkersProfileDropdown then
 					M0RMarkersProfileDropdown:UpdateValue()
 				end

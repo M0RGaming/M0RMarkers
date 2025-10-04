@@ -201,6 +201,12 @@ end
 
 
 function MM.removeClosestIcon()
+	if MM.multipleProfilesLoaded then
+		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
 	local _, x, y, z = GetUnitRawWorldPosition('player')
 	local minDistance = math.huge
 	local closestIcon = 0

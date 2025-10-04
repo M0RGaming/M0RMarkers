@@ -365,7 +365,13 @@ MM.elmsMap = {
 
 
 function MM.parseElmsString(elmsString)
+	if MM.multipleProfilesLoaded then
+		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
 
+	
 	local amountParsed = 0
 	local currentZone = GetUnitRawWorldPosition('player')
 

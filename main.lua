@@ -415,6 +415,13 @@ Profiles = {
 local defaultOffset = 0 -- 10
 
 function MM.placeIcon()
+	if MM.multipleProfilesLoaded then
+		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
+
 	local _, x, y, z = GetUnitRawWorldPosition('player')
 	local orientation = nil
 	local currentSelections = MM.Settings.currentSelections
@@ -451,7 +458,6 @@ function MM.placeIcon()
 end
 
 function MM.saveIcons(zoneString)
-
 	local currentZone = GetUnitRawWorldPosition('player')
 	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
 	local strings = {}
@@ -487,6 +493,13 @@ end
 
 -- QUICK MENU PLACE
 function MM.placeQuickMenuIcon()
+	if MM.multipleProfilesLoaded then
+		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
+	
 	local _, x, y, z = GetUnitRawWorldPosition('player')
 	local currentSelections = MM.Settings.quickSelections
 	local offset = 0
@@ -540,6 +553,12 @@ end
 
 
 function MM.importIcons(zoneString, overwrite)
+	if MM.multipleProfilesLoaded then
+		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
 	if overwrite then
 		MM.unloadEverything()
 	end
@@ -554,6 +573,12 @@ end
 
 
 function MM.emptyCurrentZone()
+	if MM.multipleProfilesLoaded then
+		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
 	MM.unloadEverything()
 	MM.saveIcons("")
 end
@@ -605,6 +630,9 @@ function MM.loadProfile(profileName)
 	if zoneString == nil then
 		MM.saveIcons("")
 	end
+
+	MM.currentAdditionalProfiles = {}
+	MM.multipleProfilesLoaded = false
 	if M0RMarkersProfileDropdown then
 		M0RMarkersProfileDropdown:UpdateValue()
 	end
@@ -624,6 +652,9 @@ function MM.deleteCurrentProfile()
 	MM.vars.loadedProfile[currentZone] = nil
 	MM.unloadEverything()
 	MM.loadZone(currentZone)
+
+	MM.currentAdditionalProfiles = {}
+	MM.multipleProfilesLoaded = false
 	if M0RMarkersProfileDropdown then
 		M0RMarkersProfileDropdown:UpdateValue()
 	end
@@ -649,8 +680,17 @@ function MM.getCurrentZoneProfiles()
 end
 
 
-function MM.updateProfileDropdown(refresh)
-	if M0RMarkersProfileDropdown then
+function MM.updateProfileDropdown(refresh, onlyAdditional)
+
+	if M0RMarkersProfileDropdownAdditional then
+		local choices = MM.getCurrentZoneProfiles()
+		M0RMarkersProfileDropdownAdditional:UpdateChoices(choices)
+		if refresh then
+			M0RMarkersProfileDropdownAdditional:UpdateValue()
+		end
+	end
+
+	if M0RMarkersProfileDropdown and (not onlyAdditional) then
 		local choices = MM.getCurrentZoneProfiles()
 		M0RMarkersProfileDropdown:UpdateChoices(choices)
 		if refresh then
@@ -664,7 +704,33 @@ end
 
 
 
+function MM.loadAdditionalProfiles(profiles) -- profiles should be a list of profile names for the current zone
+	local currentZone = GetUnitWorldPosition('player')
+	local mainProfile = MM.vars.loadedProfile[currentZone] or "Default"
 
+
+	MM.multipleProfilesLoaded = false
+	MM.unloadEverything()
+
+	for i,currentProfileName in pairs(profiles) do
+		MM.multipleProfilesLoaded = true
+
+		if currentProfileName ~= mainProfile then
+			local zoneString = nil
+			print("Loading profile: "..currentProfileName)
+			if MM.vars.Profiles[currentZone] then
+				local zoneStrings = MM.vars.Profiles[currentZone][currentProfileName]
+				if zoneStrings then
+					zoneString = table.concat(zoneStrings, "")
+				end
+			end
+			if zoneString and zoneString ~= "" then
+				MM.decompressString(zoneString)
+			end
+		end
+	end
+	MM.loadZone(currentZone)
+end
 
 
 
