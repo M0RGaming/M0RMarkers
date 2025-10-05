@@ -576,57 +576,6 @@ function settings.createSettings()
 			end,
 		},
 
-
-		
-
-		--[[
-		{
-			type = "divider",
-		},
-		
-		{
-			type = "editbox",
-			name = "Elms Markers Import",
-			tooltip = "",
-			width = "full",
-			isMultiline = true,
-			maxChars = 10000,
-			isExtraWide = true,
-			getFunc = function() return elmsImportString end,
-			setFunc = function(text) elmsImportString = text end,
-		},
-
-		{
-			type = "button",
-			name = "Append to Profile",
-			tooltip = "",
-			width = "half",
-			func = function()
-				local amountLoaded, zoneString = MM.parseElmsString(elmsImportString)
-				print("Parsed ".. tostring(amountLoaded).. " markers.")
-				--MM.ShowDialogue("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Elms!", "", function() end)
-				exportString = zoneString
-				if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
-			end,
-		},
-		{
-			type = "button",
-			name = "|cFF5555Overwrite Profile|r",
-			tooltip = "",
-			width = "half",
-			func = function()
-				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to overwrite the current profile?", "This is a destructive action and cannot be undone.", function()
-					MM.emptyCurrentZone()
-					local amountLoaded, zoneString = MM.parseElmsString(elmsImportString)
-					print("Parsed ".. tostring(amountLoaded).. " markers.")
-					--MM.ShowDialogue("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Elms!", "", function() end)
-					exportString = zoneString
-					if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
-				end)
-			end,
-		},
-		--]]
-
 	}
 
 

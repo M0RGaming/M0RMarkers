@@ -125,11 +125,12 @@ function handlers.onHeader(unitTag, data)
 		d("finished sending data")
 		print(table.concat(currentData))
 		d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
-		--return --TODO: MAKE SURE THIS IS UNCOMMENTED
+		return --TODO: MAKE SURE THIS IS UNCOMMENTED
 	end
 
 	local failed = false
 	d("expected length: "..tostring(data.length))
+	currentData[tonumber(data.length)+1] = nil
 	for i=1, tonumber(data.length) do
 		--d(i)
 		if currentData[i] == nil then
@@ -142,7 +143,9 @@ function handlers.onHeader(unitTag, data)
 		return
 	end
 	d("finished recieving data")
+
 	local parsedString = table.concat(currentData)
+	currentData = {}
 	print(parsedString)
 	d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
 
