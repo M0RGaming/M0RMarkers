@@ -90,7 +90,7 @@ function settings.createSettings()
 	local panelName = "M0RMarkersSettingsPanel"
 	local panelData = {
 		type = "panel",
-		name = "|cFFD700M0R Markers|r",
+		name = "|cFFD700More Markers|r",
 		author = "|c0DC1CF@M0R_Gaming|r",
 		slashCommand = "/mmarkers"
 	}
@@ -164,8 +164,8 @@ function settings.createSettings()
 			toInsert = {
 				{
 					type = "description",
-					title = "|cFFD700[M0R Markers]|r",
-					text = "Hello, and thank you for using M0R Markers! If you have any errors or complaints, please reach out to me either on discord (@m0r) or at the link below!",
+					title = "|cFFD700[More Markers]|r",
+					text = "Hello, and thank you for using More Markers! If you have any errors or complaints, please reach out to me either on discord (@m0r) or at the link below!",
 					width = "full",
 				},
 				{ -- TODO: SWAP THIS TO BE M0R MARKERS, NOT ARTAEUM
@@ -528,13 +528,13 @@ function settings.createSettings()
 		
 		{
 			type = "editbox",
-			name = "Import M0R Markers String/Convert Elms Markers String",
+			name = "Import Markers String / Convert Elms Markers String",
 			tooltip = "",
 			width = "full",
 			isMultiline = true,
 			maxChars = 10000,
 			reference = "M0RMarkersImportEditBox",
-			default = "Insert either a M0R Markers Profile String here, or insert an Elm's Markers Import String to automatically convert it.",
+			default = "Insert either a More Markers Profile String here, or insert an Elm's Markers Import String to automatically convert it.",
 			isExtraWide = true,
 			getFunc = function() end, --return importString end,
 			setFunc = function(text) importString = text end,
@@ -550,7 +550,7 @@ function settings.createSettings()
 				if foundMMarkers == nil then
 					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
 					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
-						MM.ShowNotice("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "")
+						MM.ShowNotice("Notice", "Failed to find either a More Markers String or Elms Marker String", "")
 					else 
 						local amountLoaded, zoneString = MM.parseElmsString(importString)
 						print("Parsed ".. tostring(amountLoaded).. " markers.")
@@ -575,7 +575,7 @@ function settings.createSettings()
 				if foundMMarkers == nil then
 					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
 					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
-						MM.ShowNotice("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "")
+						MM.ShowNotice("Notice", "Failed to find either a More Markers String or Elms Marker String", "")
 					else
 						MM.ShowDialogue("Warning: Destructive Action",
 							"Are you sure you would like to overwrite the current profile?",

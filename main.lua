@@ -714,8 +714,9 @@ function MM.toggleQuickMenu()
 	M0RMarkerPlaceToplevel:SetHidden(not M0RMarkerPlaceToplevel:IsHidden())
 end
 
-SLASH_COMMANDS['/mmmenu'] = MM.toggleQuickMenu
-
+if not IsConsoleUI() then
+	SLASH_COMMANDS['/mmmenu'] = MM.toggleQuickMenu
+end
 
 
 

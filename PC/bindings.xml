@@ -1,6 +1,6 @@
 <Bindings>
 	<Layer name="General">
-		<Category name="|cFFD700M0R Markers|r">
+		<Category name="|cFFD700More Markers|r">
 			<Action name="M0RMARKERS_TOGGLE_QUICK_MENU">
 				<Down>M0RMarkers.toggleQuickMenu()</Down>
 			</Action>
@@ -22,7 +22,7 @@
 			<Action name="M0RMARKERS_REMOVE_MARKER_CURSOR">
 				<Down>M0RMarkers.removeIconAtCursor()</Down>
 			</Action>
-			
+
 		</Category>
 	</Layer>
 </Bindings>

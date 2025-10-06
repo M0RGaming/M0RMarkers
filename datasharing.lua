@@ -10,7 +10,7 @@ function MM.initSharing()
 	local LGB = LibGroupBroadcast
 	if LGB then
 		local handler = LGB:RegisterHandler("M0RMarkers")
-		handler:SetDisplayName("M0R Markers")
+		handler:SetDisplayName("More Markers")
 		handler:SetDescription("Tool for placing markers in the 3d world!")
 
 		

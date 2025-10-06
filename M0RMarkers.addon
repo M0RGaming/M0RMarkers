@@ -1,12 +1,13 @@
-## Title: |cFFD700M0R Markers|r
-## APIVersion:  101047
+## Title: |cFFD700More Markers|r
+## APIVersion: 101047
 ## Version: 1.0.0
 ## AddOnVersion: 100
 ## Description: A tool for placing 3d markers on the ground
 ## Author: |c0DC1CF@M0R_Gaming|r
 ## SavedVariables: Markers
 ## DependsOn: LibAddonMenu-2.0>=40
-## OptionalDependsOn: LibHarvensAddonSettings LibGroupBroadcast
+## ConsoleDependsOn: LibGroupBroadcast>=91 LibHarvensAddonSettings
+## OptionalDependsOn: LibGroupBroadcast>=91
 
 
 main.lua
@@ -17,4 +18,5 @@ settings.lua
 datasharing.lua
 
 layout.xml
-bindings.xml
+PC/pc_layout.xml
+PC/bindings.xml
