@@ -103,7 +103,8 @@ function settings.createSettings()
 	--a = displayChoices
 
 
-	local exportString = ""
+	MM.exportString = ""
+	--local exportString = MM.exportString
 	local importString = ""
 
 	local elmsImportString = ""
@@ -145,7 +146,7 @@ function settings.createSettings()
 
 	local multiProfileLoadButton = {
 		type = "dropdown",
-		name = "Additional Profiles",
+		name = "Load Additional Profiles",
 		width = "half",
 		scrollable = 10,
 		reference = "M0RMarkersProfileDropdownAdditional",
@@ -391,7 +392,7 @@ function settings.createSettings()
 				},
 
 				profileSelectButton,
-
+				--[[
 				{
 					type = "editbox",
 					name = "New Profile Name",
@@ -408,6 +409,7 @@ function settings.createSettings()
 						if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 					end,
 				},
+				--]]
 
 
 
@@ -429,12 +431,29 @@ function settings.createSettings()
 
 				{
 					type = "button",
-					name = "Create/Load Profile",
+					name = "Create Profile",
 					tooltip = "",
 					width = "half",
 					func = function()
-						MM.loadProfile(currentLoadProfileName or "Default")
-						if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+						MM.ShowEditDialogue("Creating Profile", "What would you like to name the new profile?", "", function(name)
+							MM.loadProfile(name or "Default")
+							if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+						end)
+					end,
+				},
+				{
+					type = "button",
+					name = "Rename Profile",
+					tooltip = "",
+					width = "half",
+					func = function()
+						MM.ShowEditDialogue("Renaming Profile",
+							"What would you like to rename the current profile to?",
+							"If the desired name is already a profile, it will be overwritten.",
+							function(name)
+								MM.renameCurrentProfile(name)
+								if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+							end)
 					end,
 				},
 
@@ -475,24 +494,25 @@ function settings.createSettings()
 			maxChars = 10000,
 			reference = "M0RMarkersExportEditBox",
 			isExtraWide = true,
-			getFunc = function() return exportString or "" end,
+			getFunc = function() return MM.exportString or "" end,
 			setFunc = function(text) end,
 		},
 
 
 		{
 			type = "button",
-			name = "|cFF5555Empty Zone|r",
+			name = "|cFF5555Clear Zone|r",
 			tooltip = "",
 			warning = "This will delete all markers in the current zone.",
-			width = "half",
+			width = "full",
 			func = function()
 				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to empty the current zone?", "This is a destructive action and cannot be undone.", function()
-					MM.emptyCurrentZone(); exportString = ""; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+					MM.emptyCurrentZone(); if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 				end)
 			end,
 		},
 
+		--[[
 		{
 			type = "button",
 			name = "Create Export String",
@@ -500,6 +520,7 @@ function settings.createSettings()
 			width = "half",
 			func = function() exportString = MM.compressLoaded(); if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end end,
 		},
+		--]]
 
 		{
 			type = "divider",
@@ -529,17 +550,17 @@ function settings.createSettings()
 				if foundMMarkers == nil then
 					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
 					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
-						MM.ShowDialogue("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "", function() end)
+						MM.ShowNotice("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "")
 					else 
 						local amountLoaded, zoneString = MM.parseElmsString(importString)
 						print("Parsed ".. tostring(amountLoaded).. " markers.")
-						MM.ShowDialogue("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Elms!", "", function() end)
-						exportString = zoneString
+						MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Elms!", "")
+						--exportString = zoneString
 						if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 					end
 				else
 					local zoneString = MM.importIcons(importString, false)
-					exportString = zoneString
+					--exportString = zoneString
 					if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 				end
 			end,
@@ -554,7 +575,7 @@ function settings.createSettings()
 				if foundMMarkers == nil then
 					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
 					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
-						MM.ShowDialogue("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "", function() end)
+						MM.ShowNotice("Notice", "Failed to find either a M0R Markers String or Elms Marker String", "")
 					else
 						MM.ShowDialogue("Warning: Destructive Action",
 							"Are you sure you would like to overwrite the current profile?",
@@ -563,14 +584,16 @@ function settings.createSettings()
 								MM.emptyCurrentZone()
 								local amountLoaded, zoneString = MM.parseElmsString(importString)
 								print("Parsed ".. tostring(amountLoaded).. " markers.")
-								exportString = zoneString
+								--exportString = zoneString
 								if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 							end
 						)
 					end
 				else
 					MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to overwrite the current profile?", "This is a destructive action and cannot be undone.", function()
-						MM.importIcons(importString, true); exportString = importString; if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+						MM.importIcons(importString, true);
+						--exportString = importString;
+						if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 					end)
 				end
 			end,

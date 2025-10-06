@@ -108,8 +108,10 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 	ZO_CombineNumericallyIndexedTables(mergedTables, MM.loadedMarkers.facing, MM.loadedMarkers.ground)
 
 	if #mergedTables == 0 then
-		d("You have no markers to save")
-		return nil
+		print("No markers to save, returning empty string")
+		MM.exportString = ""
+		if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+		return ""
 	end
 
 	local minX = math.huge
@@ -212,6 +214,9 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 		currentConcat[#currentConcat+1] = tostring(i) .. ":".. table.concat(v, ",")
 	end
 	out = out..table.concat(currentConcat, ";").."]"..secondPart
+
+	MM.exportString = "<"..out..">"
+	if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 
 	return "<"..out..">"
 end
@@ -416,7 +421,7 @@ local defaultOffset = 0 -- 10
 
 function MM.placeIcon()
 	if MM.multipleProfilesLoaded then
-		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
 		d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
@@ -494,7 +499,7 @@ end
 -- QUICK MENU PLACE
 function MM.placeQuickMenuIcon()
 	if MM.multipleProfilesLoaded then
-		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
 		d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
@@ -548,13 +553,16 @@ function MM.loadZone(currentZone)
 		MM.decompressString(zoneString)
 	end
 
+	MM.exportString = zoneString or ""
+	if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+
 	return zoneString
 end
 
 
 function MM.importIcons(zoneString, overwrite)
 	if MM.multipleProfilesLoaded then
-		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
 		d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
@@ -567,6 +575,10 @@ function MM.importIcons(zoneString, overwrite)
 		zoneString = MM.compressLoaded()
 	end
 	MM.saveIcons(zoneString)
+
+	MM.exportString = zoneString
+	if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+
 	return zoneString
 	
 end
@@ -574,13 +586,16 @@ end
 
 function MM.emptyCurrentZone()
 	if MM.multipleProfilesLoaded then
-		MM.ShowDialogue("Notice", "Markers are Read-Only when multiple profiles are loaded.", "", function() end)
+		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
 		d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 
 	MM.unloadEverything()
 	MM.saveIcons("")
+
+	MM.exportString = ""
+	if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 end
 
 
@@ -660,6 +675,37 @@ function MM.deleteCurrentProfile()
 	end
 	if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 end
+
+function MM.renameCurrentProfile(newName)
+	local currentZone = GetUnitRawWorldPosition('player')
+	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
+	--if currentProfileName == nil then -- this should never happen / should only happen if profile = default
+	--	MM.ShowNotice("Notice", "Unable to rename the current profile.", "")
+	--	return
+	--end
+	if MM.vars.Profiles[currentZone] and MM.vars.Profiles[currentZone][currentProfileName] then
+		MM.vars.Profiles[currentZone][newName] = ZO_ShallowTableCopy(MM.vars.Profiles[currentZone][currentProfileName])
+		MM.vars.Profiles[currentZone][currentProfileName] = nil
+
+		print("Renamed profile: "..tostring(currentProfileName).." to: "..tostring(newName))
+		MM.vars.loadedProfile[currentZone] = newName
+
+		if M0RMarkersProfileDropdown then
+			M0RMarkersProfileDropdown:UpdateValue()
+		end
+		if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+	end
+	
+	--MM.unloadEverything()
+	--MM.loadZone(currentZone)
+
+	--MM.currentAdditionalProfiles = {}
+	--MM.multipleProfilesLoaded = false
+end
+
+
+
+
 
 function MM.getCurrentZoneProfiles()
 	local currentZone = GetUnitRawWorldPosition('player')

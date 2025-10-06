@@ -1,14 +1,13 @@
 local MM = M0RMarkers
 
 ESO_Dialogs["M0RMarkerConfirmDialogue"] = {
-	canQueue = false,
+	canQueue = true,
 	gamepadInfo = { dialogType = GAMEPAD_DIALOGS.BASIC },
 	title = { text = "<<1>>" },
 	mainText = { text = "<<1>>" },
 	warning = { text = "<<1>>" },
 	buttons = { { text = "Yes", callback = function(dialogue)
 		dialogue.data.yesCallback()
-		a = dialogue
 	end }, { text = "No" } },
 }
 
@@ -20,6 +19,51 @@ function MM.ShowDialogue(title, description, warning, callback)
 		warningParams = {warning or ""}
 	})
 end
+
+
+ESO_Dialogs["M0RMarkerNotice"] = {
+    canQueue = true,
+    gamepadInfo = { dialogType = GAMEPAD_DIALOGS.BASIC },
+    title = { text = "<<1>>" },
+    mainText = { text = "<<1>>" },
+    warning = { text = "<<1>>" },
+    buttons = { { text = "OK" } },
+}
+
+
+function MM.ShowNotice(title, description, warning)
+    ZO_Dialogs_ShowPlatformDialog("M0RMarkerNotice", {}, {
+        titleParams = {title or ""},
+        mainTextParams = {description or ""},
+        warningParams = {warning or ""}
+    })
+end
+
+
+
+ESO_Dialogs["M0RMarkerEditDialogue"] = {
+    canQueue = true,
+    gamepadInfo = { dialogType = GAMEPAD_DIALOGS.BASIC },
+    title = { text = "<<1>>" },
+    mainText = { text = "<<1>>" },
+    warning = { text = "<<1>>" },
+    editBox = {},
+    buttons = { { text = "Confirm", callback = function(dialogue)
+        local message = ZO_Dialogs_GetEditBoxText(dialogue)
+        dialogue.data.yesCallback(message)
+    end }, { text = "Cancel" } },
+}
+
+
+function MM.ShowEditDialogue(title, description, warning, callback)
+    ZO_Dialogs_ShowPlatformDialog("M0RMarkerEditDialogue", {yesCallback = callback}, {
+        titleParams = {title or ""},
+        mainTextParams = {description or ""},
+        warningParams = {warning or ""}
+    })
+end
+
+
 
 
 
