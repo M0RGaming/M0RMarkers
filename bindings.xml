@@ -10,9 +10,19 @@
 			<Action name="M0RMARKERS_PLACE_QUICK_MARKER">
 				<Down>M0RMarkers.placeQuickMenuIcon()</Down>
 			</Action>
+
+			<Action name="M0RMARKERS_PLACE_QUICK_MARKER_CURSOR">
+				<Down>M0RMarkers.placeQuickMenuIconAtCursor()</Down>
+			</Action>
+
 			<Action name="M0RMARKERS_REMOVE_MARKER">
 				<Down>M0RMarkers.removeClosestIcon()</Down>
 			</Action>
+
+			<Action name="M0RMARKERS_REMOVE_MARKER_CURSOR">
+				<Down>M0RMarkers.removeIconAtCursor()</Down>
+			</Action>
+			
 		</Category>
 	</Layer>
 </Bindings>

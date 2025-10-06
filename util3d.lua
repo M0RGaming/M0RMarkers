@@ -200,7 +200,7 @@ function MM.createIcon(icon)
 end
 
 
-function MM.removeClosestIcon()
+function MM.removeClosestIcon(overwriteX, overwriteY, overwriteZ)
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
 		d("Markers are Read-Only when multiple profiles are loaded.")
@@ -208,6 +208,10 @@ function MM.removeClosestIcon()
 	end
 
 	local _, x, y, z = GetUnitRawWorldPosition('player')
+	if overwriteX then x = overwriteX end
+	if overwriteY then y = overwriteY end
+	if overwriteZ then z = overwriteZ end
+
 	local minDistance = math.huge
 	local closestIcon = 0
 	local floating = true

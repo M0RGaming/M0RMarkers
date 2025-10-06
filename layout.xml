@@ -41,7 +41,7 @@
 		-->
 
 		<TopLevelControl name="M0RMarkerPlaceToplevel" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="true">
-			<Dimensions x="320" y="210" />
+			<Dimensions x="320" y="245" />
 			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="0"/>
 			<Controls>
 				<Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="000000">
@@ -171,19 +171,34 @@
 					</OnTextChanged>
 				</EditBox>
 
-				<Button name="$(parent)Remove" inherits="ZO_DefaultButton" text="|cFFB6C1Remove|r">
+				<Button name="$(parent)PlaceAtCursor" inherits="ZO_DefaultButton" text="|c98FB98Place at Cursor|r">
 					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Text" offsetY="10" />
-					<Dimensions x="120" y="25" />
+					<Dimensions x="125" y="25" />
 					<OnClicked>
-						M0RMarkers.removeClosestIcon()
+						M0RMarkers.placeQuickMenuIconAtCursor()
 					</OnClicked>
 				</Button>
-				<Button name="$(parent)Place" inherits="ZO_DefaultButton" text="|c98FB98Place|r">
+				<Button name="$(parent)Place" inherits="ZO_DefaultButton" text="|c98FB98Place at Feet|r">
 					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)TextEdit" offsetY="10" />
-					<Dimensions x="120" y="25" />
+					<Dimensions x="125" y="25" />
 					<OnClicked>
 						
 						M0RMarkers.placeQuickMenuIcon()
+					</OnClicked>
+				</Button>
+
+				<Button name="$(parent)RemoveAtCursor" inherits="ZO_DefaultButton" text="|cFFB6C1Remove (Cursor)|r">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)PlaceAtCursor" offsetY="10" />
+					<Dimensions x="125" y="25" />
+					<OnClicked>
+						M0RMarkers.removeIconAtCursor()
+					</OnClicked>
+				</Button>
+				<Button name="$(parent)Remove" inherits="ZO_DefaultButton" text="|cFFB6C1Remove (Feet)|r">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Place" offsetY="10" />
+					<Dimensions x="125" y="25" />
+					<OnClicked>
+						M0RMarkers.removeClosestIcon()
 					</OnClicked>
 				</Button>
 
@@ -249,6 +264,14 @@
 
 				
 			</Controls>
+		</TopLevelControl>
+
+
+
+		<TopLevelControl name="M0RMarkersCameraToplevel" layer="0" hidden="true">
+			<OnInitialized>
+				self:Create3DRenderSpace()
+			</OnInitialized>
 		</TopLevelControl>
 	</Controls>
 </GuiXml>

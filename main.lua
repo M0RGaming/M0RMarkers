@@ -422,7 +422,7 @@ local defaultOffset = 0 -- 10
 function MM.placeIcon()
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
-		d("Markers are Read-Only when multiple profiles are loaded.")
+		--d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 
@@ -500,7 +500,7 @@ end
 function MM.placeQuickMenuIcon()
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
-		d("Markers are Read-Only when multiple profiles are loaded.")
+		--d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 
@@ -527,6 +527,92 @@ function MM.placeQuickMenuIcon()
 	local zoneString = MM.compressLoaded()
 	MM.saveIcons(zoneString)
 end
+
+
+local minAngle = zo_rad(-2)
+
+function MM.placeQuickMenuIconAtCursor()
+	if MM.multipleProfilesLoaded then
+		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
+		--d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
+	Set3DRenderSpaceToCurrentCamera("M0RMarkersCameraToplevel")
+	local cX, cY, cZ = GuiRender3DPositionToWorldPosition(M0RMarkersCameraToplevel:Get3DRenderSpaceOrigin())
+	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
+	local yaw = zo_atan2(fX, fZ) - math.pi
+	local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
+
+	if pitch > minAngle then
+		MM.ShowNotice("Notice", "You cannot place markers at your cursor unless there is a minimum 2 degree angle from the horizon", "")
+		return
+	end
+
+	local _, _, y, _ = GetUnitRawWorldPosition('player') --feet position
+
+	--print(pitch)
+	--print(cY)
+	--print(y)
+	local r = (cY-y)/(zo_tan(pitch))
+	--print(r)
+
+	local x = r*zo_sin(yaw) + cX
+	local z = r*zo_cos(yaw) + cZ
+
+	--print(x)
+	--print(z)
+
+	local currentSelections = MM.Settings.quickSelections
+	local offset = 0
+	if currentSelections.offsetY and currentSelections.size then
+		offset = currentSelections.offsetY*currentSelections.size
+	end
+	local icon = {
+		x = x or 0,
+		y = y+offset or 0,
+		z = z or 0,
+		bgTexture = currentSelections.texture,
+		colour = currentSelections.rgba or {1,1,1,1},
+		text = currentSelections.text or "",
+		size = currentSelections.size or 1, -- meters
+	}
+	print("Placing Icon at cursor")
+	MM.createIcon(icon)
+
+	MM.loadedMarkers.currentTimestamp = os.time()
+	local zoneString = MM.compressLoaded()
+	MM.saveIcons(zoneString)
+end
+
+
+
+function MM.removeIconAtCursor()
+	if MM.multipleProfilesLoaded then
+		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
+		--d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
+	Set3DRenderSpaceToCurrentCamera("M0RMarkersCameraToplevel")
+	local cX, cY, cZ = GuiRender3DPositionToWorldPosition(M0RMarkersCameraToplevel:Get3DRenderSpaceOrigin())
+	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
+	local yaw = zo_atan2(fX, fZ) - math.pi
+	local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
+
+	if pitch > minAngle then
+		MM.ShowNotice("Notice", "You cannot remove markers at your cursor unless there is a minimum 2 degree angle from the horizon", "")
+		return
+	end
+
+	local _, _, y, _ = GetUnitRawWorldPosition('player') --feet position
+	local r = (cY-y)/(zo_tan(pitch))
+	local x = r*zo_sin(yaw) + cX
+	local z = r*zo_cos(yaw) + cZ
+
+	MM.removeClosestIcon(x,y,z)
+end
+
 
 
 
@@ -563,7 +649,7 @@ end
 function MM.importIcons(zoneString, overwrite)
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
-		d("Markers are Read-Only when multiple profiles are loaded.")
+		--d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 
@@ -587,7 +673,7 @@ end
 function MM.emptyCurrentZone()
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
-		d("Markers are Read-Only when multiple profiles are loaded.")
+		--d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 
@@ -615,9 +701,13 @@ function MM.playerActivated()
 end
 
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_TOGGLE_QUICK_MENU", "Toggle Quick Menu Visiblity")
-ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_REMOVE_MARKER", "Remove Closest Marker")
-ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_MARKER", "Place Marker (Settings Configured)")
-ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_QUICK_MARKER", "Place Marker (Quick Menu Configured)")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_REMOVE_MARKER", "|cFFB6C1Remove Closest Marker|r")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_MARKER", "|c98FB98Place Marker (Settings Configured)|r")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_QUICK_MARKER", "|c98FB98Place Marker (Quick Menu Configured)|r")
+
+
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_QUICK_MARKER_CURSOR", "|c98FB98Place Marker at Cursor (Quick Menu Configured)|r")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_REMOVE_MARKER_CURSOR", "|cFFB6C1Remove Marker at Cursor|r")
 
 
 function MM.toggleQuickMenu()
