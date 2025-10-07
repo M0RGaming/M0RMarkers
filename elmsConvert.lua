@@ -367,7 +367,7 @@ MM.elmsMap = {
 function MM.parseElmsString(elmsString)
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
-		d("Markers are Read-Only when multiple profiles are loaded.")
+		d("|cFFD700More Markers|r: Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 

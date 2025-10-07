@@ -14,14 +14,14 @@ function MM.initSharing()
 		handler:SetDescription("Tool for placing markers in the 3d world!")
 
 		
-		protocols.header = handler:DeclareProtocol(501, "M0RMarkersHeader")
+		protocols.header = handler:DeclareProtocol(123, "M0RMarkersHeader")
 		protocols.header:AddField(LGB.CreateOptionalField(LGB.CreateNumericField("length", {numBits=11, trimValues=true})))
 		protocols.header:AddField(LGB.CreateFlagField("sending")) -- either true or false. if true then just started. if false then just ended. true requires length to exist
 		protocols.header:OnData(handlers.onHeader)
 		protocols.header:Finalize({replaceQueuedMessages = false})
 		
 
-		protocols.data = handler:DeclareProtocol(500, "M0RMarkersData")
+		protocols.data = handler:DeclareProtocol(122, "M0RMarkersData")
 		protocols.data:AddField(LGB.CreateNumericField("position", {numBits=11, trimValues=true}))
 		protocols.data:AddField(LGB.CreateStringField("data", {minLength=0, maxLength=26}))
 		protocols.data:OnData(handlers.onData)
@@ -62,7 +62,11 @@ local lastTime = 0
 local startTime = 0
 
 function MM.send(zoneString)
-	if currentlySending then d("Cant start sending, as previous send is in progress") return end
+	if currentlySending then
+		MM.ShowNotice("Notice", "You cannot start sending new markers until the current send is finished!", "")
+		d("|cFFD700More Markers|r: Cant start sending, as previous send is in progress")
+		return
+	end
 	if IsUnitGrouped('player') then
 		if not IsUnitGroupLeader('player') then
 			MM.ShowNotice("Notice", "You must be the group leader to share markers!", "")
@@ -71,7 +75,7 @@ function MM.send(zoneString)
 		currentString = zoneString
 
 		length = math.ceil(#zoneString / 25)
-		d("length of "..length)
+		print("length of "..tostring(length))
 
 
 		--protocols.header:Send({
@@ -87,10 +91,13 @@ function MM.send(zoneString)
 		lastTime = os.rawclock()
 		startTime = os.rawclock()
 
-		M0RMarkerProgressMeterBar:SetValue(0)
-		M0RMarkerProgressMeterEstimated:SetText(string.format("Estimated Time Remaining: %.1fs", 0))
-		M0RMarkerProgressMeterElapsed:SetText(string.format("Elapsed Time: %.1fs", 0))
-		M0RMarkerProgressMeter:SetHidden(false)
+
+		if LibGroupBroadcast then
+			M0RMarkerProgressMeterBar:SetValue(0)
+			M0RMarkerProgressMeterEstimated:SetText(string.format("Estimated Time Remaining: %.1fs", 0))
+			M0RMarkerProgressMeterElapsed:SetText(string.format("Elapsed Time: %.1fs", 0))
+			M0RMarkerProgressMeter:SetHidden(false)
+		end
 
 
 	else
@@ -108,7 +115,7 @@ function MM.sendTick()
 			sending = false,
 			length = length
 		})
-		d("FINSIHED")
+		print("FINSIHED")
 		return
 	end
 	protocols.data:Send({
@@ -132,36 +139,36 @@ function handlers.onHeader(unitTag, data)
 	if AreUnitsEqual('player', unitTag) then
 		currentlySending = false
 		M0RMarkerProgressMeter:SetHidden(true)
-		d("finished sending data")
+		d("|cFFD700More Markers|r: Finished Sending Profile!")
 		print(table.concat(currentData))
-		d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
-		--return --TODO: MAKE SURE THIS IS UNCOMMENTED
+		d(string.format("|cFFD700More Markers|r: Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
+		return --TODO: MAKE SURE THIS IS UNCOMMENTED
 	end
 
 	local failed = false
-	d("expected length: "..tostring(data.length))
+	print("expected length: "..tostring(data.length))
 	currentData[tonumber(data.length)+1] = nil
 	for i=1, tonumber(data.length) do
 		--d(i)
 		if currentData[i] == nil then
-			d("Failed to get data with index: "..i)
+			d("|cFFD700More Markers|r: Failed to read transmitted Data with index: "..i)
 			failed = true
 		end
 	end
 	if failed then
-		d("Something Failed when recieving data")
+		d("|cFFD700More Markers|r: Something Failed when reading the transmitted profile")
 		return
 	end
-	d("finished recieving data")
+	print("finished recieving data")
 
 	local parsedString = table.concat(currentData)
 	currentData = {}
 	print(parsedString)
-	d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
+	--d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
 
 	local _,_, zone, timestamp, mins, sizes, pitch, yaw, colour, texture, positions = string.find(parsedString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
 	if (zone == nil) or (timestamp == nil) then
-		d("Something Failed when recieving data")
+		d("|cFFD700More Markers|r: Something Failed when reading the transmitted profile")
 		return
 	else
 		local userName = GetUnitDisplayName(unitTag)
@@ -210,7 +217,7 @@ function handlers.onHeader(unitTag, data)
 					end
 					if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 				end
-				d("Saved Transmitted Markers!")
+				d("|cFFD700More Markers|r: Saved Transmitted Markers!")
 			end
 		)
 

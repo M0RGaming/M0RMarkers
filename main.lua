@@ -229,7 +229,8 @@ function MM.decompressString(exportString) -- 10 ms to load 206 textures + rende
 	local _,_, zone, timestamp, mins, sizes, pitch, yaw, colour, texture, positions = string.find(exportString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
 	local currentZone = GetUnitRawWorldPosition('player')
 	--print(zone)
-	if zone ~= tostring(currentZone) then d("These markers are for a different zone!") return end
+	if zone == nil then d("|cFFD700More Markers|r: The currently loaded markers are improperly formatted!") end
+	if zone ~= tostring(currentZone) then d("|cFFD700More Markers|r: These markers are for a different zone!") return end
 
 	local minXH, minYH, minZH = zo_strsplit(":", mins)
 	local minX = tonumber(minXH,16)
@@ -746,11 +747,13 @@ end
 
 function MM.deleteCurrentProfile()
 	local currentZone = GetUnitRawWorldPosition('player')
-	local currentProfileName = MM.vars.loadedProfile[currentZone]
+	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
+	--[[
 	if currentProfileName == nil then -- this should never happen / should only happen if profile = default
 		d("Failed to find a profile to delete/Can't delete the default profile.")
 		return
 	end
+	--]]
 	if MM.vars.Profiles[currentZone] then
 		MM.vars.Profiles[currentZone][currentProfileName] = nil
 	end
@@ -761,6 +764,8 @@ function MM.deleteCurrentProfile()
 
 	MM.currentAdditionalProfiles = {}
 	MM.multipleProfilesLoaded = false
+	MM.ShowNotice("Notice", "The profile "..tostring(currentProfileName).." was deleted.", "")
+	
 	if M0RMarkersProfileDropdown then
 		M0RMarkersProfileDropdown:UpdateValue()
 	end

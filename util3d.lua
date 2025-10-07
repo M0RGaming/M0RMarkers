@@ -203,7 +203,7 @@ end
 function MM.removeClosestIcon(overwriteX, overwriteY, overwriteZ)
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
-		d("Markers are Read-Only when multiple profiles are loaded.")
+		d("|cFFD700More Markers|r: Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 
@@ -230,7 +230,7 @@ function MM.removeClosestIcon(overwriteX, overwriteY, overwriteZ)
 			floating = false
 		end
 	end
-	if closestIcon == 0 then d("Failed to find closest icon") return end
+	if closestIcon == 0 then d("|cFFD700More Markers|r: Failed to find closest icon to delete") return end
 
 	if floating then
 		destroyControl(facingIcons[closestIcon]) 
