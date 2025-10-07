@@ -77,9 +77,10 @@ end
 
 local function SetupProfileItem(control, data, ...)
     ZO_SharedGamepadEntry_OnSetup(control, data, ...)
+    control.statusIndicator:AddIcon(CHECKED_ICON)
 
     if IsSelected(data) then
-        control.statusIndicator:AddIcon(CHECKED_ICON)
+        --control.statusIndicator:AddIcon(CHECKED_ICON)
         control.statusIndicator:Show()
     end
 end
@@ -113,8 +114,8 @@ local function SetupProfiles(dialog)
     dialog.entryList:SetSelectedDataByEval(IsSelected)
 end
 
-ESO_Dialogs["M0RMarkerProfileSelect"] =
-{
+ESO_Dialogs["M0RMarkerProfileSelect"] = {
+    canQueue = true,
     gamepadInfo =
     {
         dialogType = GAMEPAD_DIALOGS.PARAMETRIC,
@@ -135,6 +136,7 @@ ESO_Dialogs["M0RMarkerProfileSelect"] =
                             	--d("Loading: ".. data.name)
                             	MM.currentLoadProfileName = data.name
                             	MM.loadProfile(data.name)
+                                LibHarvensAddonSettings.list:RefreshVisible()
                             end
                         end,
         },
@@ -154,105 +156,158 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local function SetupProfileItemMulti(control, data, ...)
-    ZO_SharedGamepadEntry_OnSetup(control, data, ...)
-
-    --[[
-    if IsSelected(data) then
-        control.statusIndicator:AddIcon(CHECKED_ICON)
-        control.statusIndicator:Show()
-    end
-    --]]
-end
-
-
-local function SetupProfilesMulti(dialog)
-    local profiles = M0RMarkers.getCurrentZoneProfiles()
-    dialog.info.parametricList = {}
-    local template = "ZO_GamepadMultiSelectionDropdownItem"
-
-    local currentZone = GetUnitRawWorldPosition('player')
-    local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
-
-
-
-    for i,v in pairs(profiles) do
-        local entryData = ZO_GamepadEntryData:New(v, icon)
-        entryData:SetFontScaleOnSelection(false)
-        entryData:SetIconTintOnSelection(true)
-        entryData.setup = SetupProfileItemMulti
-        entryData.name = v
-        entryData.isActive = v == currentProfileName
-
-        local listItem = 
-        {
-            template = template,
-            entryData = entryData,
-        }
-        table.insert(dialog.info.parametricList, listItem)
-    end
-    dialog:setupFunc()
-    dialog.entryList:SetSelectedDataByEval(IsSelected)
-end
-
-ESO_Dialogs["M0RMarkerProfileSelectMulti"] =
-{
+ESO_Dialogs["M0RMarkerProfileSelectMulti"] = {
+    canQueue = true,
     gamepadInfo =
     {
         dialogType = GAMEPAD_DIALOGS.PARAMETRIC,
     },
-    setup = SetupProfilesMulti,
+    setup = SetupProfiles,
     title =
     {
         text = "Select your Profile",
     },
+    blockDialogReleaseOnPress = true,
+    onHidingCallback = function(dialog)
+        --a = dialog.entryList
+        ---[[
+        local profilesToLoad = {}
+        for i,v in pairs(dialog.entryList.dataList) do
+            if v.isActive then
+                --d(v.name)
+                profilesToLoad[#profilesToLoad+1] = v.name
+            end
+        end
+        MM.loadAdditionalProfiles(profilesToLoad)
+        LibHarvensAddonSettings.list:RefreshVisible()
+        --]]
+    end,
     buttons =
     {
         {
             text = SI_GAMEPAD_SELECT_OPTION,
             callback =  function(dialog)
-                            local data = dialog.entryList:GetTargetData()
-                            --d("Trying to load: ".. data.name)
-                            if data.name then
-                                --d("Loading: ".. data.name)
-                                MM.currentLoadProfileName = data.name
-                                MM.loadProfile(data.name)
-                            end
-                        end,
+                local data = dialog.entryList:GetTargetData()
+                data.isActive = not data.isActive
+                local control = dialog.entryList:GetTargetControl()
+                control.statusIndicator:SetHidden(not data.isActive)
+                --d("Trying to load: ".. data.name.. " and is now ".. tostring(data.isActive))
+            end,
         },
         {
             text = SI_DIALOG_EXIT,
+            callback = function()
+                ZO_Dialogs_ReleaseDialogOnButtonPress("M0RMarkerProfileSelectMulti")
+            end
         },
     },
 }
 
+--SLASH_COMMANDS['/mmopentest'] = function() ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelectMulti") end
+
+function MM.ShowMultiProfileSelect()
+    ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelectMulti")
+end
 
 
---function MM.ShowProfileSelect()
---    ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelectMulti")
---    /script ZO_Dialogs_ShowGamepadDialog("M0RMarkerProfileSelectMulti")
---end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ESO_Dialogs["M0RMarkerEditBox"] = {
+    canQueue = true,
+    gamepadInfo = { dialogType = GAMEPAD_DIALOGS.PARAMETRIC, },
+    setup = SetupProfiles,
+    title = { text = "<<1>>" },
+    mainText = { text = "<<1>>" },
+    warning = { text = "<<1>>" },
+    setup = function(dialog) dialog:setupFunc() end,
+    parametricList = {
+        {
+            template = "ZO_Gamepad_GenericDialog_Parametric_TextFieldItem",
+            templateData =
+            {
+                textChangedCallback = function(control)
+                    local comment = control:GetText()
+                    local dialog = ZO_GenericGamepadDialog_GetControl(GAMEPAD_DIALOGS.PARAMETRIC)
+                    dialog.data.selectedName = comment
+                end,
+                setup = function(control, data, selected, reselectingDuringRebuild, enabled, active)
+                    control.highlight:SetHidden(not selected)
+                    control.editBoxControl.textChangedCallback = data.textChangedCallback
+                    control.editBoxControl:SetMaxInputChars(1000)
+                    --control.editBoxControl:SetDefaultText(GetString(SI_EDIT_NOTE_DEFAULT_TEXT))
+                    data.control = control
+                    local dialog = ZO_GenericGamepadDialog_GetControl(GAMEPAD_DIALOGS.PARAMETRIC)
+                    if dialog.data.selectedName then
+                        control.editBoxControl:SetText(dialog.data.selectedName)
+                    end
+                end,
+                callback = function(dialog)
+                    local data = dialog.entryList:GetTargetData()
+                    local edit = data.control.editBoxControl
+
+                    edit:TakeFocus()
+                end,
+            },
+        },
+        {
+            template = "ZO_GamepadTextFieldSubmitItem", -- ZO_GamepadFullWidthLeftLabelEntryTemplate
+            templateData =
+            {
+                text = GetString(SI_GAMEPAD_CONTACTS_EDIT_NOTE_CONFIRM),
+                setup = ZO_SharedGamepadEntry_OnSetup,
+                callback = function(dialog)
+                    local name = dialog.data.selectedName
+                    dialog.data.textConfirmCallback(name)
+                    ZO_Dialogs_ReleaseDialogOnButtonPress("M0RMarkerEditBox")
+                end,
+            },
+        }
+    },
+    blockDialogReleaseOnPress = true,
+    buttons = {
+        {
+            text = SI_GAMEPAD_SELECT_OPTION,
+            callback =  function(dialog)
+                local targetData = dialog.entryList:GetTargetData()
+                if(targetData and targetData.callback) then
+                    targetData.callback(dialog)
+                end
+            end,
+        },
+        {
+            text = SI_DIALOG_EXIT,
+            callback = function()
+                ZO_Dialogs_ReleaseDialogOnButtonPress("M0RMarkerEditBox")
+            end
+        },
+    },
+}
+
+--ZO_Dialogs_ShowPlatformDialog("M0RMarkerEditBox")
+
+function MM.ShowGPEdit(title, description, warning, callback)
+    ZO_Dialogs_ShowPlatformDialog("M0RMarkerEditBox", {textConfirmCallback = callback}, {
+        titleParams = {title or "test"},
+        mainTextParams = {description or "test"},
+        warningParams = {warning or "test"}
+    })
+end
+
+--SLASH_COMMANDS['/mmopentest'] = function() MM.ShowGPEdit("Test Title", "Test description", "test warning", function(name) d("Name callback: "..tostring(name)) end) end
+
 
 
 

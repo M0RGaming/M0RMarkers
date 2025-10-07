@@ -160,7 +160,54 @@ function settings.createSettings()
 	}
 
 
+	local createProfileFunc = function()
+		MM.ShowEditDialogue("Creating Profile", "What would you like to name the new profile?", "", function(name)
+			MM.loadProfile(name or "Default")
+			if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+		end)
+	end
+
+	local renameProfileFunc = function()
+		MM.ShowEditDialogue("Renaming Profile",
+			"What would you like to rename the current profile to?",
+			"If the desired name is already a profile, it will be overwritten.",
+			function(name)
+				MM.renameCurrentProfile(name)
+				if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+			end
+		)
+	end
+
+	local refreshLHAS = function() end
+
 	if IsConsoleUI() then
+
+			refreshLHAS = function()
+				LibHarvensAddonSettings.list:RefreshVisible()
+			end
+
+			createProfileFunc = function()
+				MM.ShowGPEdit("Creating Profile",
+					"What would you like to name the new profile?",
+					"",
+					function(name)
+						MM.loadProfile(name or "Default")
+						LibHarvensAddonSettings.list:RefreshVisible()
+					end
+				)
+			end
+
+			renameProfileFunc = function()
+				MM.ShowGPEdit("Renaming Profile",
+					"What would you like to rename the current profile to?",
+					"If the desired name is already a profile, it will be overwritten.",
+					function(name)
+						MM.renameCurrentProfile(name)
+						LibHarvensAddonSettings.list:RefreshVisible()
+					end
+				)
+			end
+
 			toInsert = {
 				{
 					type = "description",
@@ -192,6 +239,13 @@ function settings.createSettings()
 				name = "Select Profile",
 				tooltip = "Click this button to change profiles!",
 				func = function() MM.ShowProfileSelect() end,
+			}
+
+			multiProfileLoadButton = {
+				type = "button",
+				name = "Load Additional Profiles",
+				tooltip = "Click this button to load additional profiles at once!",
+				func = function() MM.ShowMultiProfileSelect() end,
 			}
 
 			
@@ -423,7 +477,8 @@ function settings.createSettings()
 						MM.ShowDialogue("Warning: Destructive Action",
 							"Are you sure you would like to empty the current loaded profile?",
 							"This is a destructive action and cannot be undone.", function()
-							MM.deleteCurrentProfile(); 
+							MM.deleteCurrentProfile();
+							refreshLHAS()
 						end)
 					end,
 				},
@@ -434,27 +489,14 @@ function settings.createSettings()
 					name = "Create Profile",
 					tooltip = "",
 					width = "half",
-					func = function()
-						MM.ShowEditDialogue("Creating Profile", "What would you like to name the new profile?", "", function(name)
-							MM.loadProfile(name or "Default")
-							if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
-						end)
-					end,
+					func = createProfileFunc,
 				},
 				{
 					type = "button",
 					name = "Rename Profile",
 					tooltip = "",
 					width = "half",
-					func = function()
-						MM.ShowEditDialogue("Renaming Profile",
-							"What would you like to rename the current profile to?",
-							"If the desired name is already a profile, it will be overwritten.",
-							function(name)
-								MM.renameCurrentProfile(name)
-								if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
-							end)
-					end,
+					func = renameProfileFunc,
 				},
 
 

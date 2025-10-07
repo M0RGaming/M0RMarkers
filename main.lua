@@ -768,6 +768,13 @@ function MM.deleteCurrentProfile()
 end
 
 function MM.renameCurrentProfile(newName)
+
+	if newName == nil then
+		MM.ShowNotice("Notice", "Failed to find a name to rename the current profile to.", "")
+		return
+	end
+
+	
 	local currentZone = GetUnitRawWorldPosition('player')
 	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
 	--if currentProfileName == nil then -- this should never happen / should only happen if profile = default

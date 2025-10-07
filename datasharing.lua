@@ -29,22 +29,29 @@ function MM.initSharing()
 	else
 		protocols.header = {}
 		function protocols.header:Send()
+			MM.ShowNotice("Notice", "You cannot send markers locally without LibGroupBroadcast.", "")
 			d("You cannot send markers locally without LibGroupBroadcast")
 		end
 		protocols.data = {}
 		function protocols.data:Send()
+			MM.ShowNotice("Notice", "You cannot send markers locally without LibGroupBroadcast.", "")
 			d("You cannot send markers locally without LibGroupBroadcast")
 		end
 	end
 end
 
 function MM.shareCurrentZone()
+	if MM.multipleProfilesLoaded then
+		MM.ShowNotice("Notice", "You cannot share markers while multiple profiles are loaded.", "")
+		--d("Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
 	local zoneString = MM.compressLoaded()
 	MM.send(zoneString)
 end
 
 
-SLASH_COMMANDS['/mmtest'] = MM.shareCurrentZone
+--SLASH_COMMANDS['/mmtest'] = MM.shareCurrentZone
 
 
 local currentlySending = false
@@ -58,7 +65,8 @@ function MM.send(zoneString)
 	if currentlySending then d("Cant start sending, as previous send is in progress") return end
 	if IsUnitGrouped('player') then
 		if not IsUnitGroupLeader('player') then
-			d("You must be the group leader to share markers!")
+			MM.ShowNotice("Notice", "You must be the group leader to share markers!", "")
+			return
 		end
 		currentString = zoneString
 
@@ -85,6 +93,8 @@ function MM.send(zoneString)
 		M0RMarkerProgressMeter:SetHidden(false)
 
 
+	else
+		MM.ShowNotice("Notice", "You must be in a group to share markers!", "")
 	end
 end
 
@@ -125,7 +135,7 @@ function handlers.onHeader(unitTag, data)
 		d("finished sending data")
 		print(table.concat(currentData))
 		d(string.format("Time Taken: %.1f seconds", (os.rawclock()-startTime)/1000))
-		return --TODO: MAKE SURE THIS IS UNCOMMENTED
+		--return --TODO: MAKE SURE THIS IS UNCOMMENTED
 	end
 
 	local failed = false
@@ -191,10 +201,15 @@ function handlers.onHeader(unitTag, data)
 
 				MM.currentAdditionalProfiles = {}
 				MM.multipleProfilesLoaded = false
-				if M0RMarkersProfileDropdown then
-					M0RMarkersProfileDropdown:UpdateValue()
+
+				if IsConsoleUI() then
+					LibHarvensAddonSettings.list:RefreshVisible()
+				else
+					if M0RMarkersProfileDropdown then
+						M0RMarkersProfileDropdown:UpdateValue()
+					end
+					if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 				end
-				if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 				d("Saved Transmitted Markers!")
 			end
 		)
