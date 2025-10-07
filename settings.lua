@@ -505,9 +505,25 @@ function settings.createSettings()
 
 				{
 					type = "button",
-					name = "Share Profile",
+					name = "Insert Premade Profiles",
 					tooltip = "",
 					width = "half",
+					func = function()
+						MM.ShowDialogue("Premade Profiles",
+							"Would you like to install the premade profiles? These profiles were made by M0R, both via a conversion of Elms Markers and Hand Placement.\n\nThis will NOT replace your current profiles, but instead add them on top.",
+							"",
+							function()
+								MM.InsertPremades() 
+							end)
+					end,
+					
+				},
+
+				{
+					type = "button",
+					name = "|c0DC1CFShare Profile|r",
+					tooltip = "",
+					width = "full",
 					func = function()
 						MM.ShowDialogue("Transmitting Profile",
 							"Would you like to share your currently loaded profile to everyone in the group?",
@@ -523,36 +539,7 @@ function settings.createSettings()
 			}
 		},
 
-		{
-			type = "divider",
-		},
-
-		{
-			type = "editbox",
-			name = "Export String",
-			tooltip = "",
-			width = "full",
-			isMultiline = true,
-			maxChars = 10000,
-			reference = "M0RMarkersExportEditBox",
-			isExtraWide = true,
-			getFunc = function() return MM.exportString or "" end,
-			setFunc = function(text) end,
-		},
-
-
-		{
-			type = "button",
-			name = "|cFF5555Clear Zone|r",
-			tooltip = "",
-			warning = "This will delete all markers in the current zone.",
-			width = "full",
-			func = function()
-				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to empty the current zone?", "This is a destructive action and cannot be undone.", function()
-					MM.emptyCurrentZone(); if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
-				end)
-			end,
-		},
+		
 
 		--[[
 		{
@@ -638,6 +625,37 @@ function settings.createSettings()
 						if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 					end)
 				end
+			end,
+		},
+
+		{
+			type = "divider",
+		},
+
+		{
+			type = "editbox",
+			name = "Export String",
+			tooltip = "",
+			width = "full",
+			isMultiline = true,
+			maxChars = 10000,
+			reference = "M0RMarkersExportEditBox",
+			isExtraWide = true,
+			getFunc = function() return MM.exportString or "" end,
+			setFunc = function(text) end,
+		},
+
+
+		{
+			type = "button",
+			name = "|cFF5555Clear Zone|r",
+			tooltip = "",
+			warning = "This will delete all markers in the current zone.",
+			width = "full",
+			func = function()
+				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to empty the current zone?", "This is a destructive action and cannot be undone.", function()
+					MM.emptyCurrentZone(); if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+				end)
 			end,
 		},
 

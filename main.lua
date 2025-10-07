@@ -918,6 +918,10 @@ function MM:Initialize()
 	-- Addon Settings Menu
 	MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars)
 
+	if ZO_IsTableEmpty(MM.vars.Profiles) then
+		MM.InsertPremades()
+	end
+
 	if LibFilteredChatPanel then
 		MM.filter = LibFilteredChatPanel:CreateFilter("M0RMarkers", "/M0RMarkers/textures/chevron.dds", {0, 0.8, 0.8}, false)
 	end
