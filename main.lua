@@ -3,7 +3,7 @@ local MM = M0RMarkers
 
 -- Written by M0R_Gaming
 
-local debugMode = true
+local debugMode = false
 
 MM.name = "M0RMarkers"
 MM.varversion = 1
