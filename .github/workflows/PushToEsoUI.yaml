@@ -25,7 +25,7 @@ jobs:
         uses: M0RGaming/Push-To-EsoUI@main
         with:
           EsoUIToken: ${{secrets.ESOUI_API_TOKEN}}
-          EsoUIID: 3985
+          EsoUIID: 4266
           path: './M0RMarkers/'
           version: ${{github.event.inputs.version}}
           artifact: 'M0RMarkers.zip'

@@ -221,14 +221,14 @@ function settings.createSettings()
 					name = "Contact Me \n(QR Code)",
 					tooltip = "Click this button to be directed to a QR Code which opens the ArtaeumGroupTool esoui page where you can reach out to me!",
 					width = "half",
-					func = function() RequestOpenUnsafeURL("https://m0rgaming.github.io/create-qr-code/?url=https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
+					func = function() RequestOpenUnsafeURL("https://m0rgaming.github.io/create-qr-code/?url=https://www.esoui.com/downloads/info4266-MoreMarkers.html#comments") end,
 				},
 				{
 					type = "button",
 					name = "Contact Me \n(Direct Link)",
 					tooltip = "Click this button to be directed to the ArtaeumGroupTool esoui page where you can reach out to me!",
 					width = "half",
-					func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info3012-ArtaeumGroupTool2.0.html#comments") end,
+					func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info4266-MoreMarkers.html#comments") end,
 				},
 				{
 					type = "divider",
