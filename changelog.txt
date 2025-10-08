@@ -1,2 +1,6 @@
+----- 1.0.1 -----
+(minor) Turned off Debug Mode
+Updated links for console to be directed to the correct esoui page.
+
 ----- 1.0.0 -----
 Initial Release
