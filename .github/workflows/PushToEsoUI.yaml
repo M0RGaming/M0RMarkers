@@ -1,0 +1,31 @@
+name: PushToEsoUI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'     
+        required: true
+        default: '1.0.0'
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: Pushing
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: 'M0RMarkers'
+
+      - name: Zip release
+        run: 7z a M0RMarkers.zip * -xr!*.git*
+
+      - name: Push to EsoUI
+        id: push
+        uses: M0RGaming/Push-To-EsoUI@main
+        with:
+          EsoUIToken: ${{secrets.ESOUI_API_TOKEN}}
+          EsoUIID: 3985
+          path: './M0RMarkers/'
+          version: ${{github.event.inputs.version}}
+          artifact: 'M0RMarkers.zip'

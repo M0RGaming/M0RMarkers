@@ -150,6 +150,7 @@ function settings.createSettings()
 		width = "half",
 		scrollable = 10,
 		reference = "M0RMarkersProfileDropdownAdditional",
+		warning = "You cannot place or remove markers while multiple profiles are loaded.",
 		choices = {},
 		multiSelect = true,
 		getFunc = function() MM.updateProfileDropdown(false, true) return MM.currentAdditionalProfiles end,
@@ -288,6 +289,7 @@ function settings.createSettings()
 			type = "dropdown",
 			name = "Preset Colours",
 			width = "half",
+			tooltip = "Select one of a few default colours, or use the colour picker to fully create your own!",
 			choices = colourPresets,
 			getFunc = function() return colourLookup[ZO_ColorDef.FloatsToHex(unpack(currentSelections.rgba))] end,
 			setFunc = function(value) currentSelections.rgba = colourLookup[value] end,
@@ -295,7 +297,7 @@ function settings.createSettings()
 
 		{
 			type = "colorpicker",
-			name = "Colour",
+			name = "Colour Picker",
 			tooltip = "",
 			width = "half",
 			getFunc = function() return unpack(currentSelections.rgba) end,
@@ -306,7 +308,7 @@ function settings.createSettings()
 		{
 			type = "slider",
 			name = "Size (cm)",
-			tooltip = "",
+			tooltip = "This is the diameter of the marker. (1 meter = 100 cm)",
 			min = 10,
 			max = 1000,
 			step = 10,	--(optional)
@@ -328,7 +330,7 @@ function settings.createSettings()
 		{
 			type = "button",
 			name = "|cFF5555Remove Icon|r",
-			tooltip = "",
+			warning = "This will remove the closest icon to you.",
 			width = "half",
 			func = function()
 				MM.ShowDialogue("Warning: Destructive Action",
@@ -342,7 +344,6 @@ function settings.createSettings()
 		{
 			type = "button",
 			name = "Place Icon",
-			tooltip = "",
 			width = "half",
 			func = MM.placeIcon,
 		},
@@ -357,7 +358,7 @@ function settings.createSettings()
 				{
 					type = "checkbox",
 					name = "Facing User",
-					tooltip = "",
+					tooltip = "If this is enabled, markers will be 'floating' in the air and always turn to face the user.",
 					warning = "When turning off 'Facing User' to create flat icons, it is recommended to set your vertical offset to 0%",
 					width = "half",
 					getFunc = function() return currentSelections.floating end,
@@ -366,7 +367,7 @@ function settings.createSettings()
 				{
 					type = "button",
 					name = "Set Yaw to Camera Yaw",
-					tooltip = "",
+					tooltip = "This will set the yaw slider below to what your camera was facing before you entered the settings menu.",
 					width = "half",
 					func = function()
 						local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
@@ -378,7 +379,7 @@ function settings.createSettings()
 				{
 					type = "slider",
 					name = "Yaw",
-					tooltip = "",
+					tooltip = "If 'Facing User' is off, this will rotate the marker around the vertical axis.",
 					min = 0,
 					max = 360,
 					step = 1,	--(optional)
@@ -391,7 +392,7 @@ function settings.createSettings()
 				{
 					type = "slider",
 					name = "Pitch",
-					tooltip = "",
+					tooltip = "If 'Facing User' is off, this will rotate the marker up and down vertically.",
 					min = -90,
 					max = 90,
 					step = 1,	--(optional)
@@ -403,14 +404,14 @@ function settings.createSettings()
 				{
 					type = "editbox",
 					name = "Custom Texture",
-					tooltip = "",
+					tooltip = "If you want to use a custom texture (either in base game or included in an addon), type the texture path into this box.",
 					getFunc = function() return currentSelections.texture end,
 					setFunc = function(value) currentSelections.texture = value end,
 				},
 				{
 					type = "slider",
 					name = "Vertical Offset",
-					tooltip = "",
+					tooltip = "This will adjust the vertical offset of the marker, in percentage.\n50% means that the bottom of the marker will be at the ground, and 0% means that the center of the marker will be on the ground.",
 					min = -100,
 					max = 200,
 					step = 5,
@@ -470,7 +471,6 @@ function settings.createSettings()
 				{
 					type = "button",
 					name = "|cFF5555Delete Profile|r",
-					tooltip = "",
 					warning = "This will delete all markers in the current profile.",
 					width = "half",
 					func = function()
@@ -487,14 +487,12 @@ function settings.createSettings()
 				{
 					type = "button",
 					name = "Create Profile",
-					tooltip = "",
 					width = "half",
 					func = createProfileFunc,
 				},
 				{
 					type = "button",
 					name = "Rename Profile",
-					tooltip = "",
 					width = "half",
 					func = renameProfileFunc,
 				},
@@ -506,7 +504,7 @@ function settings.createSettings()
 				{
 					type = "button",
 					name = "Insert Premade Profiles",
-					tooltip = "",
+					tooltip = "More Markers has a few premade profiles for a few trials, created from both converting from Elms Markers strings and Hand Placement. This button will import these premade markers as new profiles.",
 					width = "half",
 					func = function()
 						MM.ShowDialogue("Premade Profiles",
@@ -522,7 +520,7 @@ function settings.createSettings()
 				{
 					type = "button",
 					name = "|c0DC1CFShare Profile|r",
-					tooltip = "",
+					tooltip = "This button will share the currently loaded profile with everyone in the group, without needing to share a custom string.",
 					width = "full",
 					func = function()
 						MM.ShowDialogue("Transmitting Profile",
@@ -558,7 +556,7 @@ function settings.createSettings()
 		{
 			type = "editbox",
 			name = "Import Markers String / Convert Elms Markers String",
-			tooltip = "",
+			tooltip = "Insert either a More Markers Profile String here, or insert an Elm's Markers Import String to automatically convert it.",
 			width = "full",
 			isMultiline = true,
 			maxChars = 10000,
@@ -572,7 +570,7 @@ function settings.createSettings()
 		{
 			type = "button",
 			name = "Append to Profile",
-			tooltip = "",
+			tooltip = "Clicking this button will add the markers to your current profile without removing anything.",
 			width = "half",
 			func = function()
 				local foundMMarkers = string.find(importString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
@@ -597,7 +595,7 @@ function settings.createSettings()
 		{
 			type = "button",
 			name = "|cFF5555Overwrite Profile|r",
-			tooltip = "",
+			warning = "Clicking this button will add the markers to your current profile, replacing all of the markers loaded.",
 			width = "half",
 			func = function()
 				local foundMMarkers = string.find(importString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
@@ -635,7 +633,7 @@ function settings.createSettings()
 		{
 			type = "editbox",
 			name = "Export String",
-			tooltip = "",
+			tooltip = "Sharing this string to other people will allow them to import your currently loaded profile.",
 			width = "full",
 			isMultiline = true,
 			maxChars = 10000,
@@ -650,7 +648,7 @@ function settings.createSettings()
 			type = "button",
 			name = "|cFF5555Clear Zone|r",
 			tooltip = "",
-			warning = "This will delete all markers in the current zone.",
+			warning = "This will delete all markers in the current zone, similar to the 'Delete Profile' button above.",
 			width = "full",
 			func = function()
 				MM.ShowDialogue("Warning: Destructive Action", "Are you sure you would like to empty the current zone?", "This is a destructive action and cannot be undone.", function()
