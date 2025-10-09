@@ -96,7 +96,7 @@ local function SetupProfiles(dialog)
 
 
 	for i,v in pairs(profiles) do
-		local entryData = ZO_GamepadEntryData:New(v, icon)
+		local entryData = ZO_GamepadEntryData:New(v)
         entryData:SetFontScaleOnSelection(false)
         entryData:SetIconTintOnSelection(true)
         entryData.setup = SetupProfileItem

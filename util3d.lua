@@ -66,7 +66,7 @@ function MM.initUtil3D()
 
 
 	if IsConsoleUI() and LibHarvensAddonSettings then
-		SecurePostHook(LibHarvensAddonSettings, "CreateAddonList", function() b = "created"; LibHarvensAddonSettings.scene:AddFragment(iconFragment) end)
+		SecurePostHook(LibHarvensAddonSettings, "CreateAddonList", function() LibHarvensAddonSettings.scene:AddFragment(iconFragment) end)
 	else 
 		local function sceneChanged(scene, oldState, newState)
 			if scene.name ~= "hud" and scene.name ~= "hudui" and newState == "showing" then

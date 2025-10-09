@@ -403,7 +403,7 @@ function MM.parseElmsString(elmsString)
 			amountParsed = amountParsed + 1
 		end
 	end
-	zoneString = MM.compressLoaded()
+	local zoneString = MM.compressLoaded()
 	MM.saveIcons(zoneString)
 	return amountParsed, zoneString
 end

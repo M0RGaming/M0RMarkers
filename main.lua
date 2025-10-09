@@ -23,32 +23,6 @@ end
 
 local print = MM.print
 
---[[
-SLASH_COMMANDS['/mmcreate'] = function(texture)
-	local _, x, y, z = GetUnitWorldPosition('player')
-	MM.createIcon(x, y, z, texture, nil, nil)
-end
-
-SLASH_COMMANDS['/mmcreateflat'] = function(texture)
-	local _, x, y, z = GetUnitWorldPosition('player')
-	MM.createIcon(x, y, z, texture, {math.pi/2, 0}, nil)
-end
-
-SLASH_COMMANDS['/mmremove'] = function()
-	MM.removeClosestIcon()
-end
---]]
-
-
--- formatting
--- 0 = custom icon
--- zone,x,y,z,colour (hex)
--- zone>depth>orientation>texture>colour>x,y,z/x,y,z/x,y,z<color>x,y,z<<texture>color>x,y,z<<<orientation>texture>colour>x,y,z<<<<<
-
-
-
-
-
 
 
 
@@ -86,9 +60,6 @@ for i,v in pairs(MM.builtInTextureList) do
 	textureLookup[v] = i
 end
 
-
-
--- NOTE: SHOULD REPLACE FLOATING WITH SIZE
 
 
 -- string.format("%x", decimal) --<-- converts decimal to hex

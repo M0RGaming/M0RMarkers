@@ -134,7 +134,6 @@ function settings.createSettings()
 		end,
 		setFunc = function(value)
 			currentLoadProfileName = value;
-			if M0RMarkersProfileNameEdit then M0RMarkersProfileNameEdit:UpdateValue() end
 			MM.loadProfile(value)
 			if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 			MM.currentAdditionalProfiles = {}
@@ -219,14 +218,14 @@ function settings.createSettings()
 				{ -- TODO: SWAP THIS TO BE M0R MARKERS, NOT ARTAEUM
 					type = "button",
 					name = "Contact Me \n(QR Code)",
-					tooltip = "Click this button to be directed to a QR Code which opens the ArtaeumGroupTool esoui page where you can reach out to me!",
+					tooltip = "Click this button to be directed to a QR Code which opens the More Markers esoui page where you can reach out to me!",
 					width = "half",
 					func = function() RequestOpenUnsafeURL("https://m0rgaming.github.io/create-qr-code/?url=https://www.esoui.com/downloads/info4266-MoreMarkers.html#comments") end,
 				},
 				{
 					type = "button",
 					name = "Contact Me \n(Direct Link)",
-					tooltip = "Click this button to be directed to the ArtaeumGroupTool esoui page where you can reach out to me!",
+					tooltip = "Click this button to be directed to the More Markers esoui page where you can reach out to me!",
 					width = "half",
 					func = function() RequestOpenUnsafeURL("https://www.esoui.com/downloads/info4266-MoreMarkers.html#comments") end,
 				},
@@ -245,7 +244,7 @@ function settings.createSettings()
 			multiProfileLoadButton = {
 				type = "button",
 				name = "Load Additional Profiles",
-				tooltip = "Click this button to load additional profiles at once!",
+				tooltip = "Click this button to load multiple profiles at once!",
 				func = function() MM.ShowMultiProfileSelect() end,
 			}
 
@@ -447,24 +446,6 @@ function settings.createSettings()
 				},
 
 				profileSelectButton,
-				--[[
-				{
-					type = "editbox",
-					name = "New Profile Name",
-					tooltip = "",
-					width = "half",
-					isMultiline = false,
-					maxChars = 2000,
-					reference = "M0RMarkersProfileNameEdit",
-					isExtraWide = false,
-					getFunc = function() return currentLoadProfileName or "Default" end,
-					setFunc = function(text)
-						currentLoadProfileName = text;
-						if M0RMarkersProfileDropdown then M0RMarkersProfileDropdown:UpdateValue() end
-						if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
-					end,
-				},
-				--]]
 
 
 
@@ -538,16 +519,6 @@ function settings.createSettings()
 		},
 
 		
-
-		--[[
-		{
-			type = "button",
-			name = "Create Export String",
-			tooltip = "",
-			width = "half",
-			func = function() exportString = MM.compressLoaded(); if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end end,
-		},
-		--]]
 
 		{
 			type = "divider",

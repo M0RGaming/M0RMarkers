@@ -1,0 +1,42 @@
+<GuiXml>
+	<Controls>
+		<TopLevelControl name="M0RMarkersTextureLoad" layer="0"> <!-- this allows console to not unload textures maybe when changing zones, or something. idk -->
+			<Controls>
+				
+				<Texture name="$(parent)chevron" hidden="true" textureFile="M0RMarkers/textures/chevron.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+				<Texture name="$(parent)circle" hidden="true" textureFile="M0RMarkers/textures/circle.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+				<Texture name="$(parent)diamond" hidden="true" textureFile="M0RMarkers/textures/diamond.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+				<Texture name="$(parent)hexagon" hidden="true" textureFile="M0RMarkers/textures/hexagon.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+				<Texture name="$(parent)octagon" hidden="true" textureFile="M0RMarkers/textures/octagon.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+				<Texture name="$(parent)sharkpog" hidden="true" textureFile="M0RMarkers/textures/sharkpog.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+				<Texture name="$(parent)square" hidden="true" textureFile="M0RMarkers/textures/square.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+				<Texture name="$(parent)blank" hidden="true" textureFile="M0RMarkers/textures/blank.dds">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="1" y="1" />
+				</Texture>
+
+			</Controls>
+		</TopLevelControl>
+	</Controls>
+</GuiXml>

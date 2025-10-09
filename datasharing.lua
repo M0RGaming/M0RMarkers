@@ -74,7 +74,7 @@ function MM.send(zoneString)
 		end
 		currentString = zoneString
 
-		length = math.ceil(#zoneString / 25)
+		local length = math.ceil(#zoneString / 25)
 		print("length of "..tostring(length))
 
 
@@ -86,7 +86,6 @@ function MM.send(zoneString)
 		currentPosition = 0
 		currentLength = length
 		currentlySending = true
-		currentlyListeningTo = GetUnitDisplayName('player') 
 		MM.sendTick()
 		lastTime = os.rawclock()
 		startTime = os.rawclock()
@@ -113,7 +112,7 @@ function MM.sendTick()
 	if currentSplice == "" then
 		protocols.header:Send({
 			sending = false,
-			length = length
+			length = currentLength
 		})
 		print("FINSIHED")
 		return
@@ -127,7 +126,6 @@ function MM.sendTick()
 end
 
 
-local currentlyListeningTo = ""
 local currentData = {} -- todo: add the local back
 local currentlyListening = false
 local expectedDataLength = 0
@@ -222,22 +220,6 @@ function handlers.onHeader(unitTag, data)
 		)
 
 	end
-
-	--[[
-
-	--d("Header Recieved")
-	if data.sending and (not currentlyListening) then
-		currentlyListeningTo = GetUnitDisplayName(unitTag)
-		currentData = {}
-		currentlyListening = true
-		expectedDataLength = data.length
-	elseif (not data.sending) and currentlyListening then
-		if GetUnitDisplayName(unitTag) == currentlyListeningTo then
-			-- check expectedDataLength vs the data recieved
-			
-		end
-	end
-	--]]
 end
 
 
@@ -260,9 +242,12 @@ function handlers.onData(unitTag, data)
 			local averageTime = average(times)
 			lastTime = os.rawclock()
 			--d("Progress: "..tostring(tonumber(data.position)/length*100).."% - Time Taken: "..times[#times]..". Expected time remaining: "..tostring(averageTime*(length-tonumber(data.position))))
-			print(string.format("Progress: %.2f%% - Time Taken: %dms - Expected Time Remaining: %dms", tonumber(data.position)/length*100, times[1], averageTime*(length-tonumber(data.position))))
-			ZO_StatusBar_SmoothTransition(M0RMarkerProgressMeterBar, tonumber(data.position)/length*100, 100)
-			M0RMarkerProgressMeterEstimated:SetText(string.format("Estimated Time Remaining: %.1fs", averageTime*(length-tonumber(data.position))/1000))
+			print(string.format("Progress: %.2f%% - Time Taken: %dms - Expected Time Remaining: %dms",
+				tonumber(data.position)/currentLength*100,
+				times[1],
+				averageTime*(currentLength-tonumber(data.position))))
+			ZO_StatusBar_SmoothTransition(M0RMarkerProgressMeterBar, tonumber(data.position)/currentLength*100, 100)
+			M0RMarkerProgressMeterEstimated:SetText(string.format("Estimated Time Remaining: %.1fs", averageTime*(currentLength-tonumber(data.position))/1000))
 			M0RMarkerProgressMeterElapsed:SetText(string.format("Elapsed Time: %.1fs", (os.rawclock()-startTime)/1000))
 			MM.sendTick()
  		end

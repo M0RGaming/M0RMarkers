@@ -1,4 +1,8 @@
 ----- 1.0.1 -----
+(Console) Potentially fixed a texture unloading bug
+(minor) Properly Localized some variables.
+
+----- 1.0.1 -----
 (minor) Turned off Debug Mode
 Updated links for console to be directed to the correct esoui page.
 
