@@ -1,3 +1,6 @@
+----- 1.0.3 -----
+Changed the dropdown for profiles into a divider
+
 ----- 1.0.2 -----
 (Console) Potentially fixed a texture unloading bug
 (minor) Properly Localized some variables.

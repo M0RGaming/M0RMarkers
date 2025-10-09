@@ -425,98 +425,91 @@ function settings.createSettings()
 		{
 			type = "divider",
 		},
+		{
+			type = "description",
+			title = "|cFFD700[Profiles]|r",
+			width = "full",
+		},
+
+		{
+			type = "description",
+			title = function()
+				local currentZone = GetUnitRawWorldPosition('player')
+				return string.format("Current Loaded Profile: |cFFD700%s|r", MM.vars.loadedProfile[currentZone] or "Default")
+			end,
+			text = function() return string.format("Last Edited at: |c0DC1CF%s|r", os.date("%a, %b %d %Y - %I:%M %p", MM.loadedMarkers.currentTimestamp)) end,
+			reference = "M0RMarkersProfilesCurrentLoadedProfile",
+			width = "full",
+		},
+
+		profileSelectButton,
 
 
 
 		{
-			type = "submenu",
-			name = "[Profiles]",
-			tooltip = "",
-			controls = {
-
-				{
-					type = "description",
-					title = function()
-						local currentZone = GetUnitRawWorldPosition('player')
-						return string.format("Current Loaded Profile: |cFFD700%s|r", MM.vars.loadedProfile[currentZone] or "Default")
-					end,
-					text = function() return string.format("Last Edited at: |c0DC1CF%s|r", os.date("%a, %b %d %Y - %I:%M %p", MM.loadedMarkers.currentTimestamp)) end,
-					reference = "M0RMarkersProfilesCurrentLoadedProfile",
-					width = "full",
-				},
-
-				profileSelectButton,
-
-
-
-				{
-					type = "button",
-					name = "|cFF5555Delete Profile|r",
-					warning = "This will delete all markers in the current profile.",
-					width = "half",
-					func = function()
-						MM.ShowDialogue("Warning: Destructive Action",
-							"Are you sure you would like to empty the current loaded profile?",
-							"This is a destructive action and cannot be undone.", function()
-							MM.deleteCurrentProfile();
-							refreshLHAS()
-						end)
-					end,
-				},
-
-
-				{
-					type = "button",
-					name = "Create Profile",
-					width = "half",
-					func = createProfileFunc,
-				},
-				{
-					type = "button",
-					name = "Rename Profile",
-					width = "half",
-					func = renameProfileFunc,
-				},
-
-
-
-				multiProfileLoadButton,
-
-				{
-					type = "button",
-					name = "Insert Premade Profiles",
-					tooltip = "More Markers has a few premade profiles for a few trials, created from both converting from Elms Markers strings and Hand Placement. This button will import these premade markers as new profiles.",
-					width = "half",
-					func = function()
-						MM.ShowDialogue("Premade Profiles",
-							"Would you like to install the premade profiles? These profiles were made by M0R, both via a conversion of Elms Markers and Hand Placement.\n\nThis will NOT replace your current profiles, but instead add them on top.",
-							"",
-							function()
-								MM.InsertPremades() 
-							end)
-					end,
-					
-				},
-
-				{
-					type = "button",
-					name = "|c0DC1CFShare Profile|r",
-					tooltip = "This button will share the currently loaded profile with everyone in the group, without needing to share a custom string.",
-					width = "full",
-					func = function()
-						MM.ShowDialogue("Transmitting Profile",
-							"Would you like to share your currently loaded profile to everyone in the group?",
-							"This will open a popup on their screen when the sharing finishes, and should probably not be used in combat.",
-							function()
-								MM.shareCurrentZone() 
-							end)
-					end,
-				},
-
-
-				-- MM.loadProfile(value)
-			}
+			type = "button",
+			name = "|cFF5555Delete Profile|r",
+			warning = "This will delete all markers in the current profile.",
+			width = "half",
+			func = function()
+				MM.ShowDialogue("Warning: Destructive Action",
+					"Are you sure you would like to empty the current loaded profile?",
+					"This is a destructive action and cannot be undone.", function()
+					MM.deleteCurrentProfile();
+					refreshLHAS()
+				end)
+			end,
 		},
+
+
+		{
+			type = "button",
+			name = "Create Profile",
+			width = "half",
+			func = createProfileFunc,
+		},
+		{
+			type = "button",
+			name = "Rename Profile",
+			width = "half",
+			func = renameProfileFunc,
+		},
+
+
+
+		multiProfileLoadButton,
+
+		{
+			type = "button",
+			name = "Insert Premade Profiles",
+			tooltip = "More Markers has a few premade profiles for a few trials, created from both converting from Elms Markers strings and Hand Placement. This button will import these premade markers as new profiles.",
+			width = "half",
+			func = function()
+				MM.ShowDialogue("Premade Profiles",
+					"Would you like to install the premade profiles? These profiles were made by M0R, both via a conversion of Elms Markers and Hand Placement.\n\nThis will NOT replace your current profiles, but instead add them on top.",
+					"",
+					function()
+						MM.InsertPremades() 
+					end)
+			end,
+			
+		},
+
+		{
+			type = "button",
+			name = "|c0DC1CFShare Profile|r",
+			tooltip = "This button will share the currently loaded profile with everyone in the group, without needing to share a custom string.",
+			width = "full",
+			func = function()
+				MM.ShowDialogue("Transmitting Profile",
+					"Would you like to share your currently loaded profile to everyone in the group?",
+					"This will open a popup on their screen when the sharing finishes, and should probably not be used in combat.",
+					function()
+						MM.shareCurrentZone() 
+					end)
+			end,
+		},
+
 
 		
 
