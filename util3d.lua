@@ -127,6 +127,7 @@ local function createControl(icon)
 	local control, key = controlPool:AcquireObject()
 	control:SetHidden(false)
 	control:SetSpace(SPACE_WORLD)
+	control:SetAnchor(CENTER,GuiRoot,CENTER) -- needed, since releasing object will clear anchors
 	--control:SetScale(icon.size/100) -- set transform scale to icon.size instead of scale
 	control:SetScale(1/100) -- 1m
 	control.bgLayer = control:GetNamedChild("Background")

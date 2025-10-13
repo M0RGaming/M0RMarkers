@@ -156,7 +156,7 @@ end
 
 
 
-ESO_Dialogs["M0RMarkerProfileSelectMulti"] = {
+ESO_Dialogs["M0RMarkerProfileSelectMulti"] = { -- TODO: Make this select all the currently loaded profiles
     canQueue = true,
     gamepadInfo =
     {

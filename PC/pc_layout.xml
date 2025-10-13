@@ -27,20 +27,21 @@
 							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="0" />
 
 							<OnInitialized>
-								local comboBox = ZO_ComboBox:New(self)
-								comboBox:SetSortsItems(false)
+								function M0RMarkers.Settings.InitTexturePicker()
+									local comboBox = ZO_ComboBox:New(self)
+									comboBox:SetSortsItems(false)
+									local currentTexture = M0RMarkers.Settings.textureSearchup[M0RMarkers.Settings.quickSelections.texture]
 
-								local firstTime = true
-								for i,v in ipairs(M0RMarkers.Settings.displayChoices) do
-									local entry = comboBox:CreateItemEntry(v, function()
-										M0RMarkers.print("Selected "..M0RMarkers.Settings.textureSearchup[v])
-										M0RMarkers.Settings.quickSelections.texture = M0RMarkers.Settings.textureSearchup[v]
-									end, true)
-									comboBox:AddItem(entry)
+									for i,v in ipairs(M0RMarkers.Settings.displayChoices) do
+										local entry = comboBox:CreateItemEntry(v, function()
+											M0RMarkers.print("Selected "..M0RMarkers.Settings.textureSearchup[v])
+											M0RMarkers.Settings.quickSelections.texture = M0RMarkers.Settings.textureSearchup[v]
+										end, true)
+										comboBox:AddItem(entry)
 
-									if firstTime then
-										comboBox:ItemSelectedClickHelper(entry)
-										firstTime = false
+										if currentTexture == v then
+											comboBox:ItemSelectedClickHelper(entry)
+										end
 									end
 								end
 							</OnInitialized>
@@ -57,21 +58,22 @@
 							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="0" />
 							
 							<OnInitialized>
-								local comboBox = ZO_ComboBox:New(self)
-								comboBox:SetSortsItems(false)
+								function M0RMarkers.Settings.InitColourPicker()
+									local comboBox = ZO_ComboBox:New(self)
+									comboBox:SetSortsItems(false)
+									local currentColourHex = M0RMarkers.Settings.colourLookup[ZO_ColorDef.FloatsToHex(unpack(M0RMarkers.Settings.quickSelections.rgba))]
 
-								local firstTime = true
-								-- ZO_ComboBox_ObjectFromContainer(self)
-								for i,v in ipairs(M0RMarkers.Settings.colourPresets) do
-									local entry = comboBox:CreateItemEntry(v, function()
-										M0RMarkers.print("Selected "..v)
-										M0RMarkers.Settings.quickSelections.rgba = M0RMarkers.Settings.colourLookup[v]
-									end, true)
-									comboBox:AddItem(entry)
+									-- ZO_ComboBox_ObjectFromContainer(self)
+									for i,v in ipairs(M0RMarkers.Settings.colourPresets) do
+										local entry = comboBox:CreateItemEntry(v, function()
+											M0RMarkers.print("Selected "..v)
+											M0RMarkers.Settings.quickSelections.rgba = M0RMarkers.Settings.colourLookup[v]
+										end, true)
+										comboBox:AddItem(entry)
 
-									if firstTime then
-										comboBox:ItemSelectedClickHelper(entry)
-										firstTime = false
+										if v == currentColourHex then
+											comboBox:ItemSelectedClickHelper(entry)
+										end
 									end
 								end
 							</OnInitialized>
@@ -89,7 +91,7 @@
 					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)ColourPicker" offsetY="10" />
 					<Limits min="2" max="50" />
 					<OnInitialized>
-						self:SetValue(10)
+						--self:SetValue(10)
 					</OnInitialized>
 					<OnValueChanged>
 						local value = self:GetValue()
@@ -109,7 +111,7 @@
 					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)SizeSlider" offsetY="10" />
 					<Limits min="-100" max="100" />
 					<OnInitialized>
-						self:SetValue(50)
+						--self:SetValue(50)
 					</OnInitialized>
 					<OnValueChanged>
 						local value = self:GetValue()

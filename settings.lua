@@ -53,31 +53,7 @@ for i,v in pairs(textureChoices) do
 end
 
 
-settings.currentSelections = {
-	text = "",
-	offsetYPercent=50,
-	texture=textureChoices[1],
-	floating=true,
-	rgba={1,1,1,1},
-	size=1,
-	yaw=0,
-	pitch=-90,
-	offsetX = 0,
-	offsetY = 0,
-	offsetZ = 0,
-}
 
-
-settings.quickSelections = { -- seperate to avoid needing to update the menu (also now can remove it when porting to console)
-	text = "",
-	offsetY=50,
-	texture=textureChoices[1],
-	floating=true,
-	rgba={1,1,1,1},
-	size=1,
-	yaw=0,
-	pitch=-90,
-}
 
 
 
@@ -96,6 +72,45 @@ function settings.createSettings()
 	}
 
 	
+	settings.currentSelections = MM.vars.currentSelections
+
+	MM.vars.currentSelections = MM.vars.currentSelections or {
+		text = "",
+		offsetYPercent=50,
+		texture=textureChoices[1],
+		floating=true,
+		rgba={1,1,1,1},
+		size=1,
+		yaw=0,
+		pitch=-90,
+	}
+
+
+	if not IsConsoleUI() then
+		settings.quickSelections = MM.vars.quickSelections
+
+		MM.vars.quickSelections = MM.vars.quickSelections or { -- seperate to avoid needing to update the menu (also now can remove it when porting to console)
+			text = "",
+			offsetY=50,
+			texture=textureChoices[1],
+			floating=true,
+			rgba={1,1,1,1},
+			size=1,
+			yaw=0,
+			pitch=-90,
+		}
+
+		settings.InitColourPicker()
+		settings.InitTexturePicker()
+
+		M0RMarkerPlaceToplevelSizeSlider:SetValue(10)
+		M0RMarkerPlaceToplevelOffsetSlider:SetValue(50)
+	end
+
+	
+
+
+
 	local currentSelections = settings.currentSelections
 
 	
@@ -527,7 +542,7 @@ function settings.createSettings()
 			reference = "M0RMarkersImportEditBox",
 			default = "Insert either a More Markers Profile String here, or insert an Elm's Markers Import String to automatically convert it.",
 			isExtraWide = true,
-			getFunc = function() end, --return importString end,
+			getFunc = function() return importString end, --return importString end,
 			setFunc = function(text) importString = text end,
 		},
 
