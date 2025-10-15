@@ -126,7 +126,7 @@ function MM.sendTick()
 end
 
 
-local currentData = {} -- todo: add the local back
+local currentData = {}
 local currentlyListening = false
 local expectedDataLength = 0
 function handlers.onHeader(unitTag, data)
@@ -207,7 +207,7 @@ function handlers.onHeader(unitTag, data)
 				MM.currentAdditionalProfiles = {}
 				MM.multipleProfilesLoaded = false
 
-				if IsConsoleUI() then
+				if IsConsoleUI() and LibHarvensAddonSettings.list then
 					LibHarvensAddonSettings.list:RefreshVisible()
 				else
 					if M0RMarkersProfileDropdown then

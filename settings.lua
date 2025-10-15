@@ -174,40 +174,42 @@ function settings.createSettings()
 		end,
 	}
 
-
+	--[[
 	local createProfileFunc = function()
 		MM.ShowEditDialogue("Creating Profile", "What would you like to name the new profile?", "", function(name)
 			MM.loadProfile(name or "Default")
 			if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 		end)
 	end
-
 	local renameProfileFunc = function()
 		MM.ShowEditDialogue("Renaming Profile",
 			"What would you like to rename the current profile to?",
 			"If the desired name is already a profile, it will be overwritten.",
 			function(name)
 				MM.renameCurrentProfile(name)
-				if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
+				
 			end
 		)
 	end
-
-	local refreshLHAS = function() end
+	--]]
+	local refreshLoadedProfile = function() if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end end
 
 	if IsConsoleUI() then
 
-			refreshLHAS = function()
-				LibHarvensAddonSettings.list:RefreshVisible()
+			refreshLoadedProfile = function()
+				if LibHarvensAddonSettings.list then
+					LibHarvensAddonSettings.list:RefreshVisible()
+				end
 			end
 
+			--[[
 			createProfileFunc = function()
 				MM.ShowGPEdit("Creating Profile",
 					"What would you like to name the new profile?",
 					"",
 					function(name)
 						MM.loadProfile(name or "Default")
-						LibHarvensAddonSettings.list:RefreshVisible()
+						refreshLoadedProfile()
 					end
 				)
 			end
@@ -218,10 +220,11 @@ function settings.createSettings()
 					"If the desired name is already a profile, it will be overwritten.",
 					function(name)
 						MM.renameCurrentProfile(name)
-						LibHarvensAddonSettings.list:RefreshVisible()
+						refreshLoadedProfile()
 					end
 				)
 			end
+			--]]
 
 			toInsert = {
 				{
@@ -230,7 +233,7 @@ function settings.createSettings()
 					text = "Hello, and thank you for using More Markers! If you have any errors or complaints, please reach out to me either on discord (@m0r) or at the link below!",
 					width = "full",
 				},
-				{ -- TODO: SWAP THIS TO BE M0R MARKERS, NOT ARTAEUM
+				{
 					type = "button",
 					name = "Contact Me \n(QR Code)",
 					tooltip = "Click this button to be directed to a QR Code which opens the More Markers esoui page where you can reach out to me!",
@@ -427,7 +430,7 @@ function settings.createSettings()
 					name = "Vertical Offset",
 					tooltip = "This will adjust the vertical offset of the marker, in percentage.\n50% means that the bottom of the marker will be at the ground, and 0% means that the center of the marker will be on the ground.",
 					min = -100,
-					max = 200,
+					max = 300,
 					step = 5,
 					getFunc = function() return currentSelections.offsetYPercent end,
 					setFunc = function(value) currentSelections.offsetYPercent = value end,
@@ -471,7 +474,7 @@ function settings.createSettings()
 					"Are you sure you would like to empty the current loaded profile?",
 					"This is a destructive action and cannot be undone.", function()
 					MM.deleteCurrentProfile();
-					refreshLHAS()
+					refreshLoadedProfile()
 				end)
 			end,
 		},
@@ -481,13 +484,35 @@ function settings.createSettings()
 			type = "button",
 			name = "Create Profile",
 			width = "half",
-			func = createProfileFunc,
+			func = function()
+				local editFunc = MM.ShowEditDialogue
+				if IsInGamepadPreferredMode() then editFunc = MM.ShowGPEdit end
+				editFunc("Creating Profile",
+					"What would you like to name the new profile?",
+					"",
+					function(name)
+						MM.loadProfile(name or "Default")
+						refreshLoadedProfile()
+					end
+				)
+			end,
 		},
 		{
 			type = "button",
 			name = "Rename Profile",
 			width = "half",
-			func = renameProfileFunc,
+			func = function()
+				local editFunc = MM.ShowEditDialogue
+				if IsInGamepadPreferredMode() then editFunc = MM.ShowGPEdit end
+				editFunc("Renaming Profile",
+					"What would you like to rename the current profile to?",
+					"If the desired name is already a profile, it will be overwritten.",
+					function(name)
+						MM.renameCurrentProfile(name)
+						refreshLoadedProfile()
+					end
+				)
+			end,
 		},
 
 
@@ -497,7 +522,7 @@ function settings.createSettings()
 		{
 			type = "button",
 			name = "Insert Premade Profiles",
-			tooltip = "More Markers has a few premade profiles for a few trials, created from both converting from Elms Markers strings and Hand Placement. This button will import these premade markers as new profiles.",
+			tooltip = "More Markers has a few premade profiles for a few trials, created from both converting from Elms Markers strings and Hand Placement. This button will import these premade markers as new profiles.\n\nPremade profiles are available for vAS, vOC, vSS, vRG, vLC, vKA, vDSR, and vSE.",
 			width = "half",
 			func = function()
 				MM.ShowDialogue("Premade Profiles",
@@ -512,9 +537,26 @@ function settings.createSettings()
 
 		{
 			type = "button",
+			name = "Unload Additional Profiles",
+			tooltip = "Unloads all of the additional Profiles",
+			width = "half",
+			func = function()
+				MM.ShowDialogue("Unloading Profiles",
+					"Would you like to unload all the additional loaded profiles?",
+					"This will not unload your main active profile.",
+					function()
+						MM.currentAdditionalProfiles = {}
+						MM.loadAdditionalProfiles({})
+					end)
+			end,
+			
+		},
+
+		{
+			type = "button",
 			name = "|c0DC1CFShare Profile|r",
 			tooltip = "This button will share the currently loaded profile with everyone in the group, without needing to share a custom string.",
-			width = "full",
+			width = "half",
 			func = function()
 				MM.ShowDialogue("Transmitting Profile",
 					"Would you like to share your currently loaded profile to everyone in the group?",
@@ -634,6 +676,42 @@ function settings.createSettings()
 					MM.emptyCurrentZone(); if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
 				end)
 			end,
+		},
+
+		{
+			type = "divider",
+		},
+
+		{
+			type = "description",
+			title = "|cFFD700[Global Settings]|r",
+			width = "full",
+		},
+
+		{
+			type = "slider",
+			name = "Global Size Multiplier (%)",
+			tooltip = "This multiplier gets applied to all markers, on top of their normal size multipliers.\n\nChanges will only take affect after you load a new profile/zone.",
+			warning = "The markers are made to match in game units, changing the global size may make certain markers inaccurate (ie. vAS Jumps).",
+			min = 10,
+			max = 200,
+			step = 5,
+			width = "half",
+			getFunc = function() return MM.vars.globalMult*100 end,
+			setFunc = function(value) MM.vars.globalMult = value/100 end,
+		},
+
+
+		{
+			type = "slider",
+			name = "Culling Distance (m)",
+			tooltip = "Markers further than this distance will be hidden from the player. Setting this to 0 will disable culling.",
+			min = 0,
+			max = 200,
+			step = 10,
+			width = "half",
+			getFunc = function() return MM.vars.cullingDistance end,
+			setFunc = function(value) MM.vars.cullingDistance = value; MM.startCulling() end,
 		},
 
 	}

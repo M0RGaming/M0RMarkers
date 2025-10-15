@@ -12,45 +12,6 @@ MM.loadedMarkers.currentTimestamp = -1
 
 local print = MM.print
 
---[[
-
-marker = {
-	x = ,
-	y = ,
-	z = ,
-	texture = ,
-	orientation = , (nil = facing, {yaw, pitch})
-	control = ,
-}
-
-{
-	x
-	y
-	z 
-	texture
-	orientation
-	colour
-	depthBuffer
-	size
-}
-
-
-{
-	x
-	y
-	z 
-	bgTexture
-	iconTexture
-	text
-	orientation
-	colour
-	depthBuffer
-	size
-}
-
-
-]]
-
 
 local controlPool = nil
 
@@ -82,6 +43,9 @@ end
 
 local currentlyUpdating = false
 
+local currentlyCulling = false
+
+
 
 local function updateMarkers()
 	if #facingIcons == 0 then
@@ -99,6 +63,53 @@ local function updateMarkers()
 		v.control:SetTransformRotation(pitch,yaw,0)
 	end
 end
+
+local function cullMarkers()
+	local cullDistance = MM.vars.cullingDistance * 100 or 0
+	if cullDistance == 0 then
+		EVENT_MANAGER:UnregisterForUpdate("M0RMarkersCullTick")
+		currentlyCulling = false
+
+		for i,v in pairs(facingIcons) do
+			v.control:SetHidden(false)
+		end
+		for i,v in pairs(groundIcons) do
+			v.control:SetHidden(false)
+		end
+
+		return
+	end
+
+	local _, x, y, z = GetUnitRawWorldPosition('player')
+	for i,v in pairs(facingIcons) do
+		local dist = zo_distance3D(x,y,z, v.x, v.y, v.z)
+		if dist > cullDistance then
+			v.control:SetHidden(true)
+		else
+			v.control:SetHidden(false)
+		end
+	end
+	for i,v in pairs(groundIcons) do
+		local dist = zo_distance3D(x,y,z, v.x, v.y, v.z)
+		if dist > cullDistance then
+			v.control:SetHidden(true)
+		else
+			v.control:SetHidden(false)
+		end
+	end
+
+end
+
+
+function MM.startCulling()
+	if not currentlyCulling then
+		EVENT_MANAGER:RegisterForUpdate("M0RMarkersCullTick", 500, cullMarkers) -- only update once every half a second.
+		currentlyCulling = true
+	end
+end
+
+
+
 
 function MM.updateMarkerPositions()
 	local sx, sy, sz = GuiRender3DPositionToWorldPosition(0,0,0)
@@ -131,11 +142,11 @@ local function createControl(icon)
 	--control:SetScale(icon.size/100) -- set transform scale to icon.size instead of scale
 	control:SetScale(1/100) -- 1m
 	control.bgLayer = control:GetNamedChild("Background")
-	--control.iconLayer = control:GetNamedChild("Icon")
 	control.textLayer = control:GetNamedChild("Text")
-	--control:SetColor(1,1,1,1)
 	control:SetTransformNormalizedOriginPoint(0.5,0.5)
-	control:SetTransformScale(icon.size)
+
+	local multiplier = MM.vars.globalMult or 1
+	control:SetTransformScale(icon.size * multiplier)
 
 	icon.control = control
 	icon.key = key
@@ -147,10 +158,6 @@ local function destroyControl(icon)
 	icon.control.bgLayer:SetHidden(true)
 	icon.control.textLayer:SetText("")
 	icon.control.textLayer:SetHidden(true)
-	--icon.control:SetTransformOffset(0,0,0)
-	--icon.control:SetScale(1)
-	--icon.control:SetSpace(SPACE_INTERFACE)
-
 	controlPool:ReleaseObject(icon.key)
 	icon.control = nil
 	icon.key = nil
@@ -173,12 +180,6 @@ function MM.createIcon(icon)
 		icon.control.bgLayer:SetTexture(icon.bgTexture)
 		icon.control.bgLayer:SetColor(unpack(icon.colour))
 	end
-	--[[
-	if icon.iconTexture then
-		icon.control.iconLayer:SetHidden(false)
-		icon.control.iconLayer:SetTexture(icon.iconTexture)
-	end
-	--]]
 	if icon.text then
 		icon.control.textLayer:SetHidden(false)
 		icon.control.textLayer:SetText(icon.text)

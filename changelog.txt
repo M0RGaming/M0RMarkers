@@ -1,3 +1,13 @@
+----- 1.1.0 -----
+Added Selections to saved vars, to persist through reloads
+Added a Global Culling distance slider, to hide markers past X meters
+Added a Global Scale slider, to change all markers scales by a percentage.
+(PC) Moved vars into an installation wide saved variable table
+(Console) Fixed a UI error when refreshing LHAS page
+(Console) Fixed visual bug with the import strings vanishing the instant that you enter them in
+(Console) Fixed a visual bug with additional loaded profiles not updating
+(minor) Cleaned up some code, including leaked variables and old comments
+
 ----- 1.0.3 -----
 Changed the dropdown for profiles into a divider
 

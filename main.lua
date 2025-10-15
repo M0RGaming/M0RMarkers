@@ -324,38 +324,14 @@ end
 
 
 
---[[
-/script M0RMarkers.decompressString("<1063]12358:30f0:e033]1,2]-90:3]0:3]ffffff:1;c9ff3e:2;ff00f4:3]^1:1,2;^6:3]2b5:0:1e0:0,cc:0:27f:0,0:3:0:0>")
-
-
-
-
-{
-		x = x or 0, ---------------------------------------------
-		y = y+currentSelections.offsetY+defaultOffset or 0, ---------------------------------------------
-		z = z or 0, ---------------------------------------------
-		texture = currentSelections.texture, ---------------------------------------------
-		orientation = orientation,
-		colour = currentSelections.rgba or {1,1,1,1}, ---------------------------------------------
-		depthBuffer = currentSelections.depth or false, ---------------------------------------------
-		width = currentSelections.width or 1, -- meters
-		height = currentSelections.height or 1, -- meters
-	}
-
-
-
-<1063]12358:30f0:e033]1,2]-90:3]0:3]ffffff:1;c9ff3e:2;ff00f4:3]^1=1,2;^6=3]2b5:0:1e0:0,cc:0:27f:0,0:3:0:0>
-]]
-
-
-
-
 
 
 
 MM.defaultVars = {
 	loadedProfile = {},
-	Profiles = {}
+	Profiles = {},
+	globalMult = 1,
+	cullingDistance = 0,
 }
 
 
@@ -371,15 +347,15 @@ loadedProfile = {
 Profiles = {
 	[zone] = {
 		[name] = {
-			icons
+			{iconsStrings}
 		},
 		[name] = {
-			icons
+			{iconsStrings}
 		}
 	},
 	[zone] = {
 		[name] = {
-			icons
+			{iconsStrings}
 		}
 	}
 }
@@ -394,7 +370,6 @@ local defaultOffset = 0 -- 10
 function MM.placeIcon()
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
-		--d("Markers are Read-Only when multiple profiles are loaded.")
 		return
 	end
 
@@ -523,17 +498,10 @@ function MM.placeQuickMenuIconAtCursor()
 
 	local _, _, y, _ = GetUnitRawWorldPosition('player') --feet position
 
-	--print(pitch)
-	--print(cY)
-	--print(y)
 	local r = (cY-y)/(zo_tan(pitch))
-	--print(r)
 
 	local x = r*zo_sin(yaw) + cX
 	local z = r*zo_cos(yaw) + cZ
-
-	--print(x)
-	--print(z)
 
 	local currentSelections = MM.Settings.quickSelections
 	local offset = 0
@@ -670,6 +638,10 @@ function MM.playerActivated()
 	MM.updateProfileDropdown(true)
 	if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 	MM.updateMarkerPositions()
+
+	if MM.vars.cullingDistance ~= 0 then
+		MM.startCulling()
+	end
 end
 
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_TOGGLE_QUICK_MENU", "Toggle Quick Menu Visiblity")
@@ -719,12 +691,7 @@ end
 function MM.deleteCurrentProfile()
 	local currentZone = GetUnitRawWorldPosition('player')
 	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
-	--[[
-	if currentProfileName == nil then -- this should never happen / should only happen if profile = default
-		d("Failed to find a profile to delete/Can't delete the default profile.")
-		return
-	end
-	--]]
+
 	if MM.vars.Profiles[currentZone] then
 		MM.vars.Profiles[currentZone][currentProfileName] = nil
 	end
@@ -753,10 +720,7 @@ function MM.renameCurrentProfile(newName)
 	
 	local currentZone = GetUnitRawWorldPosition('player')
 	local currentProfileName = MM.vars.loadedProfile[currentZone] or "Default"
-	--if currentProfileName == nil then -- this should never happen / should only happen if profile = default
-	--	MM.ShowNotice("Notice", "Unable to rename the current profile.", "")
-	--	return
-	--end
+
 	if MM.vars.Profiles[currentZone] and MM.vars.Profiles[currentZone][currentProfileName] then
 		MM.vars.Profiles[currentZone][newName] = ZO_ShallowTableCopy(MM.vars.Profiles[currentZone][currentProfileName])
 		MM.vars.Profiles[currentZone][currentProfileName] = nil
@@ -769,12 +733,6 @@ function MM.renameCurrentProfile(newName)
 		end
 		if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 	end
-	
-	--MM.unloadEverything()
-	--MM.loadZone(currentZone)
-
-	--MM.currentAdditionalProfiles = {}
-	--MM.multipleProfilesLoaded = false
 end
 
 
