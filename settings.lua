@@ -72,7 +72,6 @@ function settings.createSettings()
 	}
 
 	
-	settings.currentSelections = MM.vars.currentSelections
 
 	MM.vars.currentSelections = MM.vars.currentSelections or {
 		text = "",
@@ -85,9 +84,10 @@ function settings.createSettings()
 		pitch=-90,
 	}
 
+	settings.currentSelections = MM.vars.currentSelections
+
 
 	if not IsConsoleUI() then
-		settings.quickSelections = MM.vars.quickSelections
 
 		MM.vars.quickSelections = MM.vars.quickSelections or { -- seperate to avoid needing to update the menu (also now can remove it when porting to console)
 			text = "",
@@ -99,6 +99,8 @@ function settings.createSettings()
 			yaw=0,
 			pitch=-90,
 		}
+
+		settings.quickSelections = MM.vars.quickSelections
 
 		settings.InitColourPicker()
 		settings.InitTexturePicker()
@@ -296,8 +298,8 @@ function settings.createSettings()
 			name = "Texture",
 			choices = displayChoices,
 			tooltip = "",
-			getFunc = function() return textureSearchup[currentSelections.texture] end,
-			setFunc = function(value) currentSelections.texture = textureSearchup[value] end,
+			getFunc = function() return textureSearchup[MM.vars.currentSelections.texture] end,
+			setFunc = function(value) MM.vars.currentSelections.texture = textureSearchup[value] end,
 		},
 
 
@@ -308,8 +310,8 @@ function settings.createSettings()
 			width = "half",
 			tooltip = "Select one of a few default colours, or use the colour picker to fully create your own!",
 			choices = colourPresets,
-			getFunc = function() return colourLookup[ZO_ColorDef.FloatsToHex(unpack(currentSelections.rgba))] end,
-			setFunc = function(value) currentSelections.rgba = colourLookup[value] end,
+			getFunc = function() return colourLookup[ZO_ColorDef.FloatsToHex(unpack(MM.vars.currentSelections.rgba))] end,
+			setFunc = function(value) MM.vars.currentSelections.rgba = colourLookup[value] end,
 		},
 
 		{
@@ -317,8 +319,8 @@ function settings.createSettings()
 			name = "Colour Picker",
 			tooltip = "",
 			width = "half",
-			getFunc = function() return unpack(currentSelections.rgba) end,
-			setFunc = function(r,g,b,a) currentSelections.rgba = {r,g,b,a} end,
+			getFunc = function() return unpack(MM.vars.currentSelections.rgba) end,
+			setFunc = function(r,g,b,a) MM.vars.currentSelections.rgba = {r,g,b,a} end,
 		},
 		
 		
@@ -330,8 +332,8 @@ function settings.createSettings()
 			max = 1000,
 			step = 10,	--(optional)
 			width = "half",
-			getFunc = function() return currentSelections.size*100 end,
-			setFunc = function(value) currentSelections.size = value/100 end,
+			getFunc = function() return MM.vars.currentSelections.size*100 end,
+			setFunc = function(value) MM.vars.currentSelections.size = value/100 end,
 		},
 
 		{
@@ -340,8 +342,8 @@ function settings.createSettings()
 			tooltip = "",
 			width = "half",
 			isMultiline = true,
-			getFunc = function() return currentSelections.text end,
-			setFunc = function(text) currentSelections.text = text end,
+			getFunc = function() return MM.vars.currentSelections.text end,
+			setFunc = function(text) MM.vars.currentSelections.text = text end,
 		},
 
 		{
@@ -378,8 +380,8 @@ function settings.createSettings()
 					tooltip = "If this is enabled, markers will be 'floating' in the air and always turn to face the user.",
 					warning = "When turning off 'Facing User' to create flat icons, it is recommended to set your vertical offset to 0%",
 					width = "half",
-					getFunc = function() return currentSelections.floating end,
-					setFunc = function(value) currentSelections.floating = value end,
+					getFunc = function() return MM.vars.currentSelections.floating end,
+					setFunc = function(value) MM.vars.currentSelections.floating = value end,
 				},
 				{
 					type = "button",
@@ -389,7 +391,7 @@ function settings.createSettings()
 					func = function()
 						local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
 						local yaw = zo_atan2(fX, fZ)
-						currentSelections.yaw = zo_floor(zo_deg(yaw+math.pi))
+						MM.vars.currentSelections.yaw = zo_floor(zo_deg(yaw+math.pi))
 						if M0RMarkersAdvancedYaw then M0RMarkersAdvancedYaw:UpdateValue() end 
 					end,
 				},
@@ -402,8 +404,8 @@ function settings.createSettings()
 					step = 1,	--(optional)
 					reference = "M0RMarkersAdvancedYaw",
 					width = "half",
-					getFunc = function() return currentSelections.yaw end,
-					setFunc = function(value) currentSelections.yaw = value end,
+					getFunc = function() return MM.vars.currentSelections.yaw end,
+					setFunc = function(value) MM.vars.currentSelections.yaw = value end,
 				},
 
 				{
@@ -414,16 +416,16 @@ function settings.createSettings()
 					max = 90,
 					step = 1,	--(optional)
 					width = "half",
-					getFunc = function() return currentSelections.pitch end,
-					setFunc = function(value) currentSelections.pitch = value end,
+					getFunc = function() return MM.vars.currentSelections.pitch end,
+					setFunc = function(value) MM.vars.currentSelections.pitch = value end,
 				},
 
 				{
 					type = "editbox",
 					name = "Custom Texture",
 					tooltip = "If you want to use a custom texture (either in base game or included in an addon), type the texture path into this box.",
-					getFunc = function() return currentSelections.texture end,
-					setFunc = function(value) currentSelections.texture = value end,
+					getFunc = function() return MM.vars.currentSelections.texture end,
+					setFunc = function(value) MM.vars.currentSelections.texture = value end,
 				},
 				{
 					type = "slider",
@@ -432,8 +434,8 @@ function settings.createSettings()
 					min = -100,
 					max = 300,
 					step = 5,
-					getFunc = function() return currentSelections.offsetYPercent end,
-					setFunc = function(value) currentSelections.offsetYPercent = value end,
+					getFunc = function() return MM.vars.currentSelections.offsetYPercent end,
+					setFunc = function(value) MM.vars.currentSelections.offsetYPercent = value end,
 				},
 			}
 		},

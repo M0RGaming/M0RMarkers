@@ -845,16 +845,20 @@ function MM:Initialize()
 	MM.initSharing()
 
 	-- Addon Settings Menu
-	MM.oldVars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, {})
-	MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars, nil, "$InstallationWide")
+	if IsConsoleUI() then
+		MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars)
+	else
+		MM.oldVars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, {})
+		MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars, nil, "$InstallationWide")
 
-	if MM.oldVars.Profiles ~= nil then
-		MM.vars.Profiles = ZO_DeepTableCopy(MM.oldVars.Profiles)
-		MM.oldVars.Profiles = nil
-	end
-	if MM.oldVars.loadedProfile ~= nil then
-		MM.vars.loadedProfile = ZO_DeepTableCopy(MM.oldVars.loadedProfile)
-		MM.oldVars.loadedProfile = nil
+		if MM.oldVars.Profiles ~= nil then
+			MM.vars.Profiles = ZO_DeepTableCopy(MM.oldVars.Profiles)
+			MM.oldVars.Profiles = nil
+		end
+		if MM.oldVars.loadedProfile ~= nil then
+			MM.vars.loadedProfile = ZO_DeepTableCopy(MM.oldVars.loadedProfile)
+			MM.oldVars.loadedProfile = nil
+		end
 	end
 
 	if ZO_IsTableEmpty(MM.vars.Profiles) then
