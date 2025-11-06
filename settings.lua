@@ -105,8 +105,11 @@ function settings.createSettings()
 		settings.InitColourPicker()
 		settings.InitTexturePicker()
 
-		M0RMarkerPlaceToplevelSizeSlider:SetValue(10)
-		M0RMarkerPlaceToplevelOffsetSlider:SetValue(50)
+		M0RMarkerPlaceToplevelSizeSlider:SetValue(MM.vars.quickSelections.size*10)
+		M0RMarkerPlaceToplevelSizeSlider:GetParent():GetNamedChild("Size"):SetText("Size: "..(MM.vars.quickSelections.size).."m")
+		M0RMarkerPlaceToplevelOffsetSlider:SetValue(MM.vars.quickSelections.offsetY)
+		M0RMarkerPlaceToplevelOffsetSlider:GetParent():GetNamedChild("Offset"):SetText("Vertical Offset: "..(MM.vars.quickSelections.offsetY).."%")
+		M0RMarkerPlaceToplevelTextEdit:SetText(MM.vars.quickSelections.text or "")
 	end
 
 	

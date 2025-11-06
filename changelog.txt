@@ -1,3 +1,7 @@
+----- 1.2.0 -----
+(PC) Fixed a visual bug with the quick menu not remembering options
+
+
 ----- 1.1.0 -----
 Added Selections to saved vars, to persist through reloads
 Added a Global Culling distance slider, to hide markers past X meters
