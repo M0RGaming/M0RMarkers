@@ -3,6 +3,12 @@
 		<TopLevelControl name="M0RMarkersToplevel" layer="0">
 		</TopLevelControl>
 
+		<TopLevelControl name="M0RMarkersCameraToplevel" layer="0" hidden="true">
+			<OnInitialized>
+				self:Create3DRenderSpace()
+			</OnInitialized>
+		</TopLevelControl>
+
 		<Control name="M0RMarkersTemplate" virtual="true" space="WORLD">
 			<Dimensions x="100" y="100" />
 			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER"/>

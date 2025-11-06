@@ -198,11 +198,7 @@
 		</TopLevelControl>
 
 
-		<TopLevelControl name="M0RMarkersCameraToplevel" layer="0" hidden="true">
-			<OnInitialized>
-				self:Create3DRenderSpace()
-			</OnInitialized>
-		</TopLevelControl>
+		
 
 	</Controls>
 </GuiXml>

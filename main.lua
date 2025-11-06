@@ -478,7 +478,7 @@ end
 
 local minAngle = zo_rad(-2)
 
-function MM.placeQuickMenuIconAtCursor()
+function MM.placeQuickMenuIconAtCursor(useSettingsConfig)
 	if MM.multipleProfilesLoaded then
 		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
 		--d("Markers are Read-Only when multiple profiles are loaded.")
@@ -504,6 +504,9 @@ function MM.placeQuickMenuIconAtCursor()
 	local z = r*zo_cos(yaw) + cZ
 
 	local currentSelections = MM.Settings.quickSelections
+	if useSettingsConfig then
+		currentSelections = MM.Settings.currentSelections
+	end
 	local offset = 0
 	if currentSelections.offsetY and currentSelections.size then
 		offset = currentSelections.offsetY*currentSelections.size
@@ -873,6 +876,23 @@ function MM:Initialize()
 	EVENT_MANAGER:RegisterForEvent(MM.name, EVENT_PLAYER_ACTIVATED, MM.playerActivated)
 
 	MM.Settings.createSettings()
+
+
+	if LibRadialMenu then
+		LibRadialMenu:RegisterAddon("moremarkers", "More Markers")
+		LibRadialMenu:RegisterEntry("moremarkers", "Place Marker", "place", "M0RMarkers/textures/PlaceMarker.dds",
+			function() MM.placeIcon() end,
+			"Places a configured marker at your feet.")
+
+		LibRadialMenu:RegisterEntry("moremarkers", "Remove Marker", "remove", "M0RMarkers/textures/RemoveMarker.dds",
+			function() MM.removeClosestIcon() end,
+			"Removes the closest marker to you.")
+
+		LibRadialMenu:RegisterEntry("moremarkers", "Place Marker at Reticle", "placecursor", "M0RMarkers/textures/PlaceAtCursor.dds",
+			function() MM.placeQuickMenuIconAtCursor(true) end,
+			"Places a configured marker at your current reticle location.")
+	end
+
 	EVENT_MANAGER:UnregisterForEvent(MM.name, EVENT_ADD_ON_LOADED)
 end
  
