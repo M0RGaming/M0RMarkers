@@ -354,8 +354,8 @@ local fontEffectOptions = {
 
 
 local selectionType = {
-	"fontFace" = fontFaceOptions,
-	"fontEffect" = fontEffectOptions
+	["fontFace"] = fontFaceOptions,
+	["fontEffect"] = fontEffectOptions
 }
 
 
@@ -383,7 +383,7 @@ local function SetupFontFace(dialog)
 		entryData.fonteffect = (fontType == "fontEffect") and fontIterator or currentFontEffect
 		entryData.setup = function(control, data, ...)
 			SetupProfileItem(control, data, ...)
-			control:GetNamedChild("Label"):SetFont(string.format("$(%s)|$(GP_20)%s", data.fontface, data.fonteffect))
+			control:GetNamedChild("Label"):SetFont(string.format("$(%s)|34%s", data.fontface, data.fonteffect))
 		end
 		entryData.name = text
 		entryData.isActive = (currentFontFace == fontIterator) or (currentFontEffect == fontIterator)
@@ -415,6 +415,9 @@ ESO_Dialogs["M0RMarkerFontSelect"] = {
 							if data.fontface and data.fonteffect then
 								MM.vars.fontface = data.fontface or "GAMEPAD_BOLD_FONT"
 								MM.vars.fonteffect = data.fonteffect or "|thick-outline"
+								for i,v in pairs(dialog.entryList.dataIndexToControl) do -- revert back to normal font
+									v.label:SetFont("ZoFontGamepad34")
+								end
 							end
 						end,
 		},
@@ -427,5 +430,5 @@ ESO_Dialogs["M0RMarkerFontSelect"] = {
 
 
 function MM.ShowFontSelect(fontType)
-	ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelect", {fontType = fontType})
+	ZO_Dialogs_ShowPlatformDialog("M0RMarkerFontSelect", {fontType = fontType})
 end

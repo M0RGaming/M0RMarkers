@@ -824,6 +824,20 @@ end
 
 function MM.OpenConsoleSettings()
 	-- lam.LHASConversion.settingTables, M0RMarkersSettingsPanel
+	if (IsConsoleUI() and LibAddonMenu2 and LibHarvensAddonSettings and LibAddonMenu2.LHASConversion and LibAddonMenu2.LHASConversion.settingTables) then
+		local settings = LibAddonMenu2.LHASConversion.settingTables["M0RMarkersSettingsPanel"]
+		if settings == nil then return end
+		if (LibHarvensAddonSettings.initialized ~= true) and (LibHarvensAddonSettings.scrollList == nil)  then
+			LibHarvensAddonSettings:Initialize()
+		end
+		settings:Select()
+		local headerData = {}
+		headerData.titleText = settings.name
+		headerData.subtitleText = settings.version
+		headerData.messageText = zo_strformat(GetString(SI_ADD_ON_AUTHOR_LINE), "@M0R_Gaming")
+		ZO_GamepadGenericHeader_RefreshData(LibHarvensAddonSettings.scrollList.header, headerData)
+		SCENE_MANAGER:Push("LibHarvensAddonSettingsScene")
+	end
 end
 
 
@@ -896,6 +910,10 @@ function MM:Initialize()
 		LibRadialMenu:RegisterEntry("moremarkers", "Place Marker at Reticle", "placecursor", "M0RMarkers/textures/PlaceAtCursor.dds",
 			function() MM.placeQuickMenuIconAtCursor(true) end,
 			"Places a configured marker at your current reticle location.")
+
+		LibRadialMenu:RegisterEntry("moremarkers", "Open Settings", "opensettings", "M0RMarkers/textures/OpenSettings.dds",
+			function() MM.OpenConsoleSettings() end,
+			"Opens the More Markers settings page.")
 	end
 
 	EVENT_MANAGER:UnregisterForEvent(MM.name, EVENT_ADD_ON_LOADED)

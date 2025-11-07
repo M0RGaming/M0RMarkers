@@ -218,7 +218,7 @@ function settings.createSettings()
 		type = "dropdown",
 		name = "Change Font",
 		width = "half",
-		tooltip = "Click this button to change the font!"
+		tooltip = "Click this button to change the font!",
 		warning = "Changes will only take affect after you load a new profile/zone.",
 		choices = fontFaceDisplays,
 		getFunc = function()
@@ -234,7 +234,7 @@ function settings.createSettings()
 		type = "dropdown",
 		name = "Change Font Effect",
 		width = "half",
-		tooltip = "Click this button to change the font effect!"
+		tooltip = "Click this button to change the font effect!",
 		warning = "Changes will only take affect after you load a new profile/zone.",
 		choices = fontEffectDisplays,
 		getFunc = function()

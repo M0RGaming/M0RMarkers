@@ -152,8 +152,9 @@ local function createControl(icon)
 	local fontFace = MM.vars.fontface or "GAMEPAD_BOLD_FONT"
 	local fontEffect = MM.vars.fonteffect or "|thick-outline"
 	control.textLayer:SetFont(string.format("$(%s)|$(GP_20)%s", fontFace, fontEffect))
-	control.textLayer:SetTransformNormalizedOriginPoint(0.5,0.5)
-	control.textLayer:SetTransformScale(textMultiplier)
+	--control.textLayer:SetTransformNormalizedOriginPoint(0.5,0.5)
+	--control.textLayer:SetTransformScale(textMultiplier)
+	control.textLayer:SetScale(4*textMultiplier) -- 4 is default
 
 	icon.control = control
 	icon.key = key
