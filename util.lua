@@ -327,3 +327,105 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+local fontFaceOptions = {
+	["GAMEPAD_BOLD_FONT"] = "Bold",
+	["GAMEPAD_MEDIUM_FONT"] = "Medium",
+	["GAMEPAD_LIGHT_FONT"] = "Light",
+	["GAMEPAD_MEDIUM_FONT_LATIN"] = "Latin",
+	["ANTIQUE_FONT"] = "Antique",
+	["HANDWRITTEN_FONT"] = "Handwritten",
+	["STONE_TABLET_FONT"] = "Stone Tablet",
+}
+local fontEffectOptions = {
+	["|thick-outline"] = "Thick Outline",
+	["|soft-shadow-thick"] = "Soft Shadow Thick",
+	["|soft-shadow-thin"] = "Soft Shadow Thin",
+	[""] = "No Effect" -- none
+}
+
+
+local selectionType = {
+	"fontFace" = fontFaceOptions,
+	"fontEffect" = fontEffectOptions
+}
+
+
+
+
+
+
+
+local function SetupFontFace(dialog)
+	local fontType = dialog.data.fontType
+	local currentFontFace = MM.vars.fontface or "GAMEPAD_BOLD_FONT"
+	local currentFontEffect = MM.vars.fonteffect or "|thick-outline"
+
+	local iteratingList = selectionType[fontType]
+
+
+	dialog.info.parametricList = {}
+	local template = "ZO_GamepadSubMenuEntryWithStatusTemplate"
+
+	for fontIterator,text in pairs(iteratingList) do
+		local entryData = ZO_GamepadEntryData:New(text)
+		entryData:SetFontScaleOnSelection(false)
+		entryData:SetIconTintOnSelection(true)
+		entryData.fontface = (fontType == "fontFace") and fontIterator or currentFontFace
+		entryData.fonteffect = (fontType == "fontEffect") and fontIterator or currentFontEffect
+		entryData.setup = function(control, data, ...)
+			SetupProfileItem(control, data, ...)
+			control:GetNamedChild("Label"):SetFont(string.format("$(%s)|$(GP_20)%s", data.fontface, data.fonteffect))
+		end
+		entryData.name = text
+		entryData.isActive = (currentFontFace == fontIterator) or (currentFontEffect == fontIterator)
+
+		local listItem = {
+			template = template,
+			entryData = entryData,
+		}
+		table.insert(dialog.info.parametricList, listItem)
+	end
+	dialog:setupFunc()
+	dialog.entryList:SetSelectedDataByEval(IsSelected)
+end
+
+ESO_Dialogs["M0RMarkerFontSelect"] = {
+	canQueue = true,
+	gamepadInfo = {
+		dialogType = GAMEPAD_DIALOGS.PARAMETRIC,
+	},
+	setup = SetupFontFace,
+	title = {
+		text = "Select your desired font!",
+	},
+	buttons = {
+		{
+			text = SI_GAMEPAD_SELECT_OPTION,
+			callback =  function(dialog)
+							local data = dialog.entryList:GetTargetData()
+							if data.fontface and data.fonteffect then
+								MM.vars.fontface = data.fontface or "GAMEPAD_BOLD_FONT"
+								MM.vars.fonteffect = data.fonteffect or "|thick-outline"
+							end
+						end,
+		},
+		{
+			text = SI_DIALOG_EXIT,
+		},
+	},
+}
+
+
+
+function MM.ShowFontSelect(fontType)
+	ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelect", {fontType = fontType})
+end

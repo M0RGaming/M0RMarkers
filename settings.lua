@@ -179,25 +179,71 @@ function settings.createSettings()
 		end,
 	}
 
-	--[[
-	local createProfileFunc = function()
-		MM.ShowEditDialogue("Creating Profile", "What would you like to name the new profile?", "", function(name)
-			MM.loadProfile(name or "Default")
-			if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
-		end)
-	end
-	local renameProfileFunc = function()
-		MM.ShowEditDialogue("Renaming Profile",
-			"What would you like to rename the current profile to?",
-			"If the desired name is already a profile, it will be overwritten.",
-			function(name)
-				MM.renameCurrentProfile(name)
-				
-			end
-		)
-	end
-	--]]
 	local refreshLoadedProfile = function() if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end end
+
+
+
+	local fontFaceOptions = {
+		["GAMEPAD_BOLD_FONT"] = "Bold",
+		["GAMEPAD_MEDIUM_FONT"] = "Medium",
+		["GAMEPAD_LIGHT_FONT"] = "Light",
+		["GAMEPAD_MEDIUM_FONT_LATIN"] = "Latin",
+		["ANTIQUE_FONT"] = "Antique",
+		["HANDWRITTEN_FONT"] = "Handwritten",
+		["STONE_TABLET_FONT"] = "Stone Tablet",
+	}
+	local fontEffectOptions = {
+		["|thick-outline"] = "Thick Outline",
+		["|soft-shadow-thick"] = "Soft Shadow Thick",
+		["|soft-shadow-thin"] = "Soft Shadow Thin",
+		[""] = "No Effect"
+	}
+	local fontFaceDisplays = {}
+	local fontEffectDisplays = {}
+
+	for i,v in pairs(fontFaceOptions) do
+		fontFaceOptions[v] = i
+		fontFaceDisplays[#fontFaceDisplays+1] = v
+	end
+	for i,v in pairs(fontEffectOptions) do
+		fontEffectOptions[v] = i
+		fontEffectDisplays[#fontEffectDisplays+1] = v
+	end
+	table.sort(fontFaceDisplays)
+	table.sort(fontEffectDisplays)
+
+
+
+	local setFontFaceButton = {
+		type = "dropdown",
+		name = "Change Font",
+		width = "half",
+		tooltip = "Click this button to change the font!"
+		warning = "Changes will only take affect after you load a new profile/zone.",
+		choices = fontFaceDisplays,
+		getFunc = function()
+			return fontFaceOptions[MM.vars.fontface or "GAMEPAD_BOLD_FONT"]
+		end,
+		setFunc = function(value)
+			MM.vars.fontface = fontFaceOptions[value] or "GAMEPAD_BOLD_FONT"
+		end
+	}
+
+
+	local setFontEffectButton = {
+		type = "dropdown",
+		name = "Change Font Effect",
+		width = "half",
+		tooltip = "Click this button to change the font effect!"
+		warning = "Changes will only take affect after you load a new profile/zone.",
+		choices = fontEffectDisplays,
+		getFunc = function()
+			return fontEffectOptions[MM.vars.fonteffect or "|thick-outline"]
+		end,
+		setFunc = function(value)
+			MM.vars.fonteffect = fontEffectOptions[value] or "|thick-outline"
+		end
+	}
 
 	if IsConsoleUI() then
 
@@ -207,29 +253,6 @@ function settings.createSettings()
 				end
 			end
 
-			--[[
-			createProfileFunc = function()
-				MM.ShowGPEdit("Creating Profile",
-					"What would you like to name the new profile?",
-					"",
-					function(name)
-						MM.loadProfile(name or "Default")
-						refreshLoadedProfile()
-					end
-				)
-			end
-
-			renameProfileFunc = function()
-				MM.ShowGPEdit("Renaming Profile",
-					"What would you like to rename the current profile to?",
-					"If the desired name is already a profile, it will be overwritten.",
-					function(name)
-						MM.renameCurrentProfile(name)
-						refreshLoadedProfile()
-					end
-				)
-			end
-			--]]
 
 			toInsert = {
 				{
@@ -269,6 +292,21 @@ function settings.createSettings()
 				name = "Load Additional Profiles",
 				tooltip = "Click this button to load multiple profiles at once!",
 				func = function() MM.ShowMultiProfileSelect() end,
+			}
+
+
+			setFontFaceButton = {
+				type = "button",
+				name = "Change Font",
+				tooltip = "Click this button to change the font!\n\nChanges will only take affect after you load a new profile/zone.\nIt is recommended to reload your UI after setting this, to clean up memory usage.",
+				func = function() MM.ShowFontSelect("fontFace") end,
+			}
+
+			setFontEffectButton = {
+				type = "button",
+				name = "Change Font Effect",
+				tooltip = "Click this button to change the font effect!\n\nChanges will only take affect after you load a new profile/zone.\nIt is recommended to reload your UI after setting this, to clean up memory usage.",
+				func = function() MM.ShowFontSelect("fontEffect") end,
 			}
 
 			
@@ -718,6 +756,19 @@ function settings.createSettings()
 			getFunc = function() return MM.vars.cullingDistance end,
 			setFunc = function(value) MM.vars.cullingDistance = value; MM.startCulling() end,
 		},
+		{
+			type = "slider",
+			name = "Font Scale Multiplier (%)",
+			tooltip = "This multiplier will apply to all text elements in markers, on top of their normal size multipliers.\n\nChanges will only take affect after you load a new profile/zone.",
+			min = 5,
+			max = 200,
+			step = 5,
+			width = "half",
+			getFunc = function() return MM.vars.fontScale*100 end,
+			setFunc = function(value) MM.vars.fontScale = value/100 end,
+		},
+		setFontFaceButton,
+		setFontEffectButton
 
 	}
 

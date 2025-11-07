@@ -1,14 +1,6 @@
 <GuiXml>
 	<Controls>
 
-		<!--
-		Colour X
-		Texture X
-		Size
-		Text
-
-		-->
-
 		<TopLevelControl name="M0RMarkerPlaceToplevel" clampedToScreen="true" mouseEnabled="true" movable="true" hidden="true">
 			<Dimensions x="320" y="245" />
 			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="0"/>
@@ -182,16 +174,6 @@
 						<Label name="$(parent)Outline" font="$(STONE_TABLET_FONT)|40|thick-outline" horizontalAlignment="1" verticalAlignment="1" text="More Markers" color="AA000000" level="1">
 							<AnchorFill />
 						</Label>
-						<!--
-
-							maybe make  M0RMarkerPlaceToplevelNameOutline:SetTransformScale(1.05)
-
-							
-						<Backdrop name="$(parent)BG" alpha="0.7" centerColor="111111" edgeColor="00000000">
-							<AnchorFill />
-							<Edge edgeSize="0"/>
-						</Backdrop>
-						-->
 					</Controls>
 				</Label>
 			</Controls>

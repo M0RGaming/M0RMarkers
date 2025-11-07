@@ -148,6 +148,13 @@ local function createControl(icon)
 	local multiplier = MM.vars.globalMult or 1
 	control:SetTransformScale(icon.size * multiplier)
 
+	local textMultiplier = MM.vars.fontScale or 1
+	local fontFace = MM.vars.fontface or "GAMEPAD_BOLD_FONT"
+	local fontEffect = MM.vars.fonteffect or "|thick-outline"
+	control.textLayer:SetFont(string.format("$(%s)|$(GP_20)%s", fontFace, fontEffect))
+	control.textLayer:SetTransformNormalizedOriginPoint(0.5,0.5)
+	control.textLayer:SetTransformScale(textMultiplier)
+
 	icon.control = control
 	icon.key = key
 	return icon

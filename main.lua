@@ -332,6 +332,9 @@ MM.defaultVars = {
 	Profiles = {},
 	globalMult = 1,
 	cullingDistance = 0,
+	fontface = "GAMEPAD_BOLD_FONT",
+	fonteffect = "|thick-outline",
+	fontScale = 1
 }
 
 
@@ -819,7 +822,9 @@ end
 
 
 
-
+function MM.OpenConsoleSettings()
+	-- lam.LHASConversion.settingTables, M0RMarkersSettingsPanel
+end
 
 
 

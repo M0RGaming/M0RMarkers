@@ -6,7 +6,7 @@
 ## Author: |c0DC1CF@M0R_Gaming|r
 ## SavedVariables: Markers
 ## DependsOn: LibAddonMenu-2.0>=40
-## ConsoleDependsOn: LibGroupBroadcast>=91 LibHarvensAddonSettings>=20005
+## ConsoleDependsOn: LibGroupBroadcast>=91 LibHarvensAddonSettings>=20005 LibRadialMenu
 ## OptionalDependsOn: LibGroupBroadcast>=91
 
 
