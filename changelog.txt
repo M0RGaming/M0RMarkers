@@ -1,3 +1,6 @@
+----- 1.2.1 -----
+(Console) Fixed a small bug where place at cursor would not respect the offsetY setting
+
 ----- 1.2.0 -----
 Added a font selection, and a text size scaling slider. This is located at the bottom of the settings!
 (PC) Fixed a visual bug with the quick menu not remembering options

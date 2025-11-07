@@ -510,10 +510,15 @@ function MM.placeQuickMenuIconAtCursor(useSettingsConfig)
 	if useSettingsConfig then
 		currentSelections = MM.Settings.currentSelections
 	end
+	
 	local offset = 0
 	if currentSelections.offsetY and currentSelections.size then
 		offset = currentSelections.offsetY*currentSelections.size
 	end
+	if currentSelections.offsetYPercent and currentSelections.size then -- quick fix cause for some reason the settings configured table has Percent at the end
+		offset = currentSelections.offsetYPercent*currentSelections.size
+	end
+	
 	local icon = {
 		x = x or 0,
 		y = y+offset or 0,
