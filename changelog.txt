@@ -1,6 +1,7 @@
 ----- 1.2.0 -----
+Added a font selection, and a text size scaling slider. This is located at the bottom of the settings!
 (PC) Fixed a visual bug with the quick menu not remembering options
-
+(Console) Added LibRadialMenu as a dependancy. Also added actions to LibRadialMenu, to place/remove/place at cursor/open settings.
 
 ----- 1.1.0 -----
 Added Selections to saved vars, to persist through reloads
