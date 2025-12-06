@@ -430,6 +430,7 @@ function settings.createSettings()
 					tooltip = "This will set the yaw slider below to what your camera was facing before you entered the settings menu.",
 					width = "half",
 					func = function()
+						MM.setYaw()
 						local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
 						local yaw = zo_atan2(fX, fZ)
 						MM.vars.currentSelections.yaw = zo_floor(zo_deg(yaw+math.pi))
