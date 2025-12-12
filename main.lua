@@ -436,6 +436,12 @@ function MM.saveIcons(zoneString)
 	end
 end
 
+function MM.setYaw()
+	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
+	local yaw = zo_atan2(fX, fZ)
+	MM.vars.currentSelections.yaw = zo_floor(zo_deg(yaw+math.pi))
+end
+
 
 
 SLASH_COMMANDS['/mmplace'] = function()
@@ -444,6 +450,10 @@ end
 
 SLASH_COMMANDS['/mmremove'] = function()
 	MM.removeClosestIcon()
+end
+
+SLASH_COMMANDS['/mmyaw'] = function()
+    MM.setYaw()
 end
 
 
