@@ -201,11 +201,11 @@ function settings.createSettings()
 	local fontFaceDisplays = {}
 	local fontEffectDisplays = {}
 
-	for i,v in pairs(fontFaceOptions) do
+	for i,v in pairs(ZO_ShallowTableCopy(fontFaceOptions)) do
 		fontFaceOptions[v] = i
 		fontFaceDisplays[#fontFaceDisplays+1] = v
 	end
-	for i,v in pairs(fontEffectOptions) do
+	for i,v in pairs(ZO_ShallowTableCopy(fontEffectOptions)) do
 		fontEffectOptions[v] = i
 		fontEffectDisplays[#fontEffectDisplays+1] = v
 	end

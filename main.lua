@@ -334,7 +334,9 @@ MM.defaultVars = {
 	cullingDistance = 0,
 	fontface = "GAMEPAD_BOLD_FONT",
 	fonteffect = "|thick-outline",
-	fontScale = 1
+	fontScale = 1,
+	currentPresetVersion = 1,
+	latestUpdateMessage = 0,
 }
 
 
@@ -851,6 +853,26 @@ end
 
 
 
+
+local latestPresetVersion = 2
+
+local updateMessages = {
+	[1] = "[MoreMarkers] More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. The presets are: "..
+	"vDSR Taleria Clock, and vOC General v2 (Arcana)."
+}
+
+local playerActivatedUpdateMessage = function()
+	d(updateMessages[#updateMessages])
+	MM.vars.latestUpdateMessage = #updateMessages
+	EVENT_MANAGER:UnregisterForEvent("M0RMarkersUpdateMessage", EVENT_PLAYER_ACTIVATED)
+end
+
+
+
+
+
+
+
 -- The following was adapted from https://wiki.esoui.com/Circonians_Stamina_Bar_Tutorial#lua_Structure
 
 -------------------------------------------------------------------------------------------------
@@ -890,7 +912,15 @@ function MM:Initialize()
 
 	if ZO_IsTableEmpty(MM.vars.Profiles) then
 		MM.InsertPremades()
+	elseif MM.vars.currentPresetVersion < latestPresetVersion then
+		MM.InsertPremades(true)
+		MM.vars.currentPresetVersion = latestPresetVersion
 	end
+
+	if MM.vars.latestUpdateMessage < #updateMessages then
+		EVENT_MANAGER:RegisterForEvent("M0RMarkersUpdateMessage", EVENT_PLAYER_ACTIVATED, playerActivatedUpdateMessage)
+	end
+
 
 	if LibFilteredChatPanel then
 		MM.filter = LibFilteredChatPanel:CreateFilter("M0RMarkers", "/M0RMarkers/textures/chevron.dds", {0, 0.8, 0.8}, false)
