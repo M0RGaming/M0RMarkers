@@ -431,9 +431,6 @@ function settings.createSettings()
 					width = "half",
 					func = function()
 						MM.setYaw()
-						local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
-						local yaw = zo_atan2(fX, fZ)
-						MM.vars.currentSelections.yaw = zo_floor(zo_deg(yaw+math.pi))
 						if M0RMarkersAdvancedYaw then M0RMarkersAdvancedYaw:UpdateValue() end 
 					end,
 				},

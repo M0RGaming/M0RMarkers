@@ -439,7 +439,9 @@ end
 function MM.setYaw()
 	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
 	local yaw = zo_atan2(fX, fZ)
-	MM.vars.currentSelections.yaw = zo_floor(zo_deg(yaw+math.pi))
+	local outYaw = zo_floor(zo_deg(yaw+math.pi))
+	MM.vars.currentSelections.yaw = outYaw
+	return outYaw
 end
 
 
@@ -453,7 +455,9 @@ SLASH_COMMANDS['/mmremove'] = function()
 end
 
 SLASH_COMMANDS['/mmyaw'] = function()
-    MM.setYaw()
+    local yaw = MM.setYaw()
+    d(string.format("|cFFD700More Markers|r: Set the configured marker yaw to %d degrees.", yaw))
+    if M0RMarkersAdvancedYaw then M0RMarkersAdvancedYaw:UpdateValue() end
 end
 
 
@@ -867,8 +871,8 @@ end
 local latestPresetVersion = 2
 
 local updateMessages = {
-	[1] = "[MoreMarkers] More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. The presets are: "..
-	"vDSR Taleria Clock, and vOC General v2 (Arcana)."
+	[1] = "|cFFD700More Markers|r: More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. "..
+	"The presets are: vDSR Taleria Clock, and vOC General v2 (Arcana)."
 }
 
 local playerActivatedUpdateMessage = function()

@@ -1,6 +1,7 @@
 ----- 1.2.2 -----
 Added 2 new preset marker sets: vDSR taleria clock, and vOC General v2 (Arcana).
 Fixed a bug where the font selector would not show all the fonts, or show duplicated fonts.
+(Contribution from @kip.anderson) Added /mmyaw to set the settings yaw without needing to open the settings page (and thus avoids issues like shifting cameras in small spaces).
 
 ----- 1.2.1 -----
 (Console) Fixed a small bug where place at cursor would not respect the offsetY setting
