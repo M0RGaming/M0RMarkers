@@ -237,7 +237,7 @@
 						local parent = self:GetParent()
 						local r,g,b,a = parent:GetCenterColor()
 						local hexCode = ZO_ColorDef.FloatsToHex(r,g,b,a)
-						d(hexCode)
+						--d(hexCode)
 
 						local hexEditor = parent:GetParent():GetNamedChild("ColourHex"):GetNamedChild("Edit")
 						hexEditor:SetText(hexCode or "")
@@ -259,7 +259,7 @@
 					<OnClicked>
 						local parent = self:GetParent()
 						local texturePath = parent:GetTextureFileName()
-						d(texturePath)
+						--d(texturePath)
 
 						local textureEditor = parent:GetParent():GetParent():GetNamedChild("Texture"):GetNamedChild("Edit")
 						textureEditor:SetText(texturePath or "")
@@ -390,7 +390,8 @@
 							</Controls>
 							<OnTextChanged>
 								local value = self:GetText()
-								d(value)
+								--d(value)
+								M0RMarkers.editorSelections.markersize = value
 							</OnTextChanged>
 						</EditBox>
 					</Controls>
@@ -413,7 +414,8 @@
 							</Controls>
 							<OnTextChanged>
 								local value = self:GetText()
-								d(value)
+								--d(value)
+								M0RMarkers.editorSelections.yaw = value
 							</OnTextChanged>
 						</EditBox>
 					</Controls>
@@ -436,7 +438,8 @@
 							</Controls>
 							<OnTextChanged>
 								local value = self:GetText()
-								d(value)
+								--d(value)
+								M0RMarkers.editorSelections.pitch = value
 							</OnTextChanged>
 						</EditBox>
 					</Controls>
@@ -471,7 +474,8 @@
 							</Controls>
 							<OnTextChanged>
 								local value = self:GetText()
-								d(value)
+								--d(value)
+								M0RMarkers.editorSelections.x = value
 							</OnTextChanged>
 						</EditBox>
 					</Controls>
@@ -494,7 +498,8 @@
 							</Controls>
 							<OnTextChanged> <!-- OnFocusLost -->
 								local value = self:GetText()
-								d(value)
+								--d(value)
+								M0RMarkers.editorSelections.y = value
 							</OnTextChanged>
 						</EditBox>
 					</Controls>
@@ -517,7 +522,8 @@
 							</Controls>
 							<OnTextChanged>
 								local value = self:GetText()
-								d(value)
+								--d(value)
+								M0RMarkers.editorSelections.z = value
 							</OnTextChanged>
 						</EditBox>
 					</Controls>
@@ -546,6 +552,7 @@
 					<OnTextChanged>
 						local value = self:GetText()
 						--d(value)
+						M0RMarkers.editorSelections.text = value
 					</OnTextChanged>
 				</EditBox>
 
@@ -609,7 +616,8 @@
 									</Controls>
 									<OnTextChanged>
 										local value = self:GetText()
-										d(value)
+										--d(value)
+										M0RMarkers.editorSelections.colour = value
 									</OnTextChanged>
 								</EditBox>
 							</Controls>
@@ -735,7 +743,8 @@
 									</Controls>
 									<OnTextChanged>
 										local value = self:GetText()
-										d(value)
+										--d(value)
+										M0RMarkers.editorSelections.texture = value
 									</OnTextChanged>
 								</EditBox>
 							</Controls>
@@ -748,7 +757,6 @@
 
 
 				
-
 				<Button name="$(parent)Save" inherits="ZO_DefaultButton" text="|cFFB6C1Save Profile|r">
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)TextEdit" offsetY="-25" offsetX="-75" />
 					<Dimensions x="125" y="25" />
@@ -757,24 +765,34 @@
 						--M0RMarkers.placeQuickMenuIcon()
 					</OnClicked>
 				</Button>
+				
 
-				<Button name="$(parent)Apply" inherits="ZO_DefaultButton" text="|c98FB98Apply Changes|r">
+
+
+				<Button name="$(parent)Discard" inherits="ZO_DefaultButton" text="|cFFB6C1Discard Changes|r">
 					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Save" offsetY="-10" />
 					<Dimensions x="125" y="25" />
 					<OnClicked>
+						M0RMarkers.reselectCurrentMarker()
+						-- set the selected marker to itself again
+						--M0RMarkers.placeQuickMenuIcon()
+					</OnClicked>
+				</Button>
+
+				<Button name="$(parent)Apply" inherits="ZO_DefaultButton" text="|c98FB98Apply Changes|r">
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Discard" offsetY="-10" />
+					
+					<Dimensions x="125" y="25" />
+					<OnClicked>
+
+						M0RMarkers.editorApplyPressed()
+
 						
 						--M0RMarkers.placeQuickMenuIcon()
 					</OnClicked>
 				</Button>
 
-				<Button name="$(parent)Discard" inherits="ZO_DefaultButton" text="|cFFB6C1Discard Changes|r">
-					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Apply" offsetY="-10" />
-					<Dimensions x="125" y="25" />
-					<OnClicked>
-						-- set the selected marker to itself again
-						--M0RMarkers.placeQuickMenuIcon()
-					</OnClicked>
-				</Button>
+				
 				
 
 				<!--

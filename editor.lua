@@ -2,9 +2,14 @@
 
 local MM = M0RMarkers
 local control
+local tileManager
 
 
 function MM.editorInit()
+
+	MM.editorSelections = {
+
+	}
 
 
 	local function GetAllMapIdsByZoneId()
@@ -134,8 +139,50 @@ function MM.editorInit()
 	-- save will populate the currentZoneMarkers back to MM.loadedMarkers, save, and load it again.
 
 
+	function MM.reselectCurrentMarker()
+		SetSelectedMarker(currentZoneMarkers[selectedMarker])
+	end
 
 
+
+	function MM.editorApplyPressed()
+		b = currentZoneMarkers
+		d("Apply Pressed")
+		if selectedMarker == 0 then return end
+		local selections = M0RMarkers.editorSelections
+		for i,v in pairs(selections) do
+			d(string.format("%s: %s", i, v))
+		end
+		local cMarker = currentZoneMarkers[selectedMarker]
+		local x = tonumber(selections.x)
+		local y = tonumber(selections.y)
+		local z = tonumber(selections.z)
+		if x then cMarker.x = x end
+		if y then cMarker.y = y end
+		if z then cMarker.z = z end
+		if selections.text then cMarker.text = selections.text end
+		local markersize = selections.markersize
+		if markersize then cMarker.size = markersize end
+		local colourR, colourG, colourB, colourA = ZO_ColorDef.HexToFloats(selections.colour)
+		if colourR then
+			cMarker.colourHex = selections.colour
+			cMarker.colour[1] = colourR
+			cMarker.colour[2] = colourG
+			cMarker.colour[3] = colourB
+			cMarker.colour[4] = colourA
+		end
+		local texture = selections.texture
+		if texture ~= "" then cMarker.bgTexture = texture end
+		local yaw = tonumber(selections.yaw)
+		local pitch = tonumber(selections.pitch)
+		if pitch or yaw then
+			cMarker.orientation = {yaw or 0, pitch or 0}
+		else
+			cMarker.orientation = nil
+		end
+
+		tileManager:ReloadMap()
+	end
 
 
 
@@ -333,12 +380,16 @@ function MM.editorInit()
 
 	tileManager = ZO_WorldMapTiles_Manager:New(image)
 
-	function tileManager:SetMapId(mapid)
+	function tileManager:SetMapId(mapid, fromReload)
 		self.mapid = mapid
 		self:UpdateTextures()
 
-
-
+		local preReloadScale
+		local preReloadAnchor
+		if fromReload then
+			preReloadScale = image:GetScale()
+			preReloadAnchor = {image:GetAnchor()}
+		end
 		image:SetScale(1)
 		image:ClearAnchors()
 		image:SetAnchor(CENTER, control, CENTER, 0, 0)
@@ -376,8 +427,19 @@ function MM.editorInit()
 				markerpreviews[#markerpreviews+1] = currentMarker
 			end
 		end
+
+		if fromReload then
+			image:SetScale(preReloadScale)
+			image:SetAnchor(preReloadAnchor[2],preReloadAnchor[3],preReloadAnchor[4],preReloadAnchor[5],preReloadAnchor[6])
+		end
 		changeScale(self, 0)
 		SetMapToMapId(currentMapId)
+
+		SetSelectedMarker(emptyMarker)
+	end
+
+	function tileManager:ReloadMap()
+		self:SetMapId(self.mapid, true)
 	end
 
 	function tileManager:UpdateMapData()
