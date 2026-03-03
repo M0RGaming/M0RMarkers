@@ -180,7 +180,638 @@
 		</TopLevelControl>
 
 
-		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<Backdrop name="M0RMarkersColourSelector" virtual="true" edgeColor="000000">
+			<Dimensions x="25" y="25" />
+			<Controls>
+				<Button name="$(parent)Button">
+					<Textures normal="/esoui/art/actionbar/abilityframe64_up.dds" 
+						pressed="/esoui/art/actionbar/abilityframe64_down.dds"/> <!-- /esoui/art/actionbar/gamepad/gp_abilityframe64.dds -->
+					<AnchorFill />
+
+					<OnClicked>
+						local parent = self:GetParent()
+						local r,g,b,a = parent:GetCenterColor()
+						local hexCode = ZO_ColorDef.FloatsToHex(r,g,b,a)
+						d(hexCode)
+
+						local hexEditor = parent:GetParent():GetNamedChild("ColourHex"):GetNamedChild("Edit")
+						hexEditor:SetText(hexCode or "")
+					</OnClicked>
+				</Button>
+			</Controls>
+		</Backdrop>
+
+
+		<Texture name="M0RMarkersTextureSelector" virtual="true"> <!-- textureFile -->
+			<Dimensions x="25" y="25" />
+			<Controls>
+				<Button name="$(parent)Button">
+					<Textures normal="/esoui/art/actionbar/abilityframe64_up.dds" 
+						pressed="/esoui/art/actionbar/abilityframe64_down.dds"/>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="-5" offsetY="-5"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)" offsetX="5" offsetY="5"/>
+
+					<OnClicked>
+						local parent = self:GetParent()
+						local texturePath = parent:GetTextureFileName()
+						d(texturePath)
+
+						local textureEditor = parent:GetParent():GetParent():GetNamedChild("Texture"):GetNamedChild("Edit")
+						textureEditor:SetText(texturePath or "")
+					</OnClicked>
+				</Button>
+			</Controls>
+		</Texture>
+
+
+
+
+
+
+
+
+
+		<TopLevelControl name="M0RMarkerEditorToplevel" clampedToScreen="true" mouseEnabled="false" movable="false" hidden="true" virtual="false">
+			<Dimensions x="1435" y="855" />
+			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER" offsetX="0" offsetY="0"/>
+			<Controls>
+				<Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="000000">
+					<AnchorFill />
+					<Edge edgeSize="3"/>
+				</Backdrop>
+				<Texture name="$(parent)Cursor" hidden="true" textureFile="/esoui/art/scrying/cursor_gamepad.dds" tier="HIGH" level="500">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
+					<Dimensions x="25" y="25" />
+					<OnInitialized>
+						self:SetTransformOffsetX(-12.5)
+						self:SetTransformOffsetY(-12.5)
+					</OnInitialized>
+				</Texture>
+				<Label name="$(parent)MapSelector" font="ZoFontGamepadBold34" horizontalAlignment="1" verticalAlignment="1" text="Map Selector">
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="0" offsetY="10" />
+					<Dimensions x="300" y="40" />
+					<Controls>
+						<Control name="$(parent)Picker" inherits="ZO_ComboBox" mouseEnabled="true" tier="HIGH" >
+							<Dimensions x="200" y="40" />
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="5" />
+							
+							<OnInitialized>
+
+
+								M0RMarkers.mapZoneLookup = {}
+							    local mapIdMax = 10000
+							    for mapId = 1, mapIdMax do
+							        local name, _, _, zoneIndex = GetMapInfoById(mapId)
+							        local zoneId = GetZoneId(zoneIndex)
+							        if zoneId ~= 2 then
+							            if M0RMarkers.mapZoneLookup[zoneId] then
+							                M0RMarkers.mapZoneLookup[zoneId][mapId] = name
+							            else
+							                M0RMarkers.mapZoneLookup[zoneId] = {[mapId] = name}
+							            end
+							        end
+							    end
+
+
+
+
+
+								local comboBox = ZO_ComboBox:New(self)
+								comboBox:SetSortsItems(true)
+								local currentMapId = GetCurrentMapId()
+
+								local currentZone = GetUnitRawWorldPosition('player')
+								local currentZoneLookup = M0RMarkers.mapZoneLookup[currentZone]
+								if currentZoneLookup then
+									for i,v in pairs(currentZoneLookup) do
+										local stringName = string.format(tostring(v).." ("..tostring(i)..")")
+										local entry = comboBox:CreateItemEntry(stringName, function()
+											d("Selected "..v)
+											if tileManager then
+												tileManager:SetMapId(i)
+											end
+										end, true)
+										comboBox:AddItem(entry)
+
+										if i == currentMapId then
+											comboBox:ItemSelectedClickHelper(entry)
+										end
+									end
+								end
+
+								M0RMarkers.mapSelectorEditbox = comboBox
+							</OnInitialized>
+						</Control>
+					</Controls>
+				</Label>
+				<!--
+				<Button name="$(parent)PlaceAtCursor" inherits="ZO_DefaultButton" text="|cFFB6C1Close|r">
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)" offsetX="75" offsetY="-10" />
+					<Dimensions x="150" y="30" />
+					<OnClicked>
+						M0RMarkerEditorToplevel:SetHidden(true)
+					</OnClicked>
+				</Button>
+				-->
+
+
+				<Control name="$(parent)MarkerDetails">
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetY="30" offsetX="0" />
+					<Dimensions x="300" y="50" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold34" horizontalAlignment="1" verticalAlignment="1" text="Selected Marker: 0">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
+							<Dimensions x="300" y="40" />
+						</Label>
+					</Controls>
+				</Control>
+
+
+				<Control name="$(parent)MarkerSize">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)MarkerDetails" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Marker Size (m)">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+							</Controls>
+							<OnTextChanged>
+								local value = self:GetText()
+								d(value)
+							</OnTextChanged>
+						</EditBox>
+					</Controls>
+				</Control>
+				<Control name="$(parent)Yaw">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)MarkerSize" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Yaw (degrees)">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+							</Controls>
+							<OnTextChanged>
+								local value = self:GetText()
+								d(value)
+							</OnTextChanged>
+						</EditBox>
+					</Controls>
+				</Control>
+				<Control name="$(parent)Pitch">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Yaw" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Pitch (degrees)">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+							</Controls>
+							<OnTextChanged>
+								local value = self:GetText()
+								d(value)
+							</OnTextChanged>
+						</EditBox>
+					</Controls>
+				</Control>
+
+				<Control name="$(parent)PositionHeader">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Pitch" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="35" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold27" horizontalAlignment="1" verticalAlignment="1" text="Positions">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
+							<Dimensions x="300" y="35" />
+						</Label>
+					</Controls>
+				</Control>
+
+				<Control name="$(parent)X">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)PositionHeader" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="X Position (cm)">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+							</Controls>
+							<OnTextChanged>
+								local value = self:GetText()
+								d(value)
+							</OnTextChanged>
+						</EditBox>
+					</Controls>
+				</Control>
+				<Control name="$(parent)Y">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)X" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Y Position (cm)">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+							</Controls>
+							<OnTextChanged> <!-- OnFocusLost -->
+								local value = self:GetText()
+								d(value)
+							</OnTextChanged>
+						</EditBox>
+					</Controls>
+				</Control>
+				<Control name="$(parent)Z">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Y" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Z Position (cm)">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+							</Controls>
+							<OnTextChanged>
+								local value = self:GetText()
+								d(value)
+							</OnTextChanged>
+						</EditBox>
+					</Controls>
+				</Control>
+
+
+				<Control name="$(parent)TextHeader">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Z" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="35" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold27" horizontalAlignment="1" verticalAlignment="1" text="Text">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
+							<Dimensions x="300" y="35" />
+						</Label>
+					</Controls>
+				</Control>
+
+				<EditBox name="$(parent)TextEditor" inherits="ZO_DefaultEditMultiLine">
+					<Dimensions x="240" y="75" />
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)TextHeader" offsetY="5" />
+					<Controls>
+						<Backdrop name="$(parent)BG" inherits="ZO_MultiLineEditBackdrop_Keyboard">
+							<AnchorFill />
+						</Backdrop>
+					</Controls>
+					<OnTextChanged>
+						local value = self:GetText()
+						--d(value)
+					</OnTextChanged>
+				</EditBox>
+
+
+				<Control name="$(parent)ColourHeader">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)TextEditor" offsetY="5" />
+					<Dimensions x="300" y="35" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold27" horizontalAlignment="1" verticalAlignment="1" text="Colour">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
+							<Dimensions x="300" y="35" />
+						</Label>
+					</Controls>
+				</Control>
+
+
+				<Control name="$(parent)ColourSelector">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)ColourHeader" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="55" />
+					<Controls>
+						<Backdrop name="$(parent)White" inherits="M0RMarkersColourSelector" centerColor="ffffff">
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="30" />
+						</Backdrop>
+						<Backdrop name="$(parent)Blue" inherits="M0RMarkersColourSelector" centerColor="0000ff">
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)White" offsetX="5" />
+						</Backdrop>
+						<Backdrop name="$(parent)Green" inherits="M0RMarkersColourSelector" centerColor="00ff00">
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Blue" offsetX="5" />
+						</Backdrop>
+						<Backdrop name="$(parent)Orange" inherits="M0RMarkersColourSelector" centerColor="ff8000">
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Green" offsetX="5" />
+						</Backdrop>
+						<Backdrop name="$(parent)Pink" inherits="M0RMarkersColourSelector" centerColor="ff00e6">
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Orange" offsetX="5" />
+						</Backdrop>
+						<Backdrop name="$(parent)Red" inherits="M0RMarkersColourSelector" centerColor="ff0000">
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Pink" offsetX="5" />
+						</Backdrop>
+						<Backdrop name="$(parent)Yellow" inherits="M0RMarkersColourSelector" centerColor="ffcc00">
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Red" offsetX="5" />
+						</Backdrop>
+						<Backdrop name="$(parent)LimeGreen" inherits="M0RMarkersColourSelector" centerColor="00ffa6">
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Yellow" offsetX="5" />
+						</Backdrop>
+
+						<Control name="$(parent)ColourHex">
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)" offsetY="0" offsetX="0" />
+							<Dimensions x="300" y="25" />
+							<Controls>
+								<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Colour (Hex Code)">
+									<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+									<Dimensions x="120" y="25" />
+								</Label>
+								<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+									<Dimensions x="120" y="25" />
+									<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+									<Controls>
+										<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+											<AnchorFill />
+										</Backdrop>
+									</Controls>
+									<OnTextChanged>
+										local value = self:GetText()
+										d(value)
+									</OnTextChanged>
+								</EditBox>
+							</Controls>
+						</Control>
+					</Controls>
+
+				</Control>
+
+
+
+
+
+
+				<Control name="$(parent)TextureHeader">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)ColourSelector" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="35" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold27" horizontalAlignment="1" verticalAlignment="1" text="Texture">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
+							<Dimensions x="300" y="35" />
+						</Label>
+					</Controls>
+				</Control>
+				<Control name="$(parent)TextureSelector">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)TextureHeader" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="155" />
+					<Controls>
+						<!--
+						<Backdrop name="$(parent)BG" alpha="0.8" centerColor="000000" edgeColor="ff0000">
+							<AnchorFill />
+							<Edge edgeSize="3"/>
+						</Backdrop>
+						-->
+						<Control name="$(parent)Container">
+							<Anchor point="TOP" relativePoint="TOP" relativeTo="$(parent)" offsetY="5" offsetX="0" />
+							<Dimensions x="265" y="120" />
+							<Controls>
+								<Texture name="$(parent)Circle" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/circle.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="0" />
+								</Texture>
+								<Texture name="$(parent)Hexagon" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/hexagon.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Circle" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Square" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/square.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Hexagon" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Diamond" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/diamond.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Square" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Octagon" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/octagon.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Diamond" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Chevron" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/chevron.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Octagon" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Blank" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/blank.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Chevron" offsetX="15" />
+								</Texture>
+
+
+								<Texture name="$(parent)Sharkpog" inherits="M0RMarkersTextureSelector" textureFile="M0RMarkers/textures/sharkpog.dds">
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Circle" offsetX="0" offsetY="15" />
+								</Texture>
+								<Texture name="$(parent)AD" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/stats/alliancebadge_aldmeri.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Sharkpog" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)EP" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/stats/alliancebadge_ebonheart.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)AD" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)DC" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/stats/alliancebadge_daggerfall.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)EP" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)DPS" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/lfg/gamepad/lfg_roleicon_dps.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DC" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Tank" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/lfg/gamepad/lfg_roleicon_tank.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DPS" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Healer" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/lfg/gamepad/lfg_roleicon_healer.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Tank" offsetX="15" />
+								</Texture>
+
+
+								<Texture name="$(parent)DK" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/icons/class/gamepad/gp_class_dragonknight.dds">
+									<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Sharkpog" offsetX="0" offsetY="15" />
+								</Texture>
+								<Texture name="$(parent)Sorc" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/icons/class/gamepad/gp_class_sorcerer.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)DK" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)NB" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/icons/class/gamepad/gp_class_nightblade.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Sorc" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Warden" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/icons/class/gamepad/gp_class_warden.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)NB" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Necro" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/icons/class/gamepad/gp_class_necromancer.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Warden" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Templar" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/icons/class/gamepad/gp_class_templar.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Necro" offsetX="15" />
+								</Texture>
+								<Texture name="$(parent)Arc" inherits="M0RMarkersTextureSelector" textureFile="esoui/art/icons/class/gamepad/gp_class_arcanist.dds">
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$(parent)Templar" offsetX="15" />
+								</Texture>
+							</Controls>
+						</Control>
+
+						<Control name="$(parent)Texture">
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)Container" offsetY="5" offsetX="0" />
+							<Dimensions x="300" y="25" />
+							<Controls>
+								<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Texture Path">
+									<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+									<Dimensions x="120" y="25" />
+								</Label>
+								<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit">
+									<Dimensions x="120" y="25" />
+									<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+									<Controls>
+										<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+											<AnchorFill />
+										</Backdrop>
+									</Controls>
+									<OnTextChanged>
+										local value = self:GetText()
+										d(value)
+									</OnTextChanged>
+								</EditBox>
+							</Controls>
+						</Control>
+					</Controls>
+				</Control>
+				
+
+
+
+
+				
+
+				<Button name="$(parent)Save" inherits="ZO_DefaultButton" text="|cFFB6C1Save Profile|r">
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)TextEdit" offsetY="-25" offsetX="-75" />
+					<Dimensions x="125" y="25" />
+					<OnClicked>
+						
+						--M0RMarkers.placeQuickMenuIcon()
+					</OnClicked>
+				</Button>
+
+				<Button name="$(parent)Apply" inherits="ZO_DefaultButton" text="|c98FB98Apply Changes|r">
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Save" offsetY="-10" />
+					<Dimensions x="125" y="25" />
+					<OnClicked>
+						
+						--M0RMarkers.placeQuickMenuIcon()
+					</OnClicked>
+				</Button>
+
+				<Button name="$(parent)Discard" inherits="ZO_DefaultButton" text="|cFFB6C1Discard Changes|r">
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Apply" offsetY="-10" />
+					<Dimensions x="125" y="25" />
+					<OnClicked>
+						-- set the selected marker to itself again
+						--M0RMarkers.placeQuickMenuIcon()
+					</OnClicked>
+				</Button>
+				
+
+				<!--
+
+					facing user, colour, remove
+				<Label name="$(parent)MarkerSize" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Marker Size (m)">
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$(parent)" offsetY="30" offsetX="-160" />
+					<Dimensions x="120" y="25" />
+				</Label>
+				<EditBox name="$(parent)MarkerSizeText" inherits="ZO_DefaultEdit">
+					<Dimensions x="120" y="25" />
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$(parent)MarkerSize" offsetX="20" />
+					<Controls>
+						<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+							<AnchorFill />
+						</Backdrop>
+					</Controls>
+					<OnTextChanged>
+						local value = self:GetText()
+						d(value)
+					</OnTextChanged>
+				</EditBox>
+			-->
+				<Control name="$(parent)LeftMouseButton" inherits="ZO_KeybindButton" hidden="true" />
+				<Control name="$(parent)RightMouseButton" inherits="ZO_KeybindButton" hidden="true" />
+	
+			</Controls>
+			<OnInitialized>
+				--self:SetWidth(ZO_MAP_CONSTANTS.MAP_WIDTH+400)
+				--self:SetHeight(ZO_MAP_CONSTANTS.MAP_HEIGHT+50)
+				--a = ZO_DeepTableCopy(ZO_MAP_CONSTANTS)
+
+			    
+			</OnInitialized>
+
+			
+		</TopLevelControl>
 
 	</Controls>
 </GuiXml>

@@ -965,6 +965,8 @@ function MM:Initialize()
 			"Opens the More Markers settings page.")
 	end
 
+	MM.editorInit()
+
 	EVENT_MANAGER:UnregisterForEvent(MM.name, EVENT_ADD_ON_LOADED)
 end
  

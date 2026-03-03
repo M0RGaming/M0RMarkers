@@ -142,7 +142,7 @@ local function createControl(icon)
 	--control:SetScale(icon.size/100) -- set transform scale to icon.size instead of scale
 	control:SetScale(1/100) -- 1m
 	control.bgLayer = control:GetNamedChild("Background")
-	control.textLayer = control:GetNamedChild("Text")
+	control.textLayer = control.bgLayer:GetNamedChild("Text")
 	control:SetTransformNormalizedOriginPoint(0.5,0.5)
 
 	local multiplier = MM.vars.globalMult or 1
@@ -164,6 +164,8 @@ end
 local function destroyControl(icon)
 	icon.control:SetHidden(true)
 	icon.control.bgLayer:SetHidden(true)
+	icon.control.bgLayer:SetScale(1)
+	icon.control.bgLayer:SetTransformScale(1)
 	icon.control.textLayer:SetText("")
 	icon.control.textLayer:SetHidden(true)
 	controlPool:ReleaseObject(icon.key)
@@ -186,6 +188,9 @@ function MM.createIcon(icon)
 	if icon.bgTexture then
 		icon.control.bgLayer:SetHidden(false)
 		icon.control.bgLayer:SetTexture(icon.bgTexture)
+		local width = icon.control.bgLayer:GetTextureFileDimensions() or 1
+		icon.control.bgLayer:SetScale(width)
+		icon.control.bgLayer:SetTransformScale(1/width)
 		icon.control.bgLayer:SetColor(unpack(icon.colour))
 	end
 	if icon.text then

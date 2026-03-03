@@ -22,3 +22,6 @@ layout.xml
 PC/pc_layout.xml
 PC/bindings.xml
 console/console_textureload.xml
+
+
+notes/editor.lua

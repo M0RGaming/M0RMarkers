@@ -16,11 +16,14 @@
 				<Texture name="$(parent)Background" hidden="true">
 					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
 					<Dimensions x="100" y="100" />
+					<Controls>
+						<Label name="$(parent)Text" font="$(GAMEPAD_BOLD_FONT)|$(GP_20)|thick-outline" horizontalAlignment="1" verticalAlignment="1" hidden="true" scale="4">
+							<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(grandparent)" offsetY="15"/>
+							<Dimensions x="200" y="100" />
+						</Label>
+					</Controls>
 				</Texture>
-				<Label name="$(parent)Text" font="$(GAMEPAD_BOLD_FONT)|$(GP_20)|thick-outline" horizontalAlignment="1" verticalAlignment="1" hidden="true" scale="4">
-					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)" offsetY="15"/>
-					<Dimensions x="200" y="100" />
-				</Label>
+				
 			</Controls>
 		</Control>
 
