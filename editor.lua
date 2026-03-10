@@ -17,23 +17,23 @@ function MM.editorInit()
 	-- now doing this in xml
 	--[[
 	local function GetAllMapIdsByZoneId()
-	    local startTime = os.rawclock()
-	    local results = {}
-	    local mapIdMax = 10000
-	    for mapId = 1, mapIdMax do
-	        local name, _, _, zoneIndex = GetMapInfoById(mapId)
-	        local zoneId = GetZoneId(zoneIndex)
-	        if zoneId ~= 2 then
-	            if results[zoneId] then
-	                results[zoneId][mapId] = name
-	            else
-	                results[zoneId] = {[mapId] = name}
-	            end
-	            last = mapId
-	        end
-	    end
-	    d(string.format("Searched through %d maps, and took %dms", last, os.rawclock()-startTime))
-	    return results
+		local startTime = os.rawclock()
+		local results = {}
+		local mapIdMax = 10000
+		for mapId = 1, mapIdMax do
+			local name, _, _, zoneIndex = GetMapInfoById(mapId)
+			local zoneId = GetZoneId(zoneIndex)
+			if zoneId ~= 2 then
+				if results[zoneId] then
+					results[zoneId][mapId] = name
+				else
+					results[zoneId] = {[mapId] = name}
+				end
+				last = mapId
+			end
+		end
+		d(string.format("Searched through %d maps, and took %dms", last, os.rawclock()-startTime))
+		return results
 	end
 	--]]
 
@@ -455,19 +455,19 @@ function MM.editorInit()
 
 	local function ImageOnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command)
 		--d(...)
-	    if image.dragging then
-	        OnDragStop()
-	    elseif button == MOUSE_BUTTON_INDEX_LEFT and upInside then
-	        -- do handler
-	        --d("left click pressed")
-	        SetSelectedMarker(emptyMarker)
-	        updateLastPlayerClickPositions()
+		if image.dragging then
+			OnDragStop()
+		elseif button == MOUSE_BUTTON_INDEX_LEFT and upInside then
+			-- do handler
+			--d("left click pressed")
+			SetSelectedMarker(emptyMarker)
+			updateLastPlayerClickPositions()
 
-	    elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
-	    	--d("right click pressed")
-	    	local x,y = GetUIMousePosition()
-	    	createMarker(x,y)
-	    end
+		elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
+			--d("right click pressed")
+			local x,y = GetUIMousePosition()
+			createMarker(x,y)
+		end
 	end
 	image:SetHandler("OnMouseUp", ImageOnMouseUp)
 
@@ -523,25 +523,25 @@ function MM.editorInit()
 
 		icon.control:SetMouseEnabled(true)
 		local function OnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command)
-		    if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
-		        SetSelectedMarker(icon)
-		        if shift then
-		        	updateLastPlayerClickPositions()
-		        end
-		    elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
-		    	local x,y = GetUIMousePosition()
+			if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
+				SetSelectedMarker(icon)
+				if shift then
+					updateLastPlayerClickPositions()
+				end
+			elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
+				local x,y = GetUIMousePosition()
 
-		    	if not shift then
-			    	MM.ShowDialogue("Creating Marker",
-			    		"You are currently trying to create a marker on top of an existing marker. It may be hard to select one of the stacked markers.\n\nWould you like to continue?",
-			    		"You can hold shift to avoid this popup.",
-			    		function() createMarker(x,y) end)
-		    	else
-		    		createMarker(x,y)
-		    	end
+				if not shift then
+					MM.ShowDialogue("Creating Marker",
+						"You are currently trying to create a marker on top of an existing marker. It may be hard to select one of the stacked markers.\n\nWould you like to continue?",
+						"You can hold shift to avoid this popup.",
+						function() createMarker(x,y) end)
+				else
+					createMarker(x,y)
+				end
 
-		    	
-		    end
+				
+			end
 		end
 		icon.control:SetHandler("OnMouseUp", OnMouseUp)
 
@@ -644,21 +644,21 @@ function MM.editorInit()
 	end
 
 	function tileManager:UpdateMapData()
-	    local numHorizontalTiles, numVerticalTiles = GetMapNumTilesForMapId(self.mapid)
+		local numHorizontalTiles, numVerticalTiles = GetMapNumTilesForMapId(self.mapid)
 
-	    self.horizontalTiles = numHorizontalTiles
-	    self.verticalTiles = numVerticalTiles
-	    self.totalTiles = numHorizontalTiles * numVerticalTiles
+		self.horizontalTiles = numHorizontalTiles
+		self.verticalTiles = numVerticalTiles
+		self.totalTiles = numHorizontalTiles * numVerticalTiles
 	end
 
 	function tileManager:UpdateTextures()
-	    self:UpdateMapData()
-	    self:LayoutTiles()
+		self:UpdateMapData()
+		self:LayoutTiles()
 
-	    for i = 1, self.totalTiles do
-	        local tileControl = self:GetActiveObject(i)
-	        tileControl:SetTexture(GetMapTileTextureForMapId(self.mapid, i))
-	    end
+		for i = 1, self.totalTiles do
+			local tileControl = self:GetActiveObject(i)
+			tileControl:SetTexture(GetMapTileTextureForMapId(self.mapid, i))
+		end
 	end
 
 
@@ -673,8 +673,8 @@ function MM.editorInit()
 
 
 	local scene = ZO_InteractScene:New("M0RMarkerEditorScene", SCENE_MANAGER, { -- TODO MAYBE GET RID OF BANKING, IDK
-	    type = "Banking",
-	    interactTypes = { INTERACTION_BANK },
+		type = "Banking",
+		interactTypes = { INTERACTION_BANK },
 	})
 	scene:AddFragment(ZO_FadeSceneFragment:New(M0RMarkerEditorToplevel))
 
@@ -691,7 +691,7 @@ function MM.editorInit()
 					function() scene:AcceptHideScene() end
 				)
 		end
-    end)
+	end)
 
 	--scene:AddFragmentGroup(FRAGMENT_GROUP.GAMEPAD_DRIVEN_UI_WINDOW)
 	-- or
@@ -702,83 +702,83 @@ function MM.editorInit()
 	SLASH_COMMANDS['/hideeditor'] = function() SCENE_MANAGER:Push('hud') end
 
 	local gamepadKeybinds = {
-	    {
-	        name = "Select",
-	        alignment = KEYBIND_STRIP_ALIGN_LEFT,
-	        keybind = "UI_SHORTCUT_PRIMARY",
-	        callback = function() d("Pressed Select") end,
-	    },
-	    {
-	        name = "Place Marker",
-	        alignment = KEYBIND_STRIP_ALIGN_LEFT,
-	        keybind = "UI_SHORTCUT_SECONDARY",
-	        callback = function() d("Pressed Place") end,
-	    },
+		{
+			name = "Select",
+			alignment = KEYBIND_STRIP_ALIGN_LEFT,
+			keybind = "UI_SHORTCUT_PRIMARY",
+			callback = function() d("Pressed Select") end,
+		},
+		{
+			name = "Place Marker",
+			alignment = KEYBIND_STRIP_ALIGN_LEFT,
+			keybind = "UI_SHORTCUT_SECONDARY",
+			callback = function() d("Pressed Place") end,
+		},
 
 
-	    {
-	        name = "Move Cursor",
-	        alignment = KEYBIND_STRIP_ALIGN_CENTER,
-	        keybind = "UI_SHORTCUT_LEFT_STICK",
-	    },
-	    {
-	        name = "Pan Map",
-	        alignment = KEYBIND_STRIP_ALIGN_CENTER,
-	        keybind = "UI_SHORTCUT_RIGHT_STICK",
-	    },
-	    {
-	        name = "Zoom In",
-	        alignment = KEYBIND_STRIP_ALIGN_CENTER,
-	        keybind = "UI_SHORTCUT_LEFT_TRIGGER",
-	    },
-	    {
-	        name = "Zoom Out",
-	        alignment = KEYBIND_STRIP_ALIGN_CENTER,
-	        keybind = "UI_SHORTCUT_RIGHT_TRIGGER",
-	    },
+		{
+			name = "Move Cursor",
+			alignment = KEYBIND_STRIP_ALIGN_CENTER,
+			keybind = "UI_SHORTCUT_LEFT_STICK",
+		},
+		{
+			name = "Pan Map",
+			alignment = KEYBIND_STRIP_ALIGN_CENTER,
+			keybind = "UI_SHORTCUT_RIGHT_STICK",
+		},
+		{
+			name = "Zoom In",
+			alignment = KEYBIND_STRIP_ALIGN_CENTER,
+			keybind = "UI_SHORTCUT_LEFT_TRIGGER",
+		},
+		{
+			name = "Zoom Out",
+			alignment = KEYBIND_STRIP_ALIGN_CENTER,
+			keybind = "UI_SHORTCUT_RIGHT_TRIGGER",
+		},
 
 
-	    {
-	        name = "Exit",
-		    alignment = KEYBIND_STRIP_ALIGN_RIGHT,
-	        keybind = "UI_SHORTCUT_NEGATIVE",
-	        callback = function() SCENE_MANAGER:Push('hud') end,
-	    }
+		{
+			name = "Exit",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			keybind = "UI_SHORTCUT_NEGATIVE",
+			callback = function() SCENE_MANAGER:Push('hud') end,
+		}
 	}
 
 
 	local customLeft = M0RMarkerEditorToplevel:GetNamedChild("LeftMouseButton")
 	customLeft:SetCustomKeyIcon("EsoUI/Art/Miscellaneous/icon_LMB.dds")
-    customLeft:SetText("Select")
+	customLeft:SetText("Select")
 	local customRight = M0RMarkerEditorToplevel:GetNamedChild("RightMouseButton")
-    customRight:SetCustomKeyIcon("EsoUI/Art/Miscellaneous/icon_RMB.dds")
-    customRight:SetText("Place Marker")
+	customRight:SetCustomKeyIcon("EsoUI/Art/Miscellaneous/icon_RMB.dds")
+	customRight:SetText("Place Marker")
 
 	local keybinds = {
-	    {
-	        --name = "PRIMARY", -- |t30:30:/esoui/art/icons/icon_lmb.dds|t 
-	        order = 1,
-	        keybind = "CUSTOM_M0R_MARKERS_EDITOR_LEFT",
-	        alignment = KEYBIND_STRIP_ALIGN_LEFT,
-	        customKeybindControl = customLeft,
-	        callback = function() end,
-	    },
-	    {
-	        --name = "SECONDARY", -- |t30:30:/esoui/art/icons/icon_rmb.dds|t 
-	        order = 2,
-	        keybind = "CUSTOM_M0R_MARKERS_EDITOR_RIGHT",
-	        alignment = KEYBIND_STRIP_ALIGN_LEFT,
-	        customKeybindControl = customRight,
-	        callback = function() end,
-	    },
-	    {
-	        --name = "SECONDARY", -- |t30:30:/esoui/art/icons/icon_rmb.dds|t 
-	        order = 2,
-	        name = "Save Profile",
-	        keybind = "CUSTOM_M0R_MARKERS_EDITOR_SAVE",
-	        alignment = KEYBIND_STRIP_ALIGN_RIGHT,
-	        callback = MM.editorSavePressed,
-	    },
+		{
+			--name = "PRIMARY", -- |t30:30:/esoui/art/icons/icon_lmb.dds|t 
+			order = 1,
+			keybind = "CUSTOM_M0R_MARKERS_EDITOR_LEFT",
+			alignment = KEYBIND_STRIP_ALIGN_LEFT,
+			customKeybindControl = customLeft,
+			callback = function() end,
+		},
+		{
+			--name = "SECONDARY", -- |t30:30:/esoui/art/icons/icon_rmb.dds|t 
+			order = 2,
+			keybind = "CUSTOM_M0R_MARKERS_EDITOR_RIGHT",
+			alignment = KEYBIND_STRIP_ALIGN_LEFT,
+			customKeybindControl = customRight,
+			callback = function() end,
+		},
+		{
+			--name = "SECONDARY", -- |t30:30:/esoui/art/icons/icon_rmb.dds|t 
+			order = 2,
+			name = "Save Profile",
+			keybind = "CUSTOM_M0R_MARKERS_EDITOR_SAVE",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			callback = MM.editorSavePressed,
+		},
 	}
 
 
@@ -836,15 +836,15 @@ function MM.editorInit()
 
 				
 
-		    if IsInGamepadPreferredMode() then
+			if IsInGamepadPreferredMode() then
 				scene:AddFragmentGroup(FRAGMENT_GROUP.GAMEPAD_DRIVEN_UI_WINDOW)
 
-		    	KEYBIND_STRIP:AddKeybindButtonGroup(gamepadKeybinds)
-		    	startGamepad()
-		    else
-		    	KEYBIND_STRIP:AddKeybindButtonGroup(keybinds)
-		    	scene:AddFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
-		    end
+				KEYBIND_STRIP:AddKeybindButtonGroup(gamepadKeybinds)
+				startGamepad()
+			else
+				KEYBIND_STRIP:AddKeybindButtonGroup(keybinds)
+				scene:AddFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
+			end
 
 
 			local currentMapId = GetCurrentMapId()
@@ -877,16 +877,16 @@ function MM.editorInit()
 
 		elseif (newState == SCENE_HIDDEN) then
 			if IsInGamepadPreferredMode() then
-			    KEYBIND_STRIP:RemoveKeybindButtonGroup(gamepadKeybinds)
-			    scene:RemoveFragmentGroup(FRAGMENT_GROUP.GAMEPAD_DRIVEN_UI_WINDOW)
+				KEYBIND_STRIP:RemoveKeybindButtonGroup(gamepadKeybinds)
+				scene:RemoveFragmentGroup(FRAGMENT_GROUP.GAMEPAD_DRIVEN_UI_WINDOW)
 			else
 				KEYBIND_STRIP:RemoveKeybindButtonGroup(keybinds)
 				scene:RemoveFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
 			end
-		    endGamepad()
+			endGamepad()
 
-		    -- destroy all marker previews
-		    for i,v in pairs(markerpreviews) do
+			-- destroy all marker previews
+			for i,v in pairs(markerpreviews) do
 				destroyControl(v)
 				markerpreviews[i] = nil
 			end
