@@ -3,6 +3,9 @@
 local MM = M0RMarkers
 local control
 local tileManager
+local _
+local image
+local destroyControl
 
 
 function MM.editorInit()
@@ -11,7 +14,8 @@ function MM.editorInit()
 
 	}
 
-
+	-- now doing this in xml
+	--[[
 	local function GetAllMapIdsByZoneId()
 	    local startTime = os.rawclock()
 	    local results = {}
@@ -31,8 +35,9 @@ function MM.editorInit()
 	    d(string.format("Searched through %d maps, and took %dms", last, os.rawclock()-startTime))
 	    return results
 	end
+	--]]
 
-	x = GetAllMapIdsByZoneId()
+	--x = GetAllMapIdsByZoneId()
 
 
 
@@ -42,9 +47,9 @@ function MM.editorInit()
 
 
 
-	wm = WINDOW_MANAGER
+	local wm = WINDOW_MANAGER
 
-	control = wm:CreateControl("BackgroundTest", M0RMarkerEditorToplevel, CT_BACKDROP)
+	control = wm:CreateControl("M0RMarkersEditorImageBackground", M0RMarkerEditorToplevel, CT_BACKDROP)
 	control:SetAnchor(CENTER, GuiRoot, CENTER, 0, 0)
 	control:SetDimensions(ZO_MAP_CONSTANTS.MAP_WIDTH, ZO_MAP_CONSTANTS.MAP_HEIGHT)
 	--control:SetDimensions(835, 835)
@@ -53,7 +58,7 @@ function MM.editorInit()
 	control:SetAutoRectClipChildren(true)
 
 
-	image = wm:CreateControl("ImageTest", control, CT_CONTROL)
+	image = wm:CreateControl("M0RMarkersEditorImageImage", control, CT_CONTROL)
 	image:SetAnchor(CENTER, control, CENTER, 0, 0)
 	image:SetDimensions(ZO_MAP_CONSTANTS.MAP_WIDTH, ZO_MAP_CONSTANTS.MAP_HEIGHT)
 	--image:SetDimensions(835, 835)
@@ -78,7 +83,10 @@ function MM.editorInit()
 
 
 
-
+	local originX
+	local originZ
+	local nxratio
+	local nzratio
 
 
 
@@ -91,6 +99,7 @@ function MM.editorInit()
 
 
 	local function SetSelectedMarker(currentMarker)
+		if type(currentMarker) ~= "table" then return end
 		local markerIndex = currentMarker.index
 		selectedMarker = markerIndex
 
@@ -101,9 +110,19 @@ function MM.editorInit()
 		local textureEdit = toplevel:GetNamedChild("TextureSelector"):GetNamedChild("Texture"):GetNamedChild("Edit")
 		local yawEdit = toplevel:GetNamedChild("Yaw"):GetNamedChild("Edit")
 		local pitchEdit = toplevel:GetNamedChild("Pitch"):GetNamedChild("Edit")
-		local xEdit = toplevel:GetNamedChild("X"):GetNamedChild("Edit")
-		local yEdit = toplevel:GetNamedChild("Y"):GetNamedChild("Edit")
-		local zEdit = toplevel:GetNamedChild("Z"):GetNamedChild("Edit")
+
+		local xContainer = toplevel:GetNamedChild("X")
+		local xEdit = xContainer:GetNamedChild("Edit")
+		local xText = xContainer:GetNamedChild("Text")
+
+		local yContainer = toplevel:GetNamedChild("Y")
+		local yEdit = yContainer:GetNamedChild("Edit")
+		local yText = yContainer:GetNamedChild("Text")
+
+		local zContainer = toplevel:GetNamedChild("Z")
+		local zEdit = zContainer:GetNamedChild("Edit")
+		local zText = zContainer:GetNamedChild("Text")
+
 		local textEditor = toplevel:GetNamedChild("TextEditor")
 		local colourEdit = toplevel:GetNamedChild("ColourSelector"):GetNamedChild("ColourHex"):GetNamedChild("Edit")
 		-- for the x y z, check the following to see if the marker is on the page. Dont allow user to move marker off of page (when applying)
@@ -114,16 +133,56 @@ function MM.editorInit()
 		markerSize:SetText(currentMarker.size or "")
 		textureEdit:SetText(currentMarker.bgTexture or "")
 		if currentMarker.orientation then
-			yawEdit:SetText(string.format("%.1f",zo_deg(currentMarker.orientation[1])))
-			pitchEdit:SetText(string.format("%.1f",zo_deg(currentMarker.orientation[2])))
+			pitchEdit:SetText(string.format("%.1f",zo_deg(currentMarker.orientation[1])))
+			yawEdit:SetText(string.format("%.1f",zo_deg(currentMarker.orientation[2])))
 		else
-			yawEdit:SetText("")
 			pitchEdit:SetText("")
+			yawEdit:SetText("")
 		end
 		xEdit:SetText(currentMarker.x or "")
 		yEdit:SetText(currentMarker.y or "")
 		zEdit:SetText(currentMarker.z or "")
 		textEditor:SetText(currentMarker.text or "")
+
+
+		-- position sanity check
+		if markerIndex ~= 0 then
+			if (not currentMarker.y) or (currentMarker.y == 0) then
+				yEdit:SetColor(1,0,0)
+				yText:SetColor(1,0,0)
+			else
+				yEdit:SetColor(1,1,1)
+				yText:SetColor(1,1,1)
+			end
+		
+			local nx = (currentMarker.x - originX)/nxratio
+			local nz = (currentMarker.z - originZ)/nzratio
+			--d(nx,nz)
+			if nx > 1 or nx < 0 then
+				xEdit:SetColor(1,0,0)
+				xText:SetColor(1,0,0)
+			else
+				xEdit:SetColor(1,1,1)
+				xText:SetColor(1,1,1)
+			end
+
+			if nz > 1 or nz < 0 then
+				zEdit:SetColor(1,0,0)
+				zText:SetColor(1,0,0)
+			else
+				zEdit:SetColor(1,1,1)
+				zText:SetColor(1,1,1)
+			end
+		else
+			xEdit:SetColor(1,1,1)
+			xText:SetColor(1,1,1)
+			yEdit:SetColor(1,1,1)
+			yText:SetColor(1,1,1)
+			zEdit:SetColor(1,1,1)
+			zText:SetColor(1,1,1)
+		end
+
+
 
 
 		local hexColour
@@ -146,13 +205,13 @@ function MM.editorInit()
 
 
 	function MM.editorApplyPressed()
-		b = currentZoneMarkers
-		d("Apply Pressed")
+		--b = currentZoneMarkers
+		--d("Apply Pressed")
 		if selectedMarker == 0 then return end
 		local selections = M0RMarkers.editorSelections
-		for i,v in pairs(selections) do
-			d(string.format("%s: %s", i, v))
-		end
+		--for i,v in pairs(selections) do
+		--	d(string.format("%s: %s", i, v))
+		--end
 		local cMarker = currentZoneMarkers[selectedMarker]
 		local x = tonumber(selections.x)
 		local y = tonumber(selections.y)
@@ -176,12 +235,98 @@ function MM.editorInit()
 		local yaw = tonumber(selections.yaw)
 		local pitch = tonumber(selections.pitch)
 		if pitch or yaw then
-			cMarker.orientation = {yaw or 0, pitch or 0}
+			cMarker.orientation = {zo_rad(pitch or 0), zo_rad(yaw or 0)}
 		else
 			cMarker.orientation = nil
 		end
 
+
+		-- TODO: Do a sanity check. If position is off the screen, ask user to confirm if they want that
+
 		tileManager:ReloadMap()
+		SetSelectedMarker(cMarker)
+	end
+
+	local function deleteSelectedMarker()
+		if selectedMarker == 0 then return end
+		if currentZoneMarkers[selectedMarker] then
+			currentZoneMarkers[selectedMarker] = nil
+			tileManager:ReloadMap()
+		end
+	end
+
+	function MM.deleteMarkerPressed()
+		if selectedMarker == 0 then return end
+		MM.ShowDialogue("Warning: Destructive Action",
+					string.format("Are you sure you would like to remove the selected marker %d?", selectedMarker),
+					"This is a destructive action and cannot be undone.",
+					deleteSelectedMarker
+				)
+	end
+
+
+
+	local function createMarker(x,y)
+		local l, t, r, b = image:ProjectRectToScreenAndBuildAABB()
+		local dx = x-l
+		local dy = y-t
+		local nx = dx/(r-l)
+		local ny = dy/(b-t)
+		--d(nx,ny)
+		local worldX = originX+nx*nxratio
+		--local _, _, y, _ = GetUnitRawWorldPosition('player')
+		local worldZ = originZ+ny*nzratio
+
+		local marker = {
+			--index = #currentZoneMarkers+1,
+			bgTexture = "M0RMarkers/textures/diamond.dds",
+			colour = {1,1,1,1},
+			colourHex = "ffffff",
+			size = 1,
+			text = "",
+			x = zo_floor(worldX),
+			y = 0,
+			z = zo_floor(worldZ)
+		}
+
+		currentZoneMarkers[#currentZoneMarkers+1] = marker
+		tileManager:ReloadMap()
+		--d(marker.index)
+		SetSelectedMarker(marker)
+	end
+
+
+
+
+	local function saveProfile() --destroyControl(v)
+		MM.unloadEverything()
+		local loadedMarkers = MM.loadedMarkers
+		for i,v in pairs(markerpreviews) do
+			destroyControl(v)
+			markerpreviews[i] = nil
+		end
+		for i,v in pairs(currentZoneMarkers) do
+			if type(v.orientation) == "table" then
+				loadedMarkers.ground[#loadedMarkers.ground+1] = v
+			else
+				loadedMarkers.facing[#loadedMarkers.facing+1] = v
+			end
+		end
+		MM.loadedMarkers.currentTimestamp = os.time()
+		local zoneString = MM.compressLoaded()
+		MM.saveIcons(zoneString)
+		ZO_ClearNumericallyIndexedTable(loadedMarkers.facing)
+		ZO_ClearNumericallyIndexedTable(loadedMarkers.ground)
+		MM.decompressString(zoneString)
+		SCENE_MANAGER:Push('hud')
+	end
+
+	function MM.editorSavePressed()
+		MM.ShowDialogue("Warning: Destructive Action",
+					"Are you sure you would like to overwrite the current profile with your edited changes?",
+					"This is a destructive action and cannot be undone.",
+					saveProfile
+				)
 	end
 
 
@@ -279,23 +424,52 @@ function MM.editorInit()
 	end
 
 
+	local function updateLastPlayerClickPositions()
+		local toplevel = M0RMarkerEditorToplevel
+		local xEdit = toplevel:GetNamedChild("lastX"):GetNamedChild("Edit")
+		local yEdit = toplevel:GetNamedChild("playerY"):GetNamedChild("Edit")
+		local zEdit = toplevel:GetNamedChild("lastZ"):GetNamedChild("Edit")
+
+		local _, _, y, _ = GetUnitRawWorldPosition("player")
+		local mx, my = GetUIMousePosition()
+		local l, t, r, b = image:ProjectRectToScreenAndBuildAABB()
+		local dx = mx-l
+		local dy = my-t
+		local nx = dx/(r-l)
+		local ny = dy/(b-t)
+		local worldX = originX+nx*nxratio
+		local worldZ = originZ+ny*nzratio
+
+		xEdit:SetText(zo_floor(worldX))
+		yEdit:SetText(y)
+		zEdit:SetText(zo_floor(worldZ))
+
+
+	end
+
+
 
 	local emptyMarker = {
 		index = 0
 	}
 
-	local function OnMouseUp(clickedControl, button, upInside)
+	local function ImageOnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command)
+		--d(...)
 	    if image.dragging then
 	        OnDragStop()
 	    elseif button == MOUSE_BUTTON_INDEX_LEFT and upInside then
 	        -- do handler
-	        d("left click pressed")
+	        --d("left click pressed")
 	        SetSelectedMarker(emptyMarker)
+	        updateLastPlayerClickPositions()
+
 	    elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
-	    	d("right click pressed")
+	    	--d("right click pressed")
+	    	local x,y = GetUIMousePosition()
+	    	createMarker(x,y)
 	    end
 	end
-	image:SetHandler("OnMouseUp", OnMouseUp)
+	image:SetHandler("OnMouseUp", ImageOnMouseUp)
 
 	
 
@@ -312,7 +486,7 @@ function MM.editorInit()
 
 
 
-	newControlPool = ZO_ControlPool:New("M0RMarkersTemplate", image)
+	local newControlPool = ZO_ControlPool:New("M0RMarkersTemplate", image)
 
 	local function createControl(icon)
 		local control, key = newControlPool:AcquireObject()
@@ -348,21 +522,32 @@ function MM.editorInit()
 		end
 
 		icon.control:SetMouseEnabled(true)
-		local function OnMouseUp(clickedControl, button, upInside)
+		local function OnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command)
 		    if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
-		        -- do handler
-		        d("Clicked marker")
-		        a = icon
 		        SetSelectedMarker(icon)
+		        if shift then
+		        	updateLastPlayerClickPositions()
+		        end
 		    elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
-		    	d("Right clicked marker")
+		    	local x,y = GetUIMousePosition()
+
+		    	if not shift then
+			    	MM.ShowDialogue("Creating Marker",
+			    		"You are currently trying to create a marker on top of an existing marker. It may be hard to select one of the stacked markers.\n\nWould you like to continue?",
+			    		"You can hold shift to avoid this popup.",
+			    		function() createMarker(x,y) end)
+		    	else
+		    		createMarker(x,y)
+		    	end
+
+		    	
 		    end
 		end
 		icon.control:SetHandler("OnMouseUp", OnMouseUp)
 
 		return icon
 	end
-	local function destroyControl(icon)
+	function destroyControl(icon)
 		icon.control:SetHidden(true)
 		icon.control:ClearTransformRotation()
 		icon.control.bgLayer:SetHidden(true)
@@ -406,7 +591,8 @@ function MM.editorInit()
 
 		local currentMapId = GetCurrentMapId()
 		SetMapToMapId(self.mapid)
-		self.cZone = GetUnitRawWorldPosition('player')
+		local px, py, pz
+		self.cZone, px, py, pz = GetUnitRawWorldPosition('player')
 		for i,cMarker in pairs(currentZoneMarkers) do
 			local nx,ny = GetRawNormalizedWorldPosition(self.cZone, cMarker.x, cMarker.y, cMarker.z)
 			if (nx >= 0 and nx <= 1 and ny >= 0 and ny <= 1) then
@@ -427,6 +613,21 @@ function MM.editorInit()
 				markerpreviews[#markerpreviews+1] = currentMarker
 			end
 		end
+
+		local offset = 2000
+		local pnx, pnz = GetRawNormalizedWorldPosition(self.cZone, px, py, pz)
+		local onx, onz = GetRawNormalizedWorldPosition(self.cZone, px+offset, py, pz+offset)
+		local dnx = onx-pnx
+		local dnz = onz-pnz
+		nxratio = offset/dnx
+		nzratio = offset/dnz
+
+		local offsetXtoOrigin = -pnx*nxratio
+		local offsetZtoOrigin = -pnz*nzratio
+		originX = px + offsetXtoOrigin
+		originZ = pz + offsetZtoOrigin
+
+		--d(GetRawNormalizedWorldPosition(self.cZone, originX, py, originZ))
 
 		if fromReload then
 			image:SetScale(preReloadScale)
@@ -471,11 +672,26 @@ function MM.editorInit()
 
 
 
-	scene = ZO_InteractScene:New("M0RMarkerEditorScene", SCENE_MANAGER, {
+	local scene = ZO_InteractScene:New("M0RMarkerEditorScene", SCENE_MANAGER, { -- TODO MAYBE GET RID OF BANKING, IDK
 	    type = "Banking",
 	    interactTypes = { INTERACTION_BANK },
 	})
 	scene:AddFragment(ZO_FadeSceneFragment:New(M0RMarkerEditorToplevel))
+
+
+	scene:SetHideSceneConfirmationCallback(function(scene, nextSceneName, bypassHideSceneConfirmationReason)
+		--a = {scene, nextSceneName, bypassHideSceneConfirmationReason}
+		if scene.hideSceneConfirmationPush then
+			scene:AcceptHideScene()
+		else
+			--d("Trying to hide")
+			MM.ShowDialogue("Warning: Exiting Editor",
+					"Are you sure you would like to close the editor?",
+					"This will discard all changes you have made.",
+					function() scene:AcceptHideScene() end
+				)
+		end
+    end)
 
 	--scene:AddFragmentGroup(FRAGMENT_GROUP.GAMEPAD_DRIVEN_UI_WINDOW)
 	-- or
@@ -539,11 +755,11 @@ function MM.editorInit()
     customRight:SetText("Place Marker")
 
 	local keybinds = {
-	    alignment = KEYBIND_STRIP_ALIGN_LEFT,
 	    {
 	        --name = "PRIMARY", -- |t30:30:/esoui/art/icons/icon_lmb.dds|t 
 	        order = 1,
 	        keybind = "CUSTOM_M0R_MARKERS_EDITOR_LEFT",
+	        alignment = KEYBIND_STRIP_ALIGN_LEFT,
 	        customKeybindControl = customLeft,
 	        callback = function() end,
 	    },
@@ -551,18 +767,18 @@ function MM.editorInit()
 	        --name = "SECONDARY", -- |t30:30:/esoui/art/icons/icon_rmb.dds|t 
 	        order = 2,
 	        keybind = "CUSTOM_M0R_MARKERS_EDITOR_RIGHT",
+	        alignment = KEYBIND_STRIP_ALIGN_LEFT,
 	        customKeybindControl = customRight,
 	        callback = function() end,
 	    },
-	    --[[
 	    {
-	        name = "NEGATIVE",
-	        icon = "/esoui/art/icons/icon_rmb.dds",
+	        --name = "SECONDARY", -- |t30:30:/esoui/art/icons/icon_rmb.dds|t 
 	        order = 2,
-	        keybind = CUSTOM_LORE_READER,
-	        callback = function() end,
-	    }
-	    --]]
+	        name = "Save Profile",
+	        keybind = "CUSTOM_M0R_MARKERS_EDITOR_SAVE",
+	        alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+	        callback = MM.editorSavePressed,
+	    },
 	}
 
 
@@ -645,7 +861,7 @@ function MM.editorInit()
 					for i,v in pairs(currentZoneLookup) do
 						local stringName = string.format(tostring(v).." ("..tostring(i)..")")
 						local entry = comboBox:CreateItemEntry(stringName, function()
-							d("Selected "..v)
+							--d("Selected "..v)
 							if tileManager then
 								tileManager:SetMapId(i)
 							end
@@ -668,46 +884,17 @@ function MM.editorInit()
 				scene:RemoveFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
 			end
 		    endGamepad()
+
+		    -- destroy all marker previews
+		    for i,v in pairs(markerpreviews) do
+				destroyControl(v)
+				markerpreviews[i] = nil
+			end
 		end
 	end)
 
+
+
+	M0RMarkers.image = image -- debug stuff
+
 end
-
-
---[[
-
-
-
-
-<Label name="$(parent)Colour" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Colour">
-	<Anchor point="TOPLEFT" relativePoint="TOP" relativeTo="$(parent)" offsetX="12.5" offsetY="10" />
-	<Dimensions x="120" y="25" />
-	<Controls>
-		<Control name="$(parent)Picker" inherits="ZO_ComboBox" mouseEnabled="true" tier="HIGH" >
-			<Dimensions x="135" y="25" />
-			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="0" />
-			
-			<OnInitialized>
-				function M0RMarkers.Settings.InitColourPicker()
-					local comboBox = ZO_ComboBox:New(self)
-					comboBox:SetSortsItems(false)
-					local currentColourHex = M0RMarkers.Settings.colourLookup[ZO_ColorDef.FloatsToHex(unpack(M0RMarkers.Settings.quickSelections.rgba))]
-
-					-- ZO_ComboBox_ObjectFromContainer(self)
-					for i,v in ipairs(M0RMarkers.Settings.colourPresets) do
-						local entry = comboBox:CreateItemEntry(v, function()
-							M0RMarkers.print("Selected "..v)
-							M0RMarkers.Settings.quickSelections.rgba = M0RMarkers.Settings.colourLookup[v]
-						end, true)
-						comboBox:AddItem(entry)
-
-						if v == currentColourHex then
-							comboBox:ItemSelectedClickHelper(entry)
-						end
-					end
-				end
-			</OnInitialized>
-		</Control>
-	</Controls>
-</Label>
---]]

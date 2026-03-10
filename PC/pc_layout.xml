@@ -349,6 +349,82 @@
 						</Control>
 					</Controls>
 				</Label>
+
+				<Control name="$(parent)CursorPositions">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)MapSelectorPicker" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="35" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold27" horizontalAlignment="1" verticalAlignment="1" text="Cursor Positions">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" />
+							<Dimensions x="300" y="35" />
+						</Label>
+					</Controls>
+				</Control>
+
+				<Control name="$(parent)lastX">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)CursorPositions" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Last Selected X">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit" editEnabled="false" text="" horizontalAlignment="1">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<!--
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+								-->
+							</Controls>
+						</EditBox>
+					</Controls>
+				</Control>
+				<Control name="$(parent)playerY">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)lastX" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Player Y">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit" editEnabled="false" text="" horizontalAlignment="1">
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<!--
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+								-->
+							</Controls>
+						</EditBox>
+					</Controls>
+				</Control>
+				<Control name="$(parent)lastZ">
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)playerY" offsetY="5" offsetX="0" />
+					<Dimensions x="300" y="25" />
+					<Controls>
+						<Label name="$(parent)Text" font="ZoFontGamepadBold20" horizontalAlignment="1" verticalAlignment="1" text="Last Selected Z">
+							<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$(parent)" offsetX="20" />
+							<Dimensions x="120" y="25" />
+						</Label>
+						<EditBox name="$(parent)Edit" inherits="ZO_DefaultEdit" editEnabled="false" text="" horizontalAlignment="1" >
+							<Dimensions x="120" y="25" />
+							<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-20" />
+							<Controls>
+								<!--
+								<Backdrop name="$(parent)BG" inherits="ZO_EditBackdrop">
+									<AnchorFill />
+								</Backdrop>
+								-->
+							</Controls>
+						</EditBox>
+					</Controls>
+				</Control>
+
 				<!--
 				<Button name="$(parent)PlaceAtCursor" inherits="ZO_DefaultButton" text="|cFFB6C1Close|r">
 					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)" offsetX="75" offsetY="-10" />
@@ -756,26 +832,41 @@
 
 
 
-				
-				<Button name="$(parent)Save" inherits="ZO_DefaultButton" text="|cFFB6C1Save Profile|r">
-					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)TextEdit" offsetY="-25" offsetX="-75" />
+				<Button name="$(parent)ExitWithoutSaving" inherits="ZO_DefaultButton" text="|cFFB6C1Exit Without Saving|r">
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$(parent)" offsetY="-25" offsetX="75" />
+					
+					
+					<Dimensions x="150" y="25" />
+					<OnClicked>
+						SCENE_MANAGER:Push('hud')
+					</OnClicked>
+				</Button>
+				<Button name="$(parent)Save" inherits="ZO_DefaultButton" text="|c98FB98Save Profile|r">
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)ExitWithoutSaving" offsetY="-10" />
 					<Dimensions x="125" y="25" />
 					<OnClicked>
-						
-						--M0RMarkers.placeQuickMenuIcon()
+						-- TODO: Do a sanity check to make sure nothing is set to y=0
+						M0RMarkers.editorSavePressed()
 					</OnClicked>
 				</Button>
 				
+				
 
 
 
-				<Button name="$(parent)Discard" inherits="ZO_DefaultButton" text="|cFFB6C1Discard Changes|r">
-					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Save" offsetY="-10" />
+				<Button name="$(parent)Delete" inherits="ZO_DefaultButton" text="|cFF0000Delete Marker|r">
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)" offsetY="-25" offsetX="-75" />
 					<Dimensions x="125" y="25" />
 					<OnClicked>
+						M0RMarkers.deleteMarkerPressed()
+					</OnClicked>
+				</Button>
+
+				<Button name="$(parent)Discard" inherits="ZO_DefaultButton" text="|cFFB6C1Discard Changes|r">
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Delete" offsetY="-10" />
+					<Dimensions x="127" y="25" />
+					<OnClicked>
 						M0RMarkers.reselectCurrentMarker()
-						-- set the selected marker to itself again
-						--M0RMarkers.placeQuickMenuIcon()
 					</OnClicked>
 				</Button>
 
@@ -784,13 +875,11 @@
 					
 					<Dimensions x="125" y="25" />
 					<OnClicked>
-
 						M0RMarkers.editorApplyPressed()
-
-						
-						--M0RMarkers.placeQuickMenuIcon()
 					</OnClicked>
 				</Button>
+
+				
 
 				
 				
