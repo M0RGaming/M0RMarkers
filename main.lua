@@ -858,6 +858,10 @@ function MM.OpenConsoleSettings()
 		headerData.messageText = zo_strformat(GetString(SI_ADD_ON_AUTHOR_LINE), "@M0R_Gaming")
 		ZO_GamepadGenericHeader_RefreshData(LibHarvensAddonSettings.scrollList.header, headerData)
 		SCENE_MANAGER:Push("LibHarvensAddonSettingsScene")
+		return
+	end
+	if ((not IsConsoleUI()) and LibAddonMenu2 and M0RMarkersSettingsPanel) then
+		LibAddonMenu2:OpenToPanel(M0RMarkersSettingsPanel)
 	end
 end
 
