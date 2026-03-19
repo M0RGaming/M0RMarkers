@@ -99,9 +99,17 @@ function MM.editorInit()
 
 
 	local function SetSelectedMarker(currentMarker)
+		if currentZoneMarkers[selectedMarker] and currentZoneMarkers[selectedMarker].control and currentZoneMarkers[selectedMarker].control.highlight then
+			currentZoneMarkers[selectedMarker].control.highlight:SetHidden(true)
+		end
+		--x = currentZoneMarkers
 		if type(currentMarker) ~= "table" then return end
 		local markerIndex = currentMarker.index
 		selectedMarker = markerIndex
+
+		if currentMarker.control then
+			currentMarker.control.highlight:SetHidden(false)
+		end
 
 
 		local toplevel = M0RMarkerEditorToplevel
@@ -494,6 +502,7 @@ function MM.editorInit()
 		control:SetSpace(SPACE_INTERFACE)
 		control:SetScale(icon.size*0.20) -- 100 x 100, scale down to 20
 		control.bgLayer = control:GetNamedChild("Background")
+		control.highlight = control.bgLayer:GetNamedChild("Highlight")
 		control.textLayer = control.bgLayer:GetNamedChild("Text")
 		control:SetTransformNormalizedOriginPoint(0.5,0.5)
 
@@ -521,6 +530,7 @@ function MM.editorInit()
 			icon.control.textLayer:SetText(icon.text)
 		end
 
+		icon.control.highlight:SetHidden(true)
 		icon.control:SetMouseEnabled(true)
 		local function OnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command)
 			if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
@@ -553,6 +563,7 @@ function MM.editorInit()
 		icon.control.bgLayer:SetHidden(true)
 		icon.control.textLayer:SetText("")
 		icon.control.textLayer:SetHidden(true)
+		icon.control.highlight:SetHidden(true)
 		newControlPool:ReleaseObject(icon.key)
 		icon.control = nil
 		icon.key = nil

@@ -13,7 +13,7 @@
 			<Dimensions x="100" y="100" />
 			<Anchor point="CENTER" relativeTo="GuiRoot" relativePoint="CENTER"/>
 			<Controls>
-				<Texture name="$(parent)Background" hidden="true">
+				<Texture name="$(parent)Background" hidden="true" layer="1">
 					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)"/>
 					<Dimensions x="100" y="100" />
 					<Controls>
@@ -21,6 +21,11 @@
 							<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(grandparent)" offsetY="15"/>
 							<Dimensions x="200" y="100" />
 						</Label>
+						<Backdrop name="$(parent)Highlight" hidden="true" edgeColor="ff0000" centerColor="00000000" layer="0" tier="0">
+							<Edge edgeSize="10"/>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetY="-10" offsetX="-10"/>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)" offsetY="10" offsetX="10"/>
+						</Backdrop>
 					</Controls>
 				</Texture>
 				
