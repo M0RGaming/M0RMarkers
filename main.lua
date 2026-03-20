@@ -655,8 +655,10 @@ end
 
 
 local oldZone = 0
+local oldsx, oldsy, oldsz
+
 function MM.playerActivated()
-	local currentZone = GetUnitRawWorldPosition('player')
+	local currentZone = GetUnitRawWorldPosition('player')	
 	if oldZone ~= currentZone then
 		oldZone = currentZone
 		MM.unloadEverything()
@@ -665,11 +667,24 @@ function MM.playerActivated()
 	MM.updateProfileDropdown(true)
 	if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 	MM.updateMarkerPositions()
+	oldsx, oldsy, oldsz = GuiRender3DPositionToWorldPosition(0,0,0)
 
 	if MM.vars.cullingDistance ~= 0 then
 		MM.startCulling()
 	end
 end
+function MM.playerZoneChanged()
+	MM.updateMarkerPositions()
+	local sx, sy, sz = GuiRender3DPositionToWorldPosition(0,0,0)
+	if (oldsx ~= sx) or (oldsy ~= sy) or (oldsz ~= sz) then
+		oldsx = sx
+		oldsy = sy
+		oldsz = sz
+		MM.updateMarkerPositions()
+		--d("Player Zone Changed")
+	end
+end
+
 
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_TOGGLE_QUICK_MENU", "Toggle Quick Menu Visiblity")
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_REMOVE_MARKER", "|cFFB6C1Remove Closest Marker|r")
@@ -946,6 +961,7 @@ function MM:Initialize()
 
 
 	EVENT_MANAGER:RegisterForEvent(MM.name, EVENT_PLAYER_ACTIVATED, MM.playerActivated)
+	EVENT_MANAGER:RegisterForEvent(MM.name, EVENT_ZONE_CHANGED, MM.playerZoneChanged)
 
 	MM.Settings.createSettings()
 

@@ -188,7 +188,7 @@ function MM.createIcon(icon)
 	if icon.bgTexture then
 		icon.control.bgLayer:SetHidden(false)
 		icon.control.bgLayer:SetTexture(icon.bgTexture)
-		local width = icon.control.bgLayer:GetTextureFileDimensions()*100 or 1 -- since the scale is set to 0.01 above
+		local width = 100*(icon.control.bgLayer:GetTextureFileDimensions() or 1) -- since the scale is set to 0.01 above
 		icon.control.bgLayer:SetScale(width)
 		icon.control.bgLayer:SetTransformScale(1/width)
 		icon.control.bgLayer:SetColor(unpack(icon.colour))
