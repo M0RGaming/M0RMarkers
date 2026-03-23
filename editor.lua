@@ -312,8 +312,10 @@ function MM.editorInit()
 		local ny = dy/(b-t)
 		--d(nx,ny)
 		local worldX = originX+nx*nxratio
-		--local _, _, y, _ = GetUnitRawWorldPosition('player')
+		local _, _, py, _ = GetUnitRawWorldPosition('player')
 		local worldZ = originZ+ny*nzratio
+
+
 
 		local marker = {
 			--index = #currentZoneMarkers+1,
@@ -323,7 +325,7 @@ function MM.editorInit()
 			size = 1,
 			text = "",
 			x = zo_floor(worldX),
-			y = 0,
+			y = py or 0,
 			z = zo_floor(worldZ)
 		}
 

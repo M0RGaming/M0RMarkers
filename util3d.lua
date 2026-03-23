@@ -65,7 +65,7 @@ local function updateMarkers()
 end
 
 local function cullMarkers()
-	local cullDistance = MM.vars.cullingDistance * 100 or 0
+	local cullDistance = (MM.vars.cullingDistance or 0) * 100
 	if cullDistance == 0 then
 		EVENT_MANAGER:UnregisterForUpdate("M0RMarkersCullTick")
 		currentlyCulling = false
