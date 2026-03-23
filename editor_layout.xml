@@ -71,57 +71,24 @@
 					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$(parent)" offsetX="0" offsetY="10" />
 					<Dimensions x="300" y="40" />
 					<Controls>
-						<Control name="$(parent)Picker" inherits="ZO_ComboBox" mouseEnabled="true" tier="HIGH" >
+						<Control name="$(parent)Picker" inherits="ZO_ComboBox" mouseEnabled="true" tier="HIGH" hidden="false">
 							<Dimensions x="200" y="40" />
 							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="5" />
 							
 							<OnInitialized>
-
-
-								M0RMarkers.mapZoneLookup = {}
-							    local mapIdMax = 10000
-							    for mapId = 1, mapIdMax do
-							        local name, _, _, zoneIndex = GetMapInfoById(mapId)
-							        local zoneId = GetZoneId(zoneIndex)
-							        if zoneId ~= 2 then
-							            if M0RMarkers.mapZoneLookup[zoneId] then
-							                M0RMarkers.mapZoneLookup[zoneId][mapId] = name
-							            else
-							                M0RMarkers.mapZoneLookup[zoneId] = {[mapId] = name}
-							            end
-							        end
-							    end
-
-
-
-
-
 								local comboBox = ZO_ComboBox:New(self)
 								comboBox:SetSortsItems(true)
-								local currentMapId = GetCurrentMapId()
-
-								local currentZone = GetUnitRawWorldPosition('player')
-								local currentZoneLookup = M0RMarkers.mapZoneLookup[currentZone]
-								if currentZoneLookup then
-									for i,v in pairs(currentZoneLookup) do
-										local stringName = string.format(tostring(v).." ("..tostring(i)..")")
-										local entry = comboBox:CreateItemEntry(stringName, function()
-											d("Selected "..v)
-											if tileManager then
-												tileManager:SetMapId(i)
-											end
-										end, true)
-										comboBox:AddItem(entry)
-
-										if i == currentMapId then
-											comboBox:ItemSelectedClickHelper(entry)
-										end
-									end
-								end
-
 								M0RMarkers.mapSelectorEditbox = comboBox
 							</OnInitialized>
 						</Control>
+						<Button name="$(parent)GamepadButton" inherits="ZO_DefaultButton" text="Alinor (1430)" hidden="true">
+							<Dimensions x="200" y="40" />
+							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="5" />
+							<OnClicked>
+								M0RMarkers.ShowEditorMapSelect()
+							</OnClicked>
+						</Button>
+
 					</Controls>
 				</Label>
 

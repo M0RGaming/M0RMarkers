@@ -432,3 +432,89 @@ ESO_Dialogs["M0RMarkerFontSelect"] = {
 function MM.ShowFontSelect(fontType)
 	ZO_Dialogs_ShowPlatformDialog("M0RMarkerFontSelect", {fontType = fontType})
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local function SetupEditorMapSelect(dialog)
+	local currentMapId = GetCurrentMapId()
+	local currentZone = GetUnitRawWorldPosition('player')
+	local currentZoneLookup = M0RMarkers.mapZoneLookup[currentZone]
+
+	dialog.info.parametricList = {}
+	local template = "ZO_GamepadSubMenuEntryWithStatusTemplate"
+
+	if currentZoneLookup then
+		for i,v in pairs(currentZoneLookup) do
+			local stringName = string.format(tostring(v).." ("..tostring(i)..")")
+
+			local entryData = ZO_GamepadEntryData:New(stringName)
+			entryData:SetFontScaleOnSelection(false)
+			entryData:SetIconTintOnSelection(true)
+			entryData.setup = SetupProfileItem
+			entryData.name = stringName
+			entryData.mapId = i
+			entryData.isActive = i == currentMapId
+
+			local listItem = 
+			{
+				template = template,
+				entryData = entryData,
+			}
+			table.insert(dialog.info.parametricList, listItem)
+		end
+		dialog:setupFunc()
+		dialog.entryList:SetSelectedDataByEval(IsSelected)
+	end
+end
+
+ESO_Dialogs["M0RMarkerEditorMapSelect"] = {
+	canQueue = true,
+	gamepadInfo = {
+		dialogType = GAMEPAD_DIALOGS.PARAMETRIC,
+	},
+	setup = SetupEditorMapSelect,
+	title =
+	{
+		text = "Select your Map",
+	},
+	buttons =
+	{
+		{
+			text = SI_GAMEPAD_SELECT_OPTION,
+			callback =  function(dialog)
+							local data = dialog.entryList:GetTargetData()
+							--d("Trying to load: ".. data.name)
+							if data.mapId and M0RMarkers.editorTileManager then
+								--d("Loading: ".. data.mapId)
+								M0RMarkers.editorTileManager:SetMapId(data.mapId)
+							end
+						end,
+		},
+		{
+			text = SI_DIALOG_EXIT,
+		},
+	},
+}
+
+
+
+function MM.ShowEditorMapSelect()
+	ZO_Dialogs_ShowPlatformDialog("M0RMarkerEditorMapSelect")
+end

@@ -39,6 +39,21 @@ function MM.editorInit()
 
 	--x = GetAllMapIdsByZoneId()
 
+	M0RMarkers.mapZoneLookup = {} -- TODO: DEFER THIS
+	local mapIdMax = 10000
+	for mapId = 1, mapIdMax do
+		local name, _, _, zoneIndex = GetMapInfoById(mapId)
+		local zoneId = GetZoneId(zoneIndex)
+		if zoneId ~= 2 then
+			if M0RMarkers.mapZoneLookup[zoneId] then
+				M0RMarkers.mapZoneLookup[zoneId][mapId] = name
+			else
+				M0RMarkers.mapZoneLookup[zoneId] = {[mapId] = name}
+			end
+		end
+	end
+
+
 
 
 	--M0RMarkerEditorToplevel:SetHidden(false)
@@ -902,9 +917,16 @@ function MM.editorInit()
 			if IsInGamepadPreferredMode() then
 				scene:AddFragmentGroup(FRAGMENT_GROUP.GAMEPAD_DRIVEN_UI_WINDOW)
 
+				M0RMarkerEditorToplevelMapSelectorPicker:SetHidden(true)
+				M0RMarkerEditorToplevelMapSelectorGamepadButton:SetHidden(false)
+
 				KEYBIND_STRIP:AddKeybindButtonGroup(gamepadKeybinds)
 				startGamepad()
 			else
+
+				M0RMarkerEditorToplevelMapSelectorPicker:SetHidden(false)
+				M0RMarkerEditorToplevelMapSelectorGamepadButton:SetHidden(true)
+
 				KEYBIND_STRIP:AddKeybindButtonGroup(keybinds)
 				scene:AddFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
 			end
@@ -959,5 +981,7 @@ function MM.editorInit()
 
 
 	M0RMarkers.image = image -- debug stuff
+
+	M0RMarkers.editorTileManager = tileManager
 
 end
