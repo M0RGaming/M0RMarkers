@@ -284,7 +284,7 @@
 					<AnchorFill />
 					<Edge edgeSize="3"/>
 				</Backdrop>
-				<Texture name="$(parent)Cursor" hidden="true" textureFile="/esoui/art/scrying/cursor_gamepad.dds" tier="HIGH" level="500">
+				<Texture name="$(parent)Cursor" hidden="true" textureFile="/esoui/art/scrying/cursor_gamepad.dds" tier="HIGH" level="500" inheritScale="true">
 					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="GuiRoot"/>
 					<Dimensions x="25" y="25" />
 					<OnInitialized>

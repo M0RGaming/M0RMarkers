@@ -89,6 +89,9 @@ function MM.editorInit()
 	local nzratio
 
 
+	local cursorId
+
+
 
 
 	local currentZoneMarkers = {}
@@ -432,7 +435,7 @@ function MM.editorInit()
 	end
 
 
-	local function updateLastPlayerClickPositions()
+	local function updateLastPlayerClickPositions(source)
 		local toplevel = M0RMarkerEditorToplevel
 		local xEdit = toplevel:GetNamedChild("lastX"):GetNamedChild("Edit")
 		local yEdit = toplevel:GetNamedChild("playerY"):GetNamedChild("Edit")
@@ -440,6 +443,9 @@ function MM.editorInit()
 
 		local _, _, y, _ = GetUnitRawWorldPosition("player")
 		local mx, my = GetUIMousePosition()
+		if cursorId and source == "gamepadCursor" then
+			mx, my = WINDOW_MANAGER:GetCursorPosition(cursorId)
+		end
 		local l, t, r, b = image:ProjectRectToScreenAndBuildAABB()
 		local dx = mx-l
 		local dy = my-t
@@ -461,7 +467,7 @@ function MM.editorInit()
 		index = 0
 	}
 
-	local function ImageOnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command)
+	local function ImageOnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command, source)
 		--d(...)
 		if image.dragging then
 			OnDragStop()
@@ -469,11 +475,14 @@ function MM.editorInit()
 			-- do handler
 			--d("left click pressed")
 			SetSelectedMarker(emptyMarker)
-			updateLastPlayerClickPositions()
+			updateLastPlayerClickPositions(source)
 
 		elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
 			--d("right click pressed")
 			local x,y = GetUIMousePosition()
+			if cursorId and source == "gamepadCursor" then
+				x, y = WINDOW_MANAGER:GetCursorPosition(cursorId)
+			end
 			createMarker(x,y)
 		end
 	end
@@ -532,7 +541,7 @@ function MM.editorInit()
 
 		icon.control.highlight:SetHidden(true)
 		icon.control:SetMouseEnabled(true)
-		local function OnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command)
+		local function OnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command, source)
 			if button == MOUSE_BUTTON_INDEX_LEFT and upInside then
 				SetSelectedMarker(icon)
 				if shift then
@@ -540,6 +549,9 @@ function MM.editorInit()
 				end
 			elseif button == MOUSE_BUTTON_INDEX_RIGHT and upInside then
 				local x,y = GetUIMousePosition()
+				if cursorId and source == "gamepadCursor" then
+					x, y = WINDOW_MANAGER:GetCursorPosition(cursorId)
+				end
 
 				if not shift then
 					MM.ShowDialogue("Creating Marker",
@@ -712,18 +724,32 @@ function MM.editorInit()
 	SLASH_COMMANDS['/showeditor'] = function() SCENE_MANAGER:Push('M0RMarkerEditorScene') end
 	SLASH_COMMANDS['/hideeditor'] = function() SCENE_MANAGER:Push('hud') end
 
+	local function handleFakeClick(button)
+		local clickedControl = WINDOW_MANAGER:GetControlAtCursor(cursorId)
+		if clickedControl:GetOwningWindow() == ZO_KeybindStripControl then return end
+		--d(clickedControl:GetName())
+		local handler = clickedControl:GetHandler("OnMouseUp")
+		if not handler then handler = clickedControl:GetHandler("OnClicked") end
+		if not handler then handler = clickedControl:GetHandler("OnMouseDown") end
+		if not handler then return end
+		handler(clickedControl, button, true, false, false, false, false, "gamepadCursor")
+	end
+
+
 	local gamepadKeybinds = {
 		{
 			name = "Select",
 			alignment = KEYBIND_STRIP_ALIGN_LEFT,
 			keybind = "UI_SHORTCUT_PRIMARY",
-			callback = function() d("Pressed Select") end,
+			callback = function() -- GAMEPAD LEFT CLICK
+				handleFakeClick(MOUSE_BUTTON_INDEX_LEFT)
+			end,
 		},
 		{
 			name = "Place Marker",
 			alignment = KEYBIND_STRIP_ALIGN_LEFT,
 			keybind = "UI_SHORTCUT_SECONDARY",
-			callback = function() d("Pressed Place") end,
+			callback = function() handleFakeClick(MOUSE_BUTTON_INDEX_RIGHT) end,
 		},
 
 
@@ -738,12 +764,12 @@ function MM.editorInit()
 			keybind = "UI_SHORTCUT_RIGHT_STICK",
 		},
 		{
-			name = "Zoom In",
+			name = "Zoom Out",
 			alignment = KEYBIND_STRIP_ALIGN_CENTER,
 			keybind = "UI_SHORTCUT_LEFT_TRIGGER",
 		},
 		{
-			name = "Zoom Out",
+			name = "Zoom In",
 			alignment = KEYBIND_STRIP_ALIGN_CENTER,
 			keybind = "UI_SHORTCUT_RIGHT_TRIGGER",
 		},
@@ -792,15 +818,16 @@ function MM.editorInit()
 		},
 	}
 
-
 	local cursorX = 0
 	local cursorY = 0
+	local oldcursorX = 0
+	local oldcursorY = 0
 	local function gamepadVirtualMouseLoop()
 		cursorX = cursorX + (GetGamepadLeftStickX() or 0)*10
 		cursorY = cursorY - (GetGamepadLeftStickY() or 0)*10
 		
 
-		local scaleDelta = GetGamepadLeftTriggerMagnitude() - GetGamepadRightTriggerMagnitude()
+		local scaleDelta = GetGamepadRightTriggerMagnitude() - GetGamepadLeftTriggerMagnitude()
 		local panX = (GetGamepadRightStickX() or 0)*20
 		local panY = (GetGamepadRightStickY() or 0)*20
 
@@ -819,13 +846,28 @@ function MM.editorInit()
 			updateTick("customDelta", -panX, panY)
 		end
 
-		M0RMarkerEditorToplevelCursor:ClearAnchors()
-		M0RMarkerEditorToplevelCursor:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, cursorX, cursorY)
+
+		if (cursorX ~= oldcursorX) or (cursorY ~= oldcursorY) then
+			local toplevelscale = M0RMarkerEditorToplevel:GetScale() or 1
+			M0RMarkerEditorToplevelCursor:ClearAnchors()
+			M0RMarkerEditorToplevelCursor:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, cursorX/toplevelscale, cursorY/toplevelscale)
+			WINDOW_MANAGER:UpdateCursorPosition(cursorId, cursorX, cursorY)
+
+			oldcursorX = cursorX
+			oldcursorY = cursorY
+		end
 	end
 
 	local function startGamepad()
 		cursorX = GuiRoot:GetWidth()/2
 		cursorY = GuiRoot:GetHeight()/2
+
+		if cursorId then
+			WINDOW_MANAGER:DestroyCursor(cursorId)
+			cursorId = nil
+		end
+		cursorId = WINDOW_MANAGER:CreateCursor(cursorX, cursorY)
+
 		M0RMarkerEditorToplevelCursor:SetHidden(false)
 		EVENT_MANAGER:RegisterForUpdate("M0RMarkerEditorCursor", 0, gamepadVirtualMouseLoop)
 	end
@@ -833,6 +875,16 @@ function MM.editorInit()
 	local function endGamepad()
 		EVENT_MANAGER:UnregisterForUpdate("M0RMarkerEditorCursor")
 		M0RMarkerEditorToplevelCursor:SetHidden(true)
+
+		cursorX = 0
+		cursorY = 0
+		oldcursorX = 0
+		oldcursorY = 0
+
+		if cursorId then
+			WINDOW_MANAGER:DestroyCursor(cursorId)
+			cursorId = nil
+		end
 	end
 
 
