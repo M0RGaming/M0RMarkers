@@ -478,9 +478,13 @@ function settings.createSettings()
 				},
 			}
 		},
-
-
-
+		{
+			type = "button",
+			name = "Open Editor",
+			tooltip = "Click this button to open the profile editor!",
+			width = "full",
+			func = function() SCENE_MANAGER:Push('M0RMarkerEditorScene') end,
+		},
 		{
 			type = "divider",
 		},
