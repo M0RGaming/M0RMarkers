@@ -983,9 +983,12 @@ function MM:Initialize()
 		LibRadialMenu:RegisterEntry("moremarkers", "Open Settings", "opensettings", "M0RMarkers/textures/OpenSettings.dds",
 			function() MM.OpenConsoleSettings() end,
 			"Opens the More Markers settings page.")
+		LibRadialMenu:RegisterEntry("moremarkers", "Open Editor", "openeditor", "M0RMarkers/textures/OpenSettings.dds",
+			function() SCENE_MANAGER:Push("M0RMarkerEditorScene") end,
+			"Opens the More Markers Editor scene.")
 	end
 
-	MM.editorInit()
+	--MM.editorInit()
 
 	EVENT_MANAGER:UnregisterForEvent(MM.name, EVENT_ADD_ON_LOADED)
 end

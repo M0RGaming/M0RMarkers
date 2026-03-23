@@ -492,7 +492,7 @@ ESO_Dialogs["M0RMarkerEditorMapSelect"] = {
 	setup = SetupEditorMapSelect,
 	title =
 	{
-		text = "Select your Map",
+		text = "Select the Zone Map!",
 	},
 	buttons =
 	{

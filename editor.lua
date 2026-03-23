@@ -7,6 +7,18 @@ local _
 local image
 local destroyControl
 
+local scene = ZO_InteractScene:New("M0RMarkerEditorScene", SCENE_MANAGER, { -- TODO MAYBE GET RID OF BANKING, IDK
+	type = "Banking",
+	interactTypes = { INTERACTION_BANK },
+})
+
+local deferredInit = ZO_DeferredInitializingObject:New(scene) -- formerly HUD_SCENE
+function deferredInit:OnDeferredInitialize()
+	MM.editorInit()
+end
+
+SLASH_COMMANDS['/mmshoweditor'] = function() SCENE_MANAGER:Push('M0RMarkerEditorScene') end
+
 
 function MM.editorInit()
 
@@ -39,7 +51,7 @@ function MM.editorInit()
 
 	--x = GetAllMapIdsByZoneId()
 
-	M0RMarkers.mapZoneLookup = {} -- TODO: DEFER THIS
+	M0RMarkers.mapZoneLookup = {}
 	local mapIdMax = 10000
 	for mapId = 1, mapIdMax do
 		local name, _, _, zoneIndex = GetMapInfoById(mapId)
@@ -710,10 +722,7 @@ function MM.editorInit()
 
 
 
-	local scene = ZO_InteractScene:New("M0RMarkerEditorScene", SCENE_MANAGER, { -- TODO MAYBE GET RID OF BANKING, IDK
-		type = "Banking",
-		interactTypes = { INTERACTION_BANK },
-	})
+	
 	scene:AddFragment(ZO_FadeSceneFragment:New(M0RMarkerEditorToplevel))
 
 
@@ -736,8 +745,8 @@ function MM.editorInit()
 	--scene:AddFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
 
 
-	SLASH_COMMANDS['/showeditor'] = function() SCENE_MANAGER:Push('M0RMarkerEditorScene') end
-	SLASH_COMMANDS['/hideeditor'] = function() SCENE_MANAGER:Push('hud') end
+	
+	--SLASH_COMMANDS['/mmhideeditor'] = function() SCENE_MANAGER:Push('hud') end
 
 	local function handleFakeClick(button)
 		local clickedControl = WINDOW_MANAGER:GetControlAtCursor(cursorId)
@@ -791,7 +800,14 @@ function MM.editorInit()
 
 
 		{
-			name = "Exit",
+			name = "|c98FB98Save Profile|r",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			keybind = "UI_SHORTCUT_TERTIARY",
+			callback = function() M0RMarkers.editorSavePressed() end,
+		},
+
+		{
+			name = "|cFFB6C1Exit Without Saving|r",
 			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
 			keybind = "UI_SHORTCUT_NEGATIVE",
 			callback = function() SCENE_MANAGER:Push('hud') end,
@@ -838,6 +854,7 @@ function MM.editorInit()
 	local oldcursorX = 0
 	local oldcursorY = 0
 	local function gamepadVirtualMouseLoop()
+		if ZO_Dialogs_IsShowingDialog() then return end
 		cursorX = cursorX + (GetGamepadLeftStickX() or 0)*10
 		cursorY = cursorY - (GetGamepadLeftStickY() or 0)*10
 		
