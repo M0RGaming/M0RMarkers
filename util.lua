@@ -518,3 +518,36 @@ ESO_Dialogs["M0RMarkerEditorMapSelect"] = {
 function MM.ShowEditorMapSelect()
 	ZO_Dialogs_ShowPlatformDialog("M0RMarkerEditorMapSelect")
 end
+
+
+
+
+
+
+
+
+
+
+
+local listofdialogs = {
+	"M0RMarkerConfirmDialogue",
+	"M0RMarkerNotice",
+	"M0RMarkerEditDialogue",
+	"M0RMarkerProfileSelect",
+	"M0RMarkerProfileSelectMulti",
+	"M0RMarkerEditBox",
+	"M0RMarkerFontSelect",
+	"M0RMarkerEditorMapSelect"
+}
+
+if IsConsoleUI() then
+	for i,v in pairs(listofdialogs) do
+		local currentDialogue = ESO_Dialogs[v]
+		local oldButtons = ZO_DeepTableCopy(currentDialogue.buttons)
+	    currentDialogue.buttons = nil
+	    currentDialogue.OnShownCallback = function(dialog)
+	        local g_keybindState = KEYBIND_STRIP:GetTopKeybindStateIndex()
+	        KEYBIND_STRIP:AddKeybindButtonGroup(oldButtons, g_keybindState)
+	    end
+	end
+end
