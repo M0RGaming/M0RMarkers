@@ -22,6 +22,11 @@ SLASH_COMMANDS['/mmshoweditor'] = function() SCENE_MANAGER:Push('M0RMarkerEditor
 
 function MM.editorInit()
 
+
+	local ZosMapWidth, ZosMapHeight = ZO_WorldMap:GetDimensions()
+
+
+
 	MM.editorSelections = {
 
 	}
@@ -78,7 +83,7 @@ function MM.editorInit()
 
 	control = wm:CreateControl("M0RMarkersEditorImageBackground", M0RMarkerEditorToplevel, CT_BACKDROP)
 	control:SetAnchor(CENTER, GuiRoot, CENTER, 0, 0)
-	control:SetDimensions(ZO_MAP_CONSTANTS.MAP_WIDTH, ZO_MAP_CONSTANTS.MAP_HEIGHT)
+	control:SetDimensions(ZosMapWidth, ZosMapHeight)
 	--control:SetDimensions(835, 835)
 	control:SetCenterColor(0, 0, 0, 0)
 	control:SetEdgeColor(0, 0, 0, 1)
@@ -87,7 +92,7 @@ function MM.editorInit()
 
 	image = wm:CreateControl("M0RMarkersEditorImageImage", control, CT_CONTROL)
 	image:SetAnchor(CENTER, control, CENTER, 0, 0)
-	image:SetDimensions(ZO_MAP_CONSTANTS.MAP_WIDTH, ZO_MAP_CONSTANTS.MAP_HEIGHT)
+	image:SetDimensions(ZosMapWidth, ZosMapHeight)
 	--image:SetDimensions(835, 835)
 	--image:SetTexture("esoui/art/crowncrates/psijic/crowncrate_psijic_back.dds")
 
@@ -101,8 +106,8 @@ function MM.editorInit()
 
 
 
-	control:SetScale(835/ZO_MAP_CONSTANTS.MAP_WIDTH)
-	M0RMarkerEditorToplevel:SetScale(ZO_MAP_CONSTANTS.MAP_WIDTH/835)
+	control:SetScale(835/ZosMapWidth)
+	M0RMarkerEditorToplevel:SetScale(ZosMapWidth/835)
 
 
 	image:ClearAnchors()
@@ -397,7 +402,7 @@ function MM.editorInit()
 		local scale = image:GetScale()
 
 		--local maxAnchor = zo_clamp((ZO_MAP_CONSTANTS.MAP_WIDTH*scale)-ZO_MAP_CONSTANTS.MAP_WIDTH, 0, ZO_MAP_CONSTANTS.MAP_WIDTH) -- 1 to 2, worse. 2 to 3, better
-		local maxAnchor = (ZO_MAP_CONSTANTS.MAP_WIDTH*scale)-ZO_MAP_CONSTANTS.MAP_WIDTH
+		local maxAnchor = (ZosMapWidth*scale)-ZosMapWidth
 		--local maxAnchor = (835*scale)-835
 
 		image:SetAnchor(CENTER, control, CENTER, zo_clamp(startOX+deltaX,-maxAnchor, maxAnchor), zo_clamp(startOY+deltaY,-maxAnchor, maxAnchor))
@@ -615,6 +620,23 @@ function MM.editorInit()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	tileManager = ZO_WorldMapTiles_Manager:New(image)
 
 	function tileManager:SetMapId(mapid, fromReload)
@@ -688,6 +710,11 @@ function MM.editorInit()
 		changeScale(self, 0)
 		SetMapToMapId(currentMapId)
 
+		if M0RMarkerEditorToplevelMapSelectorGamepadButton and type(self.mapid) == "number" then
+			local name, _, _, zoneIndex = GetMapInfoById(self.mapid)
+			M0RMarkerEditorToplevelMapSelectorGamepadButton:SetText(string.format("%s (%d)", name, self.mapid))
+		end
+
 		SetSelectedMarker(emptyMarker)
 	end
 
@@ -713,6 +740,25 @@ function MM.editorInit()
 		end
 	end
 
+	function tileManager:LayoutTiles()
+	    if self.horizontalTiles == nil then
+	        self:UpdateMapData()
+	    end
+
+	    local tileWidth = ZosMapWidth / self.horizontalTiles
+	    local tileHeight = ZosMapHeight / self.verticalTiles
+
+	    self:ReleaseAllObjects()
+	    
+	    for i = 1, self.totalTiles do
+	        local tileControl = self:AcquireObject(i)
+	        tileControl:SetDimensions(tileWidth, tileHeight)
+	        local xOffset = zo_mod(i - 1, self.horizontalTiles) * tileWidth
+	        local yOffset = zo_floor((i - 1) / self.horizontalTiles) * tileHeight
+	        tileControl:SetAnchor(TOPLEFT, self.parent, TOPLEFT, xOffset, yOffset)
+	    end
+	end
+
 
 
 
@@ -721,6 +767,27 @@ function MM.editorInit()
 	--/script tileManager:SetMapId(2687)
 	-- GetUniversallyNormalizedMapInfo
 	-- GetRawNormalizedWorldPosition
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -762,6 +829,12 @@ function MM.editorInit()
 	end
 
 
+	local snapGamepadCursor
+
+	local customDPAD = M0RMarkerEditorToplevel:GetNamedChild("DpadButton")
+	customDPAD:SetCustomKeyIcon("esoui/art/buttons/gamepad/ps4/nav_ps4_dpad.dds")
+	customDPAD:SetText("Snap Cursor")
+
 	local gamepadKeybinds = {
 		{
 			name = "Select",
@@ -799,6 +872,66 @@ function MM.editorInit()
 			alignment = KEYBIND_STRIP_ALIGN_CENTER,
 			keybind = "UI_SHORTCUT_RIGHT_TRIGGER",
 		},
+
+
+
+
+
+
+		{
+			name = "Snap to Mid",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			keybind = "UI_SHORTCUT_INPUT_UP",
+			ethereal = true,
+			callback = function()
+				if (GetGamepadLeftStickY() == 0) and (GetGamepadRightStickY() == 0) then
+					snapGamepadCursor("SnapPointMid")
+				end
+			end,
+		},
+		{
+			name = "Snap to Discard",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			keybind = "UI_SHORTCUT_INPUT_DOWN",
+			ethereal = true,
+			callback = function()
+				if (GetGamepadLeftStickY() == 0) and (GetGamepadRightStickY() == 0) then
+					snapGamepadCursor("SnapPointApply")
+				end
+			end,
+		},
+		{
+			name = "Snap to Left",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			keybind = "UI_SHORTCUT_INPUT_LEFT",
+			ethereal = true,
+			callback = function()
+				if (GetGamepadLeftStickX() == 0) and (GetGamepadRightStickX() == 0) then
+					snapGamepadCursor("SnapPointLeft")
+				end
+			end,
+		},
+		{
+			name = "Snap to Right",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			keybind = "UI_SHORTCUT_INPUT_RIGHT",
+			ethereal = true,
+			callback = function()
+				if (GetGamepadLeftStickX() == 0) and (GetGamepadRightStickX() == 0) then
+					snapGamepadCursor("SnapPointRight")
+				end
+			end,
+		},
+
+		{
+			--name = "SECONDARY", -- |t30:30:/esoui/art/icons/icon_rmb.dds|t 
+			order = 5,
+			keybind = "CUSTOM_M0R_MARKERS_EDITOR_SNAP",
+			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
+			customKeybindControl = customDPAD,
+			callback = function() end,
+		},
+
 
 
 		{
@@ -922,14 +1055,25 @@ function MM.editorInit()
 	end
 
 
+	snapGamepadCursor = function(location)
+		local control = M0RMarkerEditorToplevel:GetNamedChild(location)
+		if control then
+			cursorX = control:GetLeft()
+			cursorY = control:GetTop()
+		end
+	end
+
+
 	scene:RegisterCallback("StateChange",  function(oldState, newState)
 		if (newState == SCENE_SHOWING) then
 
-			control:SetDimensions(ZO_MAP_CONSTANTS.MAP_WIDTH, ZO_MAP_CONSTANTS.MAP_HEIGHT)
-			image:SetDimensions(ZO_MAP_CONSTANTS.MAP_WIDTH, ZO_MAP_CONSTANTS.MAP_HEIGHT)
+			ZosMapWidth, ZosMapHeight = ZO_WorldMap:GetDimensions()
 
-			control:SetScale(835/ZO_MAP_CONSTANTS.MAP_WIDTH)
-			M0RMarkerEditorToplevel:SetScale(ZO_MAP_CONSTANTS.MAP_WIDTH/835)
+			control:SetDimensions(ZosMapWidth, ZosMapHeight)
+			image:SetDimensions(ZosMapWidth, ZosMapHeight)
+
+			control:SetScale(835/ZosMapWidth)
+			M0RMarkerEditorToplevel:SetScale(ZosMapWidth/835)
 
 				
 

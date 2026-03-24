@@ -81,7 +81,7 @@
 								M0RMarkers.mapSelectorEditbox = comboBox
 							</OnInitialized>
 						</Control>
-						<Button name="$(parent)GamepadButton" inherits="ZO_DefaultButton" text="Alinor (1430)" hidden="true">
+						<Button name="$(parent)GamepadButton" inherits="ZO_DefaultButton" text="Current Zone" hidden="true">
 							<Dimensions x="200" y="40" />
 							<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$(parent)" offsetY="5" />
 							<OnClicked>
@@ -597,7 +597,7 @@
 
 
 				<Button name="$(parent)Delete" inherits="ZO_DefaultButton" text="|cFF0000Delete Marker|r">
-					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)" offsetY="-25" offsetX="-75" />
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$(parent)" offsetY="-25" offsetX="-87.5" />
 					<Dimensions x="125" y="25" />
 					<OnClicked>
 						M0RMarkers.deleteMarkerPressed()
@@ -649,15 +649,27 @@
 			-->
 				<Control name="$(parent)LeftMouseButton" inherits="ZO_KeybindButton" hidden="true" />
 				<Control name="$(parent)RightMouseButton" inherits="ZO_KeybindButton" hidden="true" />
+				<Control name="$(parent)DpadButton" inherits="ZO_KeybindButton_Gamepad" hidden="true" />
 	
-			</Controls>
-			<OnInitialized>
-				--self:SetWidth(ZO_MAP_CONSTANTS.MAP_WIDTH+400)
-				--self:SetHeight(ZO_MAP_CONSTANTS.MAP_HEIGHT+50)
-				--a = ZO_DeepTableCopy(ZO_MAP_CONSTANTS)
 
-			    
-			</OnInitialized>
+				<Control name="$(parent)SnapPointMid">
+					<Dimensions x="0" y="0" />
+					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)" />
+				</Control>
+				<Control name="$(parent)SnapPointRight">
+					<Dimensions x="0" y="0" />
+					<Anchor point="CENTER" relativePoint="RIGHT" relativeTo="$(parent)" offsetX="-150" />
+				</Control>
+				<Control name="$(parent)SnapPointLeft">
+					<Dimensions x="0" y="0" />
+					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)MapSelectorGamepadButton" />
+				</Control>
+				<Control name="$(parent)SnapPointApply">
+					<Dimensions x="0" y="0" />
+					<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$(parent)Apply"/>
+				</Control>
+
+			</Controls>
 
 			
 		</TopLevelControl>

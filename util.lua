@@ -453,7 +453,7 @@ end
 
 
 local function SetupEditorMapSelect(dialog)
-	local currentMapId = GetCurrentMapId()
+	local currentMapId = M0RMarkers.editorTileManager.mapid
 	local currentZone = GetUnitRawWorldPosition('player')
 	local currentZoneLookup = M0RMarkers.mapZoneLookup[currentZone]
 
