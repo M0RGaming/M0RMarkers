@@ -6,9 +6,9 @@ ESO_Dialogs["M0RMarkerConfirmDialogue"] = {
 	title = { text = "<<1>>" },
 	mainText = { text = "<<1>>" },
 	warning = { text = "<<1>>" },
-	buttons = { { text = "Yes", callback = function(dialogue)
+	buttons = { { text = "Yes",callback = function(dialogue)
 		dialogue.data.yesCallback()
-	end }, { text = "No" } },
+	end}, { text = "No"} },
 }
 
 
@@ -529,23 +529,63 @@ end
 
 
 
-local listofdialogs = {
-	"M0RMarkerConfirmDialogue",
-	"M0RMarkerNotice",
-	"M0RMarkerEditDialogue",
-	"M0RMarkerProfileSelect",
-	"M0RMarkerProfileSelectMulti",
-	"M0RMarkerEditBox",
-	"M0RMarkerFontSelect",
-	"M0RMarkerEditorMapSelect"
-}
+
+
+
 
 if IsConsoleUI() then
+
+	local listofdialogs = {
+		"M0RMarkerConfirmDialogue",
+		"M0RMarkerNotice",
+		"M0RMarkerEditDialogue",
+		"M0RMarkerProfileSelect",
+		"M0RMarkerProfileSelectMulti",
+		"M0RMarkerEditBox",
+		"M0RMarkerFontSelect",
+		"M0RMarkerEditorMapSelect"
+	}
+
+	local function dialogHook(dialog, pressState, callback)
+        if callback then
+            callback(dialog, pressState)
+        end
+        if(dialog and not dialog.info.blockDialogReleaseOnPress) then
+            ZO_Dialogs_ReleaseDialogOnButtonPress(dialog.name)
+        end
+	end
+
 	for i,v in pairs(listofdialogs) do
 		local currentDialogue = ESO_Dialogs[v]
 		local oldButtons = ZO_DeepTableCopy(currentDialogue.buttons)
+
+		for k,button in ipairs(oldButtons) do
+			if type(button.text) == number then
+				button.name = GetString(button.text)
+			else
+				button.name = button.text
+			end
+
+		    if not button.keybind then
+		        if k == 1 then
+		            button.keybind = "DIALOG_PRIMARY"
+		        elseif k == 2 then
+		            button.keybind = "DIALOG_NEGATIVE"
+		        end
+		    end
+		    if not button.alignment then
+		    	button.alignment = KEYBIND_STRIP_ALIGN_LEFT
+		    end
+		end
+
 	    currentDialogue.buttons = nil
 	    currentDialogue.OnShownCallback = function(dialog)
+
+		    for k,button in pairs(oldButtons) do
+		    	local oldCallback = button.callback
+				button.callback = function(pressState) dialogHook(dialog, pressState, oldCallback) end
+			end
+
 	        local g_keybindState = KEYBIND_STRIP:GetTopKeybindStateIndex()
 	        KEYBIND_STRIP:AddKeybindButtonGroup(oldButtons, g_keybindState)
 	    end
