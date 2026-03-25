@@ -835,6 +835,11 @@ function MM.editorInit()
 	customDPAD:SetCustomKeyIcon("esoui/art/buttons/gamepad/ps4/nav_ps4_dpad.dds")
 	customDPAD:SetText("Snap Cursor")
 
+	local customGPZoom = M0RMarkerEditorToplevel:GetNamedChild("GPZoom")
+	customGPZoom:SetCustomKeyIcon("esoui/art/buttons/gamepad/scarlett/nav_scarlett_ltrt.dds")
+	customGPZoom:SetText("Zoom")
+
+
 	local gamepadKeybinds = {
 		{
 			name = "Select",
@@ -858,10 +863,11 @@ function MM.editorInit()
 			keybind = "UI_SHORTCUT_LEFT_STICK",
 		},
 		{
-			name = "Pan Map",
+			name = "Pan",
 			alignment = KEYBIND_STRIP_ALIGN_CENTER,
 			keybind = "UI_SHORTCUT_RIGHT_STICK",
 		},
+		--[[
 		{
 			name = "Zoom Out",
 			alignment = KEYBIND_STRIP_ALIGN_CENTER,
@@ -871,6 +877,14 @@ function MM.editorInit()
 			name = "Zoom In",
 			alignment = KEYBIND_STRIP_ALIGN_CENTER,
 			keybind = "UI_SHORTCUT_RIGHT_TRIGGER",
+		},
+		--]]
+		{
+			--order = 5,
+			keybind = "CUSTOM_M0R_MARKERS_EDITOR_ZOOM",
+			alignment = KEYBIND_STRIP_ALIGN_CENTER,
+			customKeybindControl = customGPZoom,
+			callback = function() end,
 		},
 
 
@@ -935,14 +949,14 @@ function MM.editorInit()
 
 
 		{
-			name = "|c98FB98Save Profile|r",
+			name = "|c98FB98Save|r",
 			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
 			keybind = "UI_SHORTCUT_TERTIARY",
 			callback = function() M0RMarkers.editorSavePressed() end,
 		},
 
 		{
-			name = "|cFFB6C1Exit Without Saving|r",
+			name = "|cFFB6C1Exit|r",
 			alignment = KEYBIND_STRIP_ALIGN_RIGHT,
 			keybind = "UI_SHORTCUT_NEGATIVE",
 			callback = function() SCENE_MANAGER:Push('hud') end,

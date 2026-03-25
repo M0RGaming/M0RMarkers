@@ -650,6 +650,7 @@
 				<Control name="$(parent)LeftMouseButton" inherits="ZO_KeybindButton" hidden="true" />
 				<Control name="$(parent)RightMouseButton" inherits="ZO_KeybindButton" hidden="true" />
 				<Control name="$(parent)DpadButton" inherits="ZO_KeybindButton_Gamepad" hidden="true" />
+				<Control name="$(parent)GPZoom" inherits="ZO_KeybindButton_Gamepad" hidden="true" />
 	
 
 				<Control name="$(parent)SnapPointMid">
