@@ -560,7 +560,7 @@ if IsConsoleUI() then
 		local oldButtons = ZO_DeepTableCopy(currentDialogue.buttons)
 
 		for k,button in ipairs(oldButtons) do
-			if type(button.text) == number then
+			if type(button.text) == "number" then
 				button.name = GetString(button.text)
 			else
 				button.name = button.text
