@@ -986,6 +986,13 @@ function MM:Initialize()
 		LibRadialMenu:RegisterEntry("moremarkers", "Open Editor", "openeditor", "M0RMarkers/textures/EditorIcon.dds",
 			function() SCENE_MANAGER:Push("M0RMarkerEditorScene") end,
 			"Opens the More Markers Editor scene.")
+
+		--if IsConsoleUI() then
+			LibRadialMenu:RegisterEntry("moremarkers", "Change Profiles", "changeprofile", "M0RMarkers/textures/ProfileSelectIcon.dds",
+				function() MM.ShowProfileSelect() end,
+				"Opens a popup to change the current loaded profile!")
+			
+		--end
 	end
 
 	--MM.editorInit()

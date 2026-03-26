@@ -137,7 +137,7 @@ ESO_Dialogs["M0RMarkerProfileSelect"] = {
 								--d("Loading: ".. data.name)
 								MM.currentLoadProfileName = data.name
 								MM.loadProfile(data.name)
-								if LibHarvensAddonSettings.list then
+								if LibHarvensAddonSettings and LibHarvensAddonSettings.list then
 									LibHarvensAddonSettings.list:RefreshVisible()
 								end
 							end
