@@ -987,12 +987,16 @@ function MM:Initialize()
 			function() SCENE_MANAGER:Push("M0RMarkerEditorScene") end,
 			"Opens the More Markers Editor scene.")
 
-		--if IsConsoleUI() then
-			LibRadialMenu:RegisterEntry("moremarkers", "Change Profiles", "changeprofile", "M0RMarkers/textures/ProfileSelectIcon.dds",
-				function() MM.ShowProfileSelect() end,
-				"Opens a popup to change the current loaded profile!")
-			
-		--end
+		LibRadialMenu:RegisterEntry("moremarkers", "Change Profiles", "changeprofile", "M0RMarkers/textures/ProfileSelectIcon.dds",
+			function()
+				if IsInGamepadPreferredMode() then
+					MM.ShowProfileSelect()
+				else
+					ZO_Dialogs_ShowPlatformDialog("M0RMarkerPCProfileSelect")
+				end
+			end,
+			"Opens a popup to change the current loaded profile!")
+		
 	end
 
 	--MM.editorInit()

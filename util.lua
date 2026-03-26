@@ -527,6 +527,102 @@ end
 
 
 
+if not IsConsoleUI() then
+	MM.highlightAnimationProvider = ZO_ReversibleAnimationProvider:New("ShowOnMouseOverLabelAnimation")
+
+	local g_listDialog
+	local function getKBProfileListDialog()
+	    if not g_listDialog then
+	        local function SetupItemRow(rowControl, slotInfo)
+				local nameControl = rowControl:GetNamedChild("Name")
+                nameControl:SetText(slotInfo.name)
+                --rowControl:GetNamedChild("Selected"):SetHidden(slotInfo.name ~= MM.vars.loadedProfile[currentZone])
+                --g_listDialog:GetSelectedItem() ~= slotInfo
+                rowControl:GetNamedChild("Selected"):SetHidden(g_listDialog:GetSelectedItem() ~= slotInfo)
+                if g_listDialog:GetSelectedItem() then
+                    g_listDialog:SetFirstButtonEnabled(true)
+                end
+            end
+	        g_listDialog = ZO_ListDialog:New("M0RMarkerProfileSelectDialogItemTemplate", 52, SetupItemRow)
+
+	    end
+
+	    g_listDialog:SetFirstButtonEnabled(false)
+	    return g_listDialog
+	end
+
+
+
+	local function SetupDialog()
+	    local listDialog = getKBProfileListDialog()
+
+	    listDialog:SetAboveText()
+	    listDialog:SetBelowText("Only profiles for the active zone can be seleted.")
+	    listDialog:SetEmptyListText()
+
+	    listDialog:ClearList()
+
+	    local itemList = M0RMarkers.getCurrentZoneProfiles()
+	    table.sort(itemList)
+	    for index, name in ipairs(itemList) do
+	        listDialog:AddListItem({name=name})
+	    end
+
+		local currentZone = GetUnitRawWorldPosition('player')
+		--e = listDialog
+	    for i,v in pairs(ZO_ScrollList_GetDataList(listDialog.list)) do
+	    	--d(v.data.name)
+	    	if (v.data.name ~= nil) and (v.data.name == MM.vars.loadedProfile[currentZone]) then
+	    		--d("Found it")
+	    		ZO_ScrollList_SelectData(listDialog.list, v.data)
+	    		--ZO_Scroll_ScrollControlIntoCentralView
+	    	end
+		end
+		--g = ZO_ScrollList_GetSelectedData(listDialog.list)
+		--f = ZO_ScrollList_GetSelectedControl(listDialog.list)
+
+
+	    --if slotInfo.name == MM.vars.loadedProfile[currentZone] then
+        --	
+        --end
+
+	    listDialog:CommitList()
+	end
+
+	ZO_Dialogs_RegisterCustomDialog("M0RMarkerPCProfileSelect",
+	    {
+	        customControl = function() return getKBProfileListDialog():GetControl() end,
+	        setup = function(dialog, data) SetupDialog() end,
+
+	        title =
+	        {
+	            text = "Select your Profile",
+	        },        
+	        buttons =
+	        {
+	            {
+	                control = getKBProfileListDialog():GetButton(1),
+	                text = SI_GAMEPAD_SELECT_OPTION,
+	                --clickSound = SOUNDS.INVENTORY_ITEM_REPAIR,
+	                callback = function()
+	                	local name = getKBProfileListDialog():GetSelectedItem().name
+	                	if not name then return end
+	                	MM.currentLoadProfileName = name
+						MM.loadProfile(name)
+	                end,
+	            },
+
+	            {
+	                control = getKBProfileListDialog():GetButton(2),
+	                text = SI_DIALOG_EXIT,
+	            }
+	        }
+	    })
+
+end
+
+
+
 
 
 

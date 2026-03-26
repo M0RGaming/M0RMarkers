@@ -179,5 +179,61 @@
 			</Controls>
 		</TopLevelControl>
 
+
+
+
+
+
+
+
+
+
+		<Control name="M0RMarkerProfileSelectDialogItemTemplate" inherits="ZO_ListEntry_BackdropAndHighlight_Template" mouseEnabled="true" virtual="true">
+            <Dimensions y="52"/>
+            <OnMouseDoubleClick/>
+            <OnDragStart/>
+            <OnReceiveDrag/>
+            <OnInitialized>
+                --self.slotControlType = "listSlot"
+                --self.animation = ZO_ReversibleAnimationProvider:New("ShowOnMouseOverLabelAnimation")
+            </OnInitialized>
+            <OnMouseEnter>
+            	local highlight = self:GetNamedChild("Highlight")
+		        if highlight and highlight:GetType() == CT_TEXTURE then
+	                M0RMarkers.highlightAnimationProvider:PlayForward(highlight, instant)
+		        end
+            </OnMouseEnter>
+            <OnMouseExit>
+            	local highlight = self:GetNamedChild("Highlight")
+		        if highlight and highlight:GetType() == CT_TEXTURE then
+	                M0RMarkers.highlightAnimationProvider:PlayBackward(highlight)
+		        end
+            </OnMouseExit>
+            <Controls>
+                <Texture name="$(parent)Selected" textureFile="EsoUI/Art/Miscellaneous/listItem_selectedHighlight.dds">
+                    <AnchorFill/>
+                    <TextureCoords left="0" right="1" top="0" bottom=".625"/>
+                </Texture>
+                <!--
+                <Button name="$(parent)Button" inherits="ZO_InventorySlotNoMouseover">
+                    <Dimensions x="40" y="40"/>
+                    <Anchor point="CENTER" relativePoint="TOPLEFT" offsetX="65" offsetY="26"/>
+                </Button>
+            	-->
+                <Label name="$(parent)Name" font="ZoFontGameShadow" wrapMode="ELLIPSIS">
+                    <Dimensions x="300"/> <!--245-->
+                    <Anchor point="LEFT" offsetX="50"/> <!--offsetX="105"-->
+                </Label>
+                <!--
+                <Texture name="$(parent)StatusTexture" hidden="true">
+                    <Dimensions x="32" y="32"/>
+                    <Anchor point="RIGHT" relativeTo="$(parent)Button" relativePoint="LEFT" offsetX="-5"/>
+                </Texture>
+            	-->
+            </Controls>
+        </Control>
+
+
+
 	</Controls>
 </GuiXml>
