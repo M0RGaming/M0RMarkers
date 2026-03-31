@@ -621,13 +621,13 @@ function settings.createSettings()
 		
 		{
 			type = "editbox",
-			name = "Import Markers String / Convert Elms Markers String",
-			tooltip = "Insert either a More Markers Profile String here, or insert an Elm's Markers Import String to automatically convert it.",
+			name = "Import Markers String / Convert Elms Markers or Akamatsu's Marker String",
+			tooltip = "Insert either a More Markers Profile String here, or insert an Elm's Markers or Akamatsu's Marker Import String to automatically convert it.",
 			width = "full",
 			isMultiline = true,
 			maxChars = 10000,
 			reference = "M0RMarkersImportEditBox",
-			default = "Insert either a More Markers Profile String here, or insert an Elm's Markers Import String to automatically convert it.",
+			default = "Insert either a More Markers Profile String here, or insert an Elm's Markers or Akamatsu's Marker Import String to automatically convert it.",
 			isExtraWide = true,
 			getFunc = function() return importString end, --return importString end,
 			setFunc = function(text) importString = text end,
@@ -641,9 +641,43 @@ function settings.createSettings()
 			func = function()
 				local foundMMarkers = string.find(importString, "<(.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)](.-)>")
 				if foundMMarkers == nil then
+
 					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
 					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
-						MM.ShowNotice("Notice", "Failed to find either a More Markers String or Elms Marker String", "")
+
+						local foundAkaMarkers = string.find(importString, "//(%d+)/(%d+)/(%d+)/(%d+)/(%d+)")
+						if foundAkaMarkers == nil then
+							MM.ShowNotice("Notice", "Failed to find either a More Markers, Elms Markers, or Akamatsu's Marker string", "")
+						else
+							--MM.parseAkamatsuString(markerString, useLibEmote)
+							if string.find(importString, "//(%d+)/(%d+)/(%d+)/(%d+)/(%d[12367890]%d%d%d)") then
+								-- found a LibEmote marker (aka not pack 15 or 14). Ask user if they want to convert it or use LibEmote
+								if LibEmote then
+									MM.ShowDialogue("Custom Emotes Detected",
+										"The detected Akamatsu's Marker profile contains LibEmote custom icons in it. Would you like to convert these custom icons to chevrons?",
+										"If you choose not to convert to chevrons, only people who have LibEmote installed will be able to see the markers which contain the custom icon.",
+										function()
+											local amountLoaded, zoneString = MM.parseAkamatsuString(importString, false)
+											if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+											MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "")
+										end,
+										function()
+											local amountLoaded, zoneString = MM.parseAkamatsuString(importString, true)
+											if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+											MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "")
+										end
+									)
+								else
+									local amountLoaded, zoneString = MM.parseAkamatsuString(importString, false)
+									MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "Markers which used LibEmote icons were automatically converted to chevrons. To keep them as LibEmote icons, install LibEmote and reimport!")
+								end
+							else
+								local amountLoaded, zoneString = MM.parseAkamatsuString(importString, false)
+								MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "")
+							end
+
+
+						end
 					else 
 						local amountLoaded, zoneString = MM.parseElmsString(importString)
 						print("Parsed ".. tostring(amountLoaded).. " markers.")
@@ -668,7 +702,43 @@ function settings.createSettings()
 				if foundMMarkers == nil then
 					local foundElmsMarkers = string.find(importString, "/(%d+)//(%d+),(%d+),(%d+),(%d+)/")
 					if foundElmsMarkers == nil then -- didnt find either M0R markers string or Elms String
-						MM.ShowNotice("Notice", "Failed to find either a More Markers String or Elms Marker String", "")
+						local foundAkaMarkers = string.find(importString, "//(%d+)/(%d+)/(%d+)/(%d+)/(%d+)")
+						if foundAkaMarkers == nil then
+							MM.ShowNotice("Notice", "Failed to find either a More Markers, Elms Markers, or Akamatsu's Marker string", "")
+						else
+							--MM.parseAkamatsuString(markerString, useLibEmote)
+							if string.find(importString, "//(%d+)/(%d+)/(%d+)/(%d+)/(%d[12367890]%d%d%d)") then
+								-- found a LibEmote marker (aka not pack 15 or 14). Ask user if they want to convert it or use LibEmote
+								if LibEmote then
+									MM.ShowDialogue("Custom Emotes Detected",
+										"The detected Akamatsu's Marker profile contains LibEmote custom icons in it. Would you like to convert these custom icons to chevrons?",
+										"If you choose not to convert to chevrons, only people who have LibEmote installed will be able to see the markers which contain the custom icon.",
+										function()
+											MM.emptyCurrentZone()
+											local amountLoaded, zoneString = MM.parseAkamatsuString(importString, false)
+											if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+											MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "")
+										end,
+										function()
+											MM.emptyCurrentZone()
+											local amountLoaded, zoneString = MM.parseAkamatsuString(importString, true)
+											if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+											MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "")
+										end
+									)
+								else
+									MM.emptyCurrentZone()
+									local amountLoaded, zoneString = MM.parseAkamatsuString(importString, false)
+									MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "Markers which used LibEmote icons were automatically converted to chevrons. To keep them as LibEmote icons, install LibEmote and reimport!")
+								end
+							else
+								MM.emptyCurrentZone()
+								local amountLoaded, zoneString = MM.parseAkamatsuString(importString, false)
+								MM.ShowNotice("Notice", "Loaded a total of "..tostring(amountLoaded).." markers from Akamatsu's Marker!", "")
+							end
+
+
+						end
 					else
 						MM.ShowDialogue("Warning: Destructive Action",
 							"Are you sure you would like to overwrite the current profile?",

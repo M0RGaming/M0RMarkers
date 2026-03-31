@@ -12,7 +12,7 @@ local scene = ZO_InteractScene:New("M0RMarkerEditorScene", SCENE_MANAGER, { -- T
 	interactTypes = { INTERACTION_BANK },
 })
 
-local deferredInit = ZO_DeferredInitializingObject:New(scene) -- formerly HUD_SCENE
+local deferredInit = ZO_DeferredInitializingObject:New(scene)
 function deferredInit:OnDeferredInitialize()
 	MM.editorInit()
 end
@@ -69,6 +69,14 @@ function MM.editorInit()
 			end
 		end
 	end
+
+	-- manual adding of zones cause KA broke or something idk
+	M0RMarkers.mapZoneLookup[1196] = {
+		[1805] = GetMapName(1805),
+		[1806] = GetMapName(1806),
+		[1807] = GetMapName(1807),
+		[1808] = GetMapName(1808),
+	}
 
 
 
@@ -1108,8 +1116,11 @@ function MM.editorInit()
 				scene:AddFragmentGroup(FRAGMENT_GROUP.MOUSE_DRIVEN_UI_WINDOW)
 			end
 
-
+			local oldMap = GetCurrentMapId()
+			SetMapToPlayerLocation()
 			local currentMapId = GetCurrentMapId()
+			SetMapToMapId(oldMap)
+
 			local currentZone = GetUnitRawWorldPosition('player')
 			local currentZoneLookup = M0RMarkers.mapZoneLookup[currentZone]
 
@@ -1134,6 +1145,16 @@ function MM.editorInit()
 							comboBox:ItemSelectedClickHelper(entry)
 						end
 					end
+				else -- if the current zone couldnt be found in the lookup, just display the current map index.
+					local name = GetMapInfoById(currentMapId)
+					local stringName = string.format(tostring(name).." ("..tostring(currentMapId)..")")
+					local entry = comboBox:CreateItemEntry(stringName, function()
+						if tileManager then
+							tileManager:SetMapId(currentMapId)
+						end
+					end, true)
+					comboBox:AddItem(entry)
+					comboBox:ItemSelectedClickHelper(entry)
 				end
 			end
 

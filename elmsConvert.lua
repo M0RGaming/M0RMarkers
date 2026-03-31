@@ -407,3 +407,91 @@ function MM.parseElmsString(elmsString)
 	MM.saveIcons(zoneString)
 	return amountParsed, zoneString
 end
+
+
+
+
+
+
+
+
+-- icon starts with 15: elms marker equiv
+-- icon starts with 14: eso base game icon
+
+-- string.find(markerString, "//(%d+)/(%d+)/(%d+)/(%d+)/(%d[12367890]%d%d%d)") to check if conversion needs to happen
+
+function MM.parseAkamatsuString(markerString, useLibEmote)
+	if MM.multipleProfilesLoaded then
+		MM.ShowNotice("Notice", "Markers are Read-Only when multiple profiles are loaded.", "")
+		d("|cFFD700More Markers|r: Markers are Read-Only when multiple profiles are loaded.")
+		return
+	end
+
+	
+	local amountParsed = 0
+	local currentZone = GetUnitRawWorldPosition('player')
+	local zone = string.match(markerString, "(%d+)//")
+	--d(zone)
+	if tonumber(zone) ~= currentZone then
+		--d("didnt match zone")
+		return 0, ""
+	end
+
+
+	for x, y, z, size, iconKey in string.gmatch(markerString, "//(%d+)/(%d+)/(%d+)/(%d+)/(%d+)") do
+		x = tonumber(x)
+		y = tonumber(y)
+		z = tonumber(z)
+		size = tonumber(size)
+		iconKey = tonumber(iconKey)
+		local elmsIconKey = string.gsub(iconKey, "^15", "")
+		local elmsIconKey = tonumber(elmsIconKey)
+		local texture
+
+		if elmsIconKey and elmsIconKey <= 70 and elmsIconKey > 0 then
+			iconKey = elmsIconKey
+		elseif MM.akamatsuMap[iconKey] then
+			texture = MM.akamatsuMap[iconKey]
+			iconKey = nil
+		elseif useLibEmote and LibEmote then
+			texture = LibEmote.GetEmoteByIndex(iconKey).textures[1]
+			iconKey = nil
+		else
+			iconKey = 14 -- convert emote icons to chevrons
+		end
+
+		if texture or MM.elmsMap[iconKey] then
+			
+
+			local iconData = {
+				bgTexture = "M0RMarkers/textures/blank.dds",
+				x = 0,
+				y = 0,
+				z = 0,
+				colour = {1, 1, 1, 1},
+				text = "",
+				size = 1
+			}
+
+			if MM.elmsMap[iconKey] then
+				print("Converting icon with key: ".. iconKey)
+				iconData = ZO_ShallowTableCopy(MM.elmsMap[iconKey], iconData)
+			elseif texture then
+				iconData.bgTexture = texture
+			end
+			
+
+			iconData.size = size/100
+			iconData.x = x
+			iconData.y = y + 50 * iconData.size
+			iconData.z = z
+
+			MM.createIcon(iconData)
+
+			amountParsed = amountParsed + 1
+		end
+	end
+	local zoneString = MM.compressLoaded()
+	MM.saveIcons(zoneString)
+	return amountParsed, zoneString
+end

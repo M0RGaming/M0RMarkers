@@ -8,12 +8,14 @@ ESO_Dialogs["M0RMarkerConfirmDialogue"] = {
 	warning = { text = "<<1>>" },
 	buttons = { { text = "Yes",callback = function(dialogue)
 		dialogue.data.yesCallback()
-	end}, { text = "No"} },
+	end}, { text = "No", callback = function(dialogue)
+		if dialogue.data.noCallback then dialogue.data.noCallback() end
+	end} },
 }
 
 
-function MM.ShowDialogue(title, description, warning, callback)
-	ZO_Dialogs_ShowPlatformDialog("M0RMarkerConfirmDialogue", {yesCallback = callback}, {
+function MM.ShowDialogue(title, description, warning, callback, noCallback)
+	ZO_Dialogs_ShowPlatformDialog("M0RMarkerConfirmDialogue", {yesCallback = callback, noCallback = noCallback}, {
 		titleParams = {title or ""},
 		mainTextParams = {description or ""},
 		warningParams = {warning or ""}
