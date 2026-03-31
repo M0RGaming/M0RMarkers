@@ -74,8 +74,18 @@ function MM.editorInit()
 	M0RMarkers.mapZoneLookup[1196] = {
 		[1805] = GetMapName(1805),
 		[1806] = GetMapName(1806),
-		[1807] = GetMapName(1807),
-		[1808] = GetMapName(1808),
+		[1807] = GetMapName(1807), -- start at 18182
+		[1808] = GetMapName(1808), -- start at 10882
+	}
+
+	local mapStartY = {
+		[1807] = 18182,
+		[1808] = 10882
+	}
+
+	local mapEndY = {
+		[1806] = 18182,
+		[1807] = 10882
 	}
 
 
@@ -674,10 +684,10 @@ function MM.editorInit()
 		local currentMapId = GetCurrentMapId()
 		SetMapToMapId(self.mapid)
 		local px, py, pz
-		self.cZone, px, py, pz = GetUnitRawWorldPosition('player')
+		self.cZone, px, py, pz = GetUnitWorldPosition('player')
 		for i,cMarker in pairs(currentZoneMarkers) do
-			local nx,ny = GetRawNormalizedWorldPosition(self.cZone, cMarker.x, cMarker.y, cMarker.z)
-			if (nx >= 0 and nx <= 1 and ny >= 0 and ny <= 1) then
+			local nx,ny = GetNormalizedWorldPosition(self.cZone, cMarker.x, cMarker.y, cMarker.z) -- GetRawNormalizedWorldPosition
+			if (nx >= 0 and nx <= 1 and ny >= 0 and ny <= 1) and (cMarker.y <= (mapStartY[self.mapid] or math.huge)) and (cMarker.y >= (mapEndY[self.mapid] or 0)) then
 				local currentMarker = createControl(cMarker)
 
 				local imageWidth, imageHeight = image:GetDimensions()
@@ -697,8 +707,8 @@ function MM.editorInit()
 		end
 
 		local offset = 2000
-		local pnx, pnz = GetRawNormalizedWorldPosition(self.cZone, px, py, pz)
-		local onx, onz = GetRawNormalizedWorldPosition(self.cZone, px+offset, py, pz+offset)
+		local pnx, pnz = GetNormalizedWorldPosition(self.cZone, px, py, pz)
+		local onx, onz = GetNormalizedWorldPosition(self.cZone, px+offset, py, pz+offset)
 		local dnx = onx-pnx
 		local dnz = onz-pnz
 		nxratio = offset/dnx
