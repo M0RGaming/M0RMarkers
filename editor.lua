@@ -87,6 +87,11 @@ function MM.editorInit()
 		[1806] = 18182,
 		[1807] = 10882
 	}
+	local mapFloors = {
+		[1806] = 21720,
+		[1807] = 14644,
+		[1808] = 7120
+	}
 
 
 
@@ -149,9 +154,16 @@ function MM.editorInit()
 	local selectedMarker = 0
 
 
+	local emptyMarker = {
+		index = 0
+	}
+
 
 
 	local function SetSelectedMarker(currentMarker)
+		if not markerpreviews[currentMarker.index] then -- if the marker isnt on the current map, dont load it (maybe fixes falg idk)
+			currentMarker = emptyMarker
+		end
 		if currentZoneMarkers[selectedMarker] and currentZoneMarkers[selectedMarker].control and currentZoneMarkers[selectedMarker].control.highlight then
 			currentZoneMarkers[selectedMarker].control.highlight:SetHidden(true)
 		end
@@ -336,6 +348,12 @@ function MM.editorInit()
 		--d(nx,ny)
 		local worldX = originX+nx*nxratio
 		local _, _, py, _ = GetUnitRawWorldPosition('player')
+
+		if mapFloors[tileManager.mapid] then
+			py = mapFloors[tileManager.mapid]
+			MM.ShowNotice("Notice", "Due to how ESO handles Falgraven's Room in Kynes Aegis, markers placed with the editor will be offset by a certain distance and may not show up in game unless manually corrected.", "")
+		end
+
 		local worldZ = originZ+ny*nzratio
 
 
@@ -515,9 +533,7 @@ function MM.editorInit()
 
 
 
-	local emptyMarker = {
-		index = 0
-	}
+
 
 	local function ImageOnMouseUp(clickedControl, button, upInside, ctrl, alt, shift, command, source)
 		--d(...)
@@ -702,7 +718,7 @@ function MM.editorInit()
 
 				currentMarker.index = i
 
-				markerpreviews[#markerpreviews+1] = currentMarker
+				markerpreviews[i] = currentMarker
 			end
 		end
 
