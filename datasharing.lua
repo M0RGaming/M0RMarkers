@@ -26,6 +26,14 @@ function MM.initSharing()
 		protocols.data:AddField(LGB.CreateStringField("data", {minLength=0, maxLength=26}))
 		protocols.data:OnData(handlers.onData)
 		protocols.data:Finalize({replaceQueuedMessages = false})
+
+
+		protocols.tempMarker = handler:DeclareProtocol(124, "M0RMarkersTempMarker")
+		protocols.tempMarker:AddField(LGB.CreateNumericField("x"))
+		protocols.tempMarker:AddField(LGB.CreateNumericField("y"))
+		protocols.tempMarker:AddField(LGB.CreateNumericField("z"))
+		protocols.tempMarker:OnData(handlers.onTempMarker)
+		protocols.tempMarker:Finalize({replaceQueuedMessages = true})
 	else
 		protocols.header = {}
 		function protocols.header:Send()
@@ -36,6 +44,11 @@ function MM.initSharing()
 		function protocols.data:Send()
 			MM.ShowNotice("Notice", "You cannot send markers locally without LibGroupBroadcast.", "")
 			d("You cannot send markers locally without LibGroupBroadcast")
+		end
+		protocols.tempMarker = {}
+		function protocols.tempMarker:Send()
+			MM.ShowNotice("Notice", "You cannot send temporary markers without LibGroupBroadcast.", "")
+			d("You cannot send temporary markers without LibGroupBroadcast")
 		end
 	end
 end
@@ -253,4 +266,38 @@ function handlers.onData(unitTag, data)
  		end
 		currentData[data.position] = data.data
 	--end
+end
+
+
+
+local minAngle = zo_rad(-2)
+
+function MM.sendTempMarker()
+	Set3DRenderSpaceToCurrentCamera("M0RMarkersCameraToplevel")
+	local cX, cY, cZ = GuiRender3DPositionToWorldPosition(M0RMarkersCameraToplevel:Get3DRenderSpaceOrigin())
+	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
+	local yaw = zo_atan2(fX, fZ) - math.pi
+	local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
+
+	if pitch > minAngle then
+		MM.ShowNotice("Notice", "You cannot send temporary markers at your cursor unless there is a minimum 2 degree angle from the horizon", "")
+		return
+	end
+
+	local _, _, y, _ = GetUnitRawWorldPosition('player')
+	local r = (cY-y)/(zo_tan(pitch))
+	local x = r*zo_sin(yaw) + cX
+	local z = r*zo_cos(yaw) + cZ
+
+	protocols.tempMarker:Send({
+		x = x,
+		y = y+30,
+		z = z
+	})
+
+end
+
+
+function handlers.onTempMarker(unitTag, data)
+	MM.createTemporaryGroupIcon(unitTag, data.x, data.y, data.z)
 end

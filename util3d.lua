@@ -158,6 +158,20 @@ local function createControl(icon)
 
 	icon.control = control
 	icon.key = key
+
+	if icon.bgTexture then
+		icon.control.bgLayer:SetHidden(false)
+		icon.control.bgLayer:SetTexture(icon.bgTexture)
+		local width = 100*(icon.control.bgLayer:GetTextureFileDimensions() or 1) -- since the scale is set to 0.01 above
+		icon.control.bgLayer:SetScale(width)
+		icon.control.bgLayer:SetTransformScale(1/width)
+		icon.control.bgLayer:SetColor(unpack(icon.colour))
+	end
+	if icon.text then
+		icon.control.textLayer:SetHidden(false)
+		icon.control.textLayer:SetText(icon.text)
+	end
+
 	return icon
 end
 
@@ -184,19 +198,6 @@ end
 
 function MM.createIcon(icon)
 	icon = createControl(icon)
-
-	if icon.bgTexture then
-		icon.control.bgLayer:SetHidden(false)
-		icon.control.bgLayer:SetTexture(icon.bgTexture)
-		local width = 100*(icon.control.bgLayer:GetTextureFileDimensions() or 1) -- since the scale is set to 0.01 above
-		icon.control.bgLayer:SetScale(width)
-		icon.control.bgLayer:SetTransformScale(1/width)
-		icon.control.bgLayer:SetColor(unpack(icon.colour))
-	end
-	if icon.text then
-		icon.control.textLayer:SetHidden(false)
-		icon.control.textLayer:SetText(icon.text)
-	end
 
 
 	local x,y,z = WorldPositionToGuiRender3DPosition(icon.x, icon.y, icon.z)
@@ -271,4 +272,100 @@ function MM.unloadEverything()
 		destroyControl(v)
 	end
 	ZO_ClearNumericallyIndexedTable(groundIcons)
+end
+
+
+
+
+
+
+
+
+
+
+
+--- temp marker stuff ---
+local tempIcon = {
+	x = 0,
+	y = 0,
+	z = 0,
+	bgTexture = "M0RMarkers/textures/chevron.dds",
+	colour = {1,1,1,1},
+	text = "",
+	size = 0.6,
+}
+local unitTagColours = {
+	{1, 1, 1, 1}, -- white
+	{0, 0, 1, 1}, -- blue
+	{0, 1, 0, 1}, -- green
+	{1, 0.5, 0, 1}, -- orange
+	{1, 0, 0.9, 1}, -- pink
+	{1, 0, 0, 1}, -- red
+	{1, 0.8, 0, 1}, -- yellow
+	{0, 1, 0.65, 1}, -- lime green
+	{0.5, 0, 0.5, 1}, -- purple
+	{0.47, 0.52, 0.79, 1}, -- periwinkle
+	{0.29, 0.08, 0.67, 1}, -- indigo 
+	{0.94, 0.81, 0.89, 1} -- mauve
+}
+MM.tempMarkers = {}
+local tempMarkers = MM.tempMarkers
+for i=1,12 do
+	local unitTag = string.format("group%d", i)
+	MM.tempMarkers[unitTag] = ZO_ShallowTableCopy(tempIcon)
+	MM.tempMarkers[unitTag].colour = unitTagColours[i]
+end
+
+
+
+
+
+local currentlyUpdatingTemps = false
+local rawclock = os.rawclock
+
+local function updateTempMarkers()
+	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
+	local yaw = zo_atan2(fX, fZ) - math.pi
+	local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
+
+	local somethingIsActive = false
+	local currentTime = rawclock()
+	for i,v in pairs(tempMarkers) do
+		if v.control then
+			if v.startTime and (v.startTime+5000 > currentTime) then
+				v.control:SetTransformRotation(pitch,yaw,0)
+				somethingIsActive = true
+			else
+				v.startTime = nil
+				destroyControl(v)
+				--d("No more control")
+			end
+		end
+	end
+
+	if somethingIsActive == false then
+		EVENT_MANAGER:UnregisterForUpdate("M0RMarkersTempIconsUpdateTick")
+		currentlyUpdatingTemps = false
+		return
+	end
+end
+
+function MM.createTemporaryGroupIcon(grouptag, wx, wy, wz)
+	local icon = MM.tempMarkers[grouptag]
+	icon.text = tostring(GetUnitDisplayName(grouptag)).."\n\n"
+
+	if not icon.control then 
+		icon = createControl(icon)
+	end
+
+	local x,y,z = WorldPositionToGuiRender3DPosition(wx, wy, wz)
+	icon.control:SetTransformOffset(x,y,z)
+
+	icon.startTime = os.rawclock()
+
+
+	if not currentlyUpdatingTemps then
+		EVENT_MANAGER:RegisterForUpdate("M0RMarkersTempIconsUpdateTick", 0, updateTempMarkers)
+		currentlyUpdatingTemps = true
+	end
 end

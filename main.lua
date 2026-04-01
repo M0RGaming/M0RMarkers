@@ -695,6 +695,7 @@ ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_QUICK_MARKER", "|c98FB98Plac
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_QUICK_MARKER_CURSOR", "|c98FB98Place Marker at Cursor (Quick Menu Configured)|r")
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_REMOVE_MARKER_CURSOR", "|cFFB6C1Remove Marker at Cursor|r")
 
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_TEMP_MARKER", "|c98FB98Send Temporary Marker at Reticle|r")
 
 function MM.toggleQuickMenu()
 	M0RMarkerPlaceToplevel:SetHidden(not M0RMarkerPlaceToplevel:IsHidden())
@@ -996,6 +997,10 @@ function MM:Initialize()
 				end
 			end,
 			"Opens a popup to change the current loaded profile!")
+
+		LibRadialMenu:RegisterEntry("moremarkers", "Send Temporary Marker at Reticle", "sendtempmarker", "M0RMarkers/textures/PlaceAtCursor.dds",
+			MM.sendTempMarker,
+			"Sends your reticle location to everyone else in the group, visible as a temporary marker!")
 		
 	end
 

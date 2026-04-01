@@ -23,6 +23,10 @@
 				<Down>M0RMarkers.removeIconAtCursor()</Down>
 			</Action>
 
+			<Action name="M0RMARKERS_PLACE_TEMP_MARKER">
+				<Down>M0RMarkers.sendTempMarker()</Down>
+			</Action>
+
 		</Category>
 	</Layer>
 </Bindings>
