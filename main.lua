@@ -888,11 +888,15 @@ end
 
 
 
-local latestPresetVersion = 2
+local latestPresetVersion = 3
 
 local updateMessages = {
 	[1] = "|cFFD700More Markers|r: More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. "..
-	"The presets are: vDSR Taleria Clock, and vOC General v2 (Arcana)."
+	"The presets are: vDSR Taleria Clock, and vOC General v2 (Arcana).",
+	[2] = "|cFFD700More Markers|r: More Markers has updated to 2.0, adding the new Profile Editor, new presets, and Akamatsu's Marker importing!\n"..
+	"The editor can be used to place markers anywhere in your current zone via a top-down map and can be accessed by pressing the button in the settings menu.\n"..
+	"In addition, various marker profiles have been added for: vMoL (including fang focused), vRG (bahsei portal), and Opulent Ordeal.\n"..
+	"The ability to import profiles from Akamatsu's Marker has also been added!"
 }
 
 local playerActivatedUpdateMessage = function()
@@ -902,9 +906,19 @@ local playerActivatedUpdateMessage = function()
 end
 
 
-
-
-
+--[[
+MM.defaultVars = {
+	loadedProfile = {},
+	Profiles = {},
+	globalMult = 1,
+	cullingDistance = 150,
+	fontface = "GAMEPAD_BOLD_FONT",
+	fonteffect = "|thick-outline",
+	fontScale = 1,
+	currentPresetVersion = 1,
+	latestUpdateMessage = 0,
+}
+]]
 
 
 -- The following was adapted from https://wiki.esoui.com/Circonians_Stamina_Bar_Tutorial#lua_Structure
@@ -928,21 +942,44 @@ function MM:Initialize()
 	MM.initSharing()
 
 	-- Addon Settings Menu
+	local oldVars
 	if IsConsoleUI() then
-		MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars)
+		oldVars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, {})
+		MM.vars = ZO_SavedVars:NewAccountWide("M0RMarkersSavedMarkers", MM.varversion, nil, MM.defaultVars)
 	else
-		MM.oldVars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, {})
-		MM.vars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, MM.defaultVars, nil, "$InstallationWide")
+		local evenOlderVars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, {})
+		oldVars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, {}, nil, "$InstallationWide")
+		MM.vars = ZO_SavedVars:NewAccountWide("M0RMarkersSavedMarkers", MM.varversion, nil, MM.defaultVars, nil, "$InstallationWide")
 
-		if MM.oldVars.Profiles ~= nil then
-			MM.vars.Profiles = ZO_DeepTableCopy(MM.oldVars.Profiles)
-			MM.oldVars.Profiles = nil
+		if evenOlderVars.Profiles ~= nil then -- migrate from even older vars to just old vars
+			oldVars.Profiles = ZO_DeepTableCopy(evenOlderVars.Profiles)
+			evenOlderVars.Profiles = nil
 		end
-		if MM.oldVars.loadedProfile ~= nil then
-			MM.vars.loadedProfile = ZO_DeepTableCopy(MM.oldVars.loadedProfile)
-			MM.oldVars.loadedProfile = nil
+		if evenOlderVars.loadedProfile ~= nil then
+			oldVars.loadedProfile = ZO_DeepTableCopy(evenOlderVars.loadedProfile)
+			evenOlderVars.loadedProfile = nil
 		end
 	end
+	if oldVars.Profiles ~= nil then
+		local indexesToCopy = ZO_ShallowTableCopy(MM.defaultVars)
+		indexesToCopy.currentSelections = true
+		indexesToCopy.quickSelections = true
+
+		for i,dV in pairs(indexesToCopy) do -- doing this manually since i dont want to copy the general saved var metatable
+			local v = oldVars[i]
+			if type(v) == "table" then
+				MM.vars[i] = ZO_DeepTableCopy(v)
+			else
+				MM.vars[i] = v
+			end
+			oldVars[i] = nil
+		end
+	end
+
+
+
+
+
 
 	if ZO_IsTableEmpty(MM.vars.Profiles) then
 		MM.InsertPremades()
