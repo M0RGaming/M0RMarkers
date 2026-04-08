@@ -1,3 +1,14 @@
+----- 2.0.0 -----
+Added the editor. This can be accessed via the button in the settings, /mmshoweditor, or by using the new libradialmenu entry
+Added support for importing Akamatsu's "Marker" profiles
+Added presets for vMoL, vRG bahsei portal, and Opulent Ordeal
+Added the ability to send Temporary Markers to your group where your reticle is looking, which last for 5 seconds before dissapearing.
+(minor) Added more LibRadialMenu actions
+(minor) A ton of backend changes, including allowing textures with mipmaps to display properly
+(minor) Fixed some spelling mistakes
+(minor) Fixed Non-English Keybinding
+
+
 ----- 1.2.2 -----
 Added 2 new preset marker sets: vDSR taleria clock, and vOC General v2 (Arcana).
 Fixed a bug where the font selector would not show all the fonts, or show duplicated fonts.

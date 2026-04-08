@@ -351,7 +351,7 @@ function MM.editorInit()
 
 		if mapFloors[tileManager.mapid] then
 			py = mapFloors[tileManager.mapid]
-			MM.ShowNotice("Notice", "Due to how ESO handles Falgraven's Room in Kynes Aegis, markers placed with the editor will be offset by a certain distance and may not show up in game unless manually corrected.", "")
+			MM.ShowNotice("Notice", "Due to how ESO handles Falgravn's Room in Kynes Aegis, markers placed with the editor will be offset by a certain distance and may not show up in game unless manually corrected.", "")
 		end
 
 		local worldZ = originZ+ny*nzratio
