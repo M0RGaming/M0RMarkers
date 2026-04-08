@@ -1,5 +1,5 @@
 <Bindings>
-	<Layer name="General">
+	<Layer name="SI_KEYBINDINGS_LAYER_GENERAL">
 		<Category name="|cFFD700More Markers|r">
 			<Action name="M0RMARKERS_TOGGLE_QUICK_MENU">
 				<Down>M0RMarkers.toggleQuickMenu()</Down>

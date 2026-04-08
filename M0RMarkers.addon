@@ -6,8 +6,8 @@
 ## Author: |c0DC1CF@M0R_Gaming|r
 ## SavedVariables: Markers M0RMarkersSavedMarkers
 ## DependsOn: LibAddonMenu-2.0>=41
-## ConsoleDependsOn: LibGroupBroadcast>=91 LibHarvensAddonSettings>=20005 LibRadialMenu
-## OptionalDependsOn: LibGroupBroadcast>=91
+## ConsoleDependsOn: LibGroupBroadcast>=91 LibHarvensAddonSettings>=20005
+## OptionalDependsOn: LibGroupBroadcast>=91 LibRadialMenu
 
 
 main.lua

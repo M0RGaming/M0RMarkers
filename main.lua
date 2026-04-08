@@ -686,7 +686,7 @@ function MM.playerZoneChanged()
 end
 
 
-ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_TOGGLE_QUICK_MENU", "Toggle Quick Menu Visiblity")
+ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_TOGGLE_QUICK_MENU", "Toggle Quick Menu Visibility")
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_REMOVE_MARKER", "|cFFB6C1Remove Closest Marker|r")
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_MARKER", "|c98FB98Place Marker (Settings Configured)|r")
 ZO_CreateStringId("SI_BINDING_NAME_M0RMARKERS_PLACE_QUICK_MARKER", "|c98FB98Place Marker (Quick Menu Configured)|r")
