@@ -826,7 +826,7 @@ function MM.editorInit()
 
 
 	
-	scene:AddFragment(ZO_FadeSceneFragment:New(M0RMarkerEditorToplevel))
+	scene:AddFragment(ZO_HUDFadeSceneFragment:New(M0RMarkerEditorToplevel, DEFAULT_SCENE_TRANSITION_TIME, 0))
 
 
 	scene:SetHideSceneConfirmationCallback(function(scene, nextSceneName, bypassHideSceneConfirmationReason)

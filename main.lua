@@ -998,7 +998,7 @@ function MM:Initialize()
 			end,
 			"Opens a popup to change the current loaded profile!")
 
-		LibRadialMenu:RegisterEntry("moremarkers", "Send Temporary Marker at Reticle", "sendtempmarker", "M0RMarkers/textures/PlaceAtCursor.dds",
+		LibRadialMenu:RegisterEntry("moremarkers", "Send Temporary Marker at Reticle", "sendtempmarker", "M0RMarkers/textures/PlaceTempMarker.dds",
 			MM.sendTempMarker,
 			"Sends your reticle location to everyone else in the group, visible as a temporary marker!")
 		
