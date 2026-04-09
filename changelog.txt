@@ -1,3 +1,6 @@
+----- 2.0.2 -----
+(minor) Added a quick sanity check to the saved vars loading
+
 ----- 2.0.1 -----
 (minor) Fixed a small incompatibility with the editor and votan's minimap
 

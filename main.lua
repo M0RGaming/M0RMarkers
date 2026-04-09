@@ -983,12 +983,12 @@ function MM:Initialize()
 
 	if ZO_IsTableEmpty(MM.vars.Profiles) then
 		MM.InsertPremades()
-	elseif MM.vars.currentPresetVersion < latestPresetVersion then
+	elseif MM.vars.currentPresetVersion and MM.vars.currentPresetVersion < latestPresetVersion then
 		MM.InsertPremades(true)
 		MM.vars.currentPresetVersion = latestPresetVersion
 	end
 
-	if MM.vars.latestUpdateMessage < #updateMessages then
+	if MM.vars.latestUpdateMessage and MM.vars.latestUpdateMessage < #updateMessages then
 		EVENT_MANAGER:RegisterForEvent("M0RMarkersUpdateMessage", EVENT_PLAYER_ACTIVATED, playerActivatedUpdateMessage)
 	end
 
