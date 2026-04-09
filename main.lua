@@ -967,12 +967,14 @@ function MM:Initialize()
 
 		for i,dV in pairs(indexesToCopy) do -- doing this manually since i dont want to copy the general saved var metatable
 			local v = oldVars[i]
-			if type(v) == "table" then
-				MM.vars[i] = ZO_DeepTableCopy(v)
-			else
-				MM.vars[i] = v
+			if v then
+				if type(v) == "table" then
+					MM.vars[i] = ZO_DeepTableCopy(v)
+				else
+					MM.vars[i] = v
+				end
+				oldVars[i] = nil
 			end
-			oldVars[i] = nil
 		end
 	end
 
