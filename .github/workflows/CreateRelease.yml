@@ -19,7 +19,7 @@ jobs:
 
       - name: Generate Changelog Diff
         run: |
-          awk '/^----- / { if (!found) { found=1; print; next } else { exit } } found' changelog.txt > RELEASE_NOTES.txt
+          awk '/^----- / { if (!found) { found=1; print; next } else { exit } } found' M0RMarkers/changelog.txt > RELEASE_NOTES.txt
           cat RELEASE_NOTES.txt
 
       - name: Release
