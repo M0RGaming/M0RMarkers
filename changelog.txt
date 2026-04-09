@@ -1,3 +1,6 @@
+----- 2.0.1 -----
+(minor) Fixed a small incompatibility with the editor and votan's minimap
+
 ----- 2.0.0 -----
 Added the editor. This can be accessed via the button in the settings, /mmshoweditor, or by using the new libradialmenu entry
 Added support for importing Akamatsu's "Marker" profiles

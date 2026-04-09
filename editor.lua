@@ -23,7 +23,10 @@ SLASH_COMMANDS['/mmshoweditor'] = function() SCENE_MANAGER:Push('M0RMarkerEditor
 function MM.editorInit()
 
 
-	local ZosMapWidth, ZosMapHeight = ZO_WorldMap:GetDimensions()
+	--local ZosMapWidth, ZosMapHeight = ZO_WorldMap:GetDimensions()
+	local _, guiHeight = GuiRoot:GetDimensions()
+	local ZosMapWidth = guiHeight*0.75
+	local ZosMapHeight = guiHeight*0.75
 
 
 
@@ -1115,7 +1118,10 @@ function MM.editorInit()
 	scene:RegisterCallback("StateChange",  function(oldState, newState)
 		if (newState == SCENE_SHOWING) then
 
-			ZosMapWidth, ZosMapHeight = ZO_WorldMap:GetDimensions()
+			--ZosMapWidth, ZosMapHeight = ZO_WorldMap:GetDimensions()
+			_, guiHeight = GuiRoot:GetDimensions()
+			ZosMapWidth = guiHeight*0.75
+			ZosMapHeight = guiHeight*0.75
 
 			control:SetDimensions(ZosMapWidth, ZosMapHeight)
 			image:SetDimensions(ZosMapWidth, ZosMapHeight)
