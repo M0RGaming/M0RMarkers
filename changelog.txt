@@ -1,3 +1,6 @@
+----- 2.0.3 -----
+(minor) Fixed how stuff loads when transfering database names
+
 ----- 2.0.2 -----
 (minor) Added a quick sanity check to the saved vars loading
 
