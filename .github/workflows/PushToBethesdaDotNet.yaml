@@ -1,0 +1,37 @@
+name: PushToBethesdaDotNet
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'     
+        required: true
+        default: '2.0.4'
+
+jobs:
+  publish_job:
+    runs-on: ubuntu-latest
+    name: Pushing
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: 'M0RMarkers'
+
+      - name: Generate Changelog Diff
+        run: |
+          awk '/^----- / { if (!found) { found=1; print; next } else { exit } } found' changelog.txt > RELEASE_NOTES.txt
+          cat RELEASE_NOTES.txt
+
+      - name: Zip release
+        run: 7z a M0RMarkers.zip * -xr!*.git* -x!README.md -x!changelog.txt -xr!PC -x!RELEASE_NOTES.txt
+
+      - name: Push to BNET
+        id: push
+        uses: m00nyONE/bnet-upload@v1
+        with:
+          BNET_USERNAME: ${{ secrets.BNET_USERNAME }}
+          BNET_PASSWORD: ${{ secrets.BNET_PASSWORD }}
+          addon_id: 'c41f5a50-974f-45e6-a218-e99590da3841'
+          version: ${{github.event.inputs.version}}
+          zip_file: 'M0RMarkers.zip'
+          release_notes_file: 'RELEASE_NOTES.txt'

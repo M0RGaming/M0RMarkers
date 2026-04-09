@@ -1,3 +1,6 @@
+----- 2.0.4 -----
+(Console) Changed temp markers to use Milliseconds instead of Microseconds for timing the removal
+
 ----- 2.0.3 -----
 (minor) Fixed how stuff loads when transfering database names
 

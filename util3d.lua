@@ -321,7 +321,7 @@ end
 
 
 local currentlyUpdatingTemps = false
-local rawclock = os.rawclock
+local getTime = GetGameTimeMilliseconds --os.rawclock -- if using rawclock, also use os.clockpersecond() to get the units
 
 local function updateTempMarkers()
 	local fX, fY, fZ = GetCameraForward(SPACE_WORLD)
@@ -329,14 +329,14 @@ local function updateTempMarkers()
 	local pitch = zo_atan2(fY, zo_sqrt(fX * fX + fZ * fZ))
 
 	local somethingIsActive = false
-	local currentTime = rawclock()
+	local currentTime = getTime()
 	for i,v in pairs(tempMarkers) do
 		if v.control then
-			if v.startTime and (v.startTime+5000 > currentTime) then
+			if v.endTime and (v.endTime > currentTime) then
 				v.control:SetTransformRotation(pitch,yaw,0)
 				somethingIsActive = true
 			else
-				v.startTime = nil
+				v.endTime = nil
 				destroyControl(v)
 				--d("No more control")
 			end
@@ -361,7 +361,7 @@ function MM.createTemporaryGroupIcon(grouptag, wx, wy, wz)
 	local x,y,z = WorldPositionToGuiRender3DPosition(wx, wy, wz)
 	icon.control:SetTransformOffset(x,y,z)
 
-	icon.startTime = os.rawclock()
+	icon.endTime = getTime()+5000
 
 
 	if not currentlyUpdatingTemps then

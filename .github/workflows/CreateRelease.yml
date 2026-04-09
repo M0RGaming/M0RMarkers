@@ -17,9 +17,14 @@ jobs:
       - name: Zip release
         run: 7z a M0RMarkers.zip * -xr!*.git*
 
+      - name: Generate Changelog Diff
+        run: |
+          awk '/^----- / { if (!found) { found=1; print; next } else { exit } } found' changelog.txt > RELEASE_NOTES.txt
+          cat RELEASE_NOTES.txt
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: M0RMarkers.zip
+          body_path: RELEASE_NOTES.txt
           token: ${{ secrets.TOKEN_GITHUB }}
