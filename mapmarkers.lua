@@ -42,17 +42,11 @@ function MM.initMapMarkers()
 			else
 				local baseSection = tooltip.tooltip
 				local descriptionSection = baseSection:AcquireSection(baseSection:GetStyle("bodySection"))
-				descriptionSection:AddLine("ahhhh", baseSection:GetStyle("bodyDescription"))
+				descriptionSection:AddLine(pinTag.text, baseSection:GetStyle("bodyDescription"), baseSection:GetStyle("whiteFontColor"))
 				baseSection:AddSection(descriptionSection)
 			end
-			--d('creating')
 		end,
 		tooltip = ZO_MAP_TOOLTIP_MODE.INFORMATION,
-
-        --     categoryId = ZO_MapPin.PIN_ORDERS.DESTINATIONS,
-        --     gamepadSpacing = true,
-        --     entryName = GetWayshrineNameFromPin,
-        -- },
 	}
 
 	local fakestorage = {}
