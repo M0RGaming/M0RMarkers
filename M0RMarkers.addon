@@ -7,7 +7,7 @@
 ## SavedVariables: Markers M0RMarkersSavedMarkers
 ## DependsOn: LibAddonMenu-2.0>=41
 ## ConsoleDependsOn: LibGroupBroadcast>=91 LibHarvensAddonSettings>=20005
-## OptionalDependsOn: LibGroupBroadcast>=91 LibRadialMenu LibMapPins
+## OptionalDependsOn: LibGroupBroadcast>=91 LibRadialMenu LibMapPins-1.0
 
 
 main.lua
