@@ -56,8 +56,8 @@ MM.builtInTextureList = {
 
 local textureLookup = {}
 for i,v in pairs(MM.builtInTextureList) do
-	textureLookup[tostring(i)] = v
-	textureLookup[v] = i
+	textureLookup[tostring(i)] = string.lower(v)
+	textureLookup[string.lower(v)] = i
 end
 
 
@@ -179,8 +179,12 @@ function MM.compressLoaded() -- took 169 icons 2ms to do
 
 	currentConcat = {}
 	for i,v in pairs(textures) do
-		if textureLookup[i] then
-			i = "^"..textureLookup[i]
+		local potentialMatch = string.lower(i)
+		if string.sub(potentialMatch, 1, 1) == "/" then
+			potentialMatch = string.sub(potentialMatch, 2)
+		end
+		if textureLookup[potentialMatch] then
+			i = "^"..textureLookup[potentialMatch]
 		end
 		currentConcat[#currentConcat+1] = tostring(i) .. ":".. table.concat(v, ",")
 	end
