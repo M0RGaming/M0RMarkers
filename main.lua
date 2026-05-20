@@ -672,6 +672,11 @@ function MM.playerActivated()
 	if MM.vars.cullingDistance ~= 0 then
 		MM.startCulling()
 	end
+
+
+	if LibMapPins then
+		LibMapPins:RefreshPins("More Markers")
+	end
 end
 function MM.playerZoneChanged()
 	MM.updateMarkerPositions()
@@ -888,7 +893,7 @@ end
 
 
 
-local latestPresetVersion = 3
+local latestPresetVersion = 4
 
 local updateMessages = {
 	[1] = "|cFFD700More Markers|r: More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. "..
@@ -896,7 +901,9 @@ local updateMessages = {
 	[2] = "|cFFD700More Markers|r: More Markers has updated to 2.0, adding the new Profile Editor, new presets, and Akamatsu's Marker importing!\n"..
 	"The editor can be used to place markers anywhere in your current zone via a top-down map and can be accessed by pressing the button in the settings menu.\n"..
 	"In addition, various marker profiles have been added for: vMoL (including fang focused), vRG (bahsei portal), and Opulent Ordeal.\n"..
-	"The ability to import profiles from Akamatsu's Marker has also been added!"
+	"The ability to import profiles from Akamatsu's Marker has also been added!",
+	[3] = "|cFFD700More Markers|r: More markers has updated, adding a new vSE and a Night Market Quests preset, as well as an optional dependancy of LibMapPins to see markers "..
+	"on your main map via a map filter. A remove duplicate markers button has also been added to the editor."
 }
 
 local playerActivatedUpdateMessage = function()
@@ -1041,6 +1048,10 @@ function MM:Initialize()
 			MM.sendTempMarker,
 			"Sends your reticle location to everyone else in the group, visible as a temporary marker!")
 		
+	end
+
+	if LibMapPins then
+		MM.initMapMarkers()
 	end
 
 	--MM.editorInit()

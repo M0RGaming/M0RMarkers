@@ -593,7 +593,7 @@
 				</Button>
 
 				<Button name="$(parent)ClearDupes" inherits="ZO_DefaultButton" text="|cFFB6C1Clear Duplicates|r" font="ZoFontGamepadBold18">
-					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Save" offsetY="-20" />
+					<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$(parent)Save" offsetY="-30" />
 					<Dimensions x="125" y="25" />
 					<OnClicked>
 						M0RMarkers.deleteAllDuplicates()

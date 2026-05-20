@@ -1,3 +1,9 @@
+----- 2.1.0 -----
+Added an optional dependancy for LibMapPins to allow users to show markers on their world map after enabling a map filter.
+Added 2 new preset marker sets: vSE General v2, and Kyzer's Night Market Quests (Thank you Kyzeragon for creating them!).
+Added a remove duplicates button to the editor.
+
+
 ----- 2.0.4 -----
 (Console) Changed temp markers to use Milliseconds instead of Microseconds for timing the removal
 
