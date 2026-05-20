@@ -75,10 +75,10 @@ function MM.editorInit()
 
 	-- manual adding of zones cause KA broke or something idk
 	M0RMarkers.mapZoneLookup[1196] = {
-		[1805] = GetMapName(1805),
-		[1806] = GetMapName(1806),
-		[1807] = GetMapName(1807), -- start at 18182
-		[1808] = GetMapName(1808), -- start at 10882
+		[1805] = GetMapNameById(1805),
+		[1806] = GetMapNameById(1806),
+		[1807] = GetMapNameById(1807), -- start at 18182
+		[1808] = GetMapNameById(1808), -- start at 10882
 	}
 
 	local mapStartY = {
@@ -338,6 +338,30 @@ function MM.editorInit()
 					"This is a destructive action and cannot be undone.",
 					deleteSelectedMarker
 				)
+	end
+
+
+
+	function MM.deleteAllDuplicates() -- god this is inefficient  
+		local count = 0
+		--deletedMarkers = {}
+		for i,v in pairs(currentZoneMarkers) do
+			for j,k in pairs(currentZoneMarkers) do
+				if (i ~= j) and (v.x == k.x) and (v.y == k.y) and (v.z == k.z) and (v.text == k.text) and (v.size == k.size) and (v.colourHex == k.colourHex) and (v.bgTexture == k.bgTexture) and (v.yaw == k.yaw) and (v.pitch == k.pitch) then
+					-- i guess this is an exact match
+					currentZoneMarkers[j] = nil
+					--deletedMarkers[#deletedMarkers+1] = j
+					count = count + 1
+				end
+			end
+		end
+		if count ~= 0 then
+			MM.ShowNotice("Notice", string.format("%d duplicate markers were found and deleted.", count), "")
+		else
+			MM.ShowNotice("Notice", "No duplicate markers were found.", "")
+		end
+		--d("Found and deleted "..count.." duped markers.")
+		tileManager:ReloadMap()
 	end
 
 
