@@ -529,7 +529,7 @@ end
 
 
 
-if not IsConsoleUI() then
+if not ZO_IsConsoleOrGameCoreUI() then
 	MM.highlightAnimationProvider = ZO_ReversibleAnimationProvider:New("ShowOnMouseOverLabelAnimation")
 
 	local g_listDialog
@@ -631,7 +631,7 @@ end
 
 
 
-if IsConsoleUI() then
+if ZO_IsConsoleOrGameCoreUI() then
 
 	local listofdialogs = {
 		"M0RMarkerConfirmDialogue",

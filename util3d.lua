@@ -26,7 +26,7 @@ function MM.initUtil3D()
 	GAME_MENU_SCENE:AddFragment(iconFragment)
 
 
-	if IsConsoleUI() and LibHarvensAddonSettings then
+	if ZO_IsConsoleOrGameCoreUI() and LibHarvensAddonSettings then
 		SecurePostHook(LibHarvensAddonSettings, "CreateAddonList", function() LibHarvensAddonSettings.scene:AddFragment(iconFragment) end)
 	else 
 		local function sceneChanged(scene, oldState, newState)

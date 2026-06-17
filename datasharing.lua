@@ -220,7 +220,7 @@ function handlers.onHeader(unitTag, data)
 				MM.currentAdditionalProfiles = {}
 				MM.multipleProfilesLoaded = false
 
-				if IsConsoleUI() and LibHarvensAddonSettings.list then
+				if ZO_IsConsoleOrGameCoreUI() and LibHarvensAddonSettings.list then
 					LibHarvensAddonSettings.list:RefreshVisible()
 				else
 					if M0RMarkersProfileDropdown then

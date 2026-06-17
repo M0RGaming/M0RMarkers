@@ -710,7 +710,7 @@ function MM.toggleQuickMenu()
 	M0RMarkerPlaceToplevel:SetHidden(not M0RMarkerPlaceToplevel:IsHidden())
 end
 
-if not IsConsoleUI() then
+if not ZO_IsConsoleOrGameCoreUI() then
 	SLASH_COMMANDS['/mmmenu'] = MM.toggleQuickMenu
 end
 
@@ -870,7 +870,7 @@ end
 
 function MM.OpenConsoleSettings()
 	-- lam.LHASConversion.settingTables, M0RMarkersSettingsPanel
-	if (IsConsoleUI() and LibAddonMenu2 and LibHarvensAddonSettings and LibAddonMenu2.LHASConversion and LibAddonMenu2.LHASConversion.settingTables) then
+	if (ZO_IsConsoleOrGameCoreUI() and LibAddonMenu2 and LibHarvensAddonSettings and LibAddonMenu2.LHASConversion and LibAddonMenu2.LHASConversion.settingTables) then
 		local settings = LibAddonMenu2.LHASConversion.settingTables["M0RMarkersSettingsPanel"]
 		if settings == nil then return end
 		if (LibHarvensAddonSettings.initialized ~= true) and (LibHarvensAddonSettings.scrollList == nil)  then
@@ -885,7 +885,7 @@ function MM.OpenConsoleSettings()
 		SCENE_MANAGER:Push("LibHarvensAddonSettingsScene")
 		return
 	end
-	if ((not IsConsoleUI()) and LibAddonMenu2 and M0RMarkersSettingsPanel) then
+	if ((not ZO_IsConsoleOrGameCoreUI()) and LibAddonMenu2 and M0RMarkersSettingsPanel) then
 		LibAddonMenu2:OpenToPanel(M0RMarkersSettingsPanel)
 	end
 end
@@ -897,7 +897,7 @@ end
 
 
 
-local latestPresetVersion = 4
+local latestPresetVersion = 5
 
 local updateMessages = {
 	[1] = "|cFFD700More Markers|r: More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. "..
@@ -954,7 +954,7 @@ function MM:Initialize()
 
 	-- Addon Settings Menu
 	local oldVars
-	if IsConsoleUI() then
+	if ZO_IsConsoleOrGameCoreUI() then
 		oldVars = ZO_SavedVars:NewAccountWide("Markers", MM.varversion, nil, {})
 		MM.vars = ZO_SavedVars:NewAccountWide("M0RMarkersSavedMarkers", MM.varversion, nil, MM.defaultVars)
 	else

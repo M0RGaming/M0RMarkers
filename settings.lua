@@ -87,7 +87,7 @@ function settings.createSettings()
 	settings.currentSelections = MM.vars.currentSelections
 
 
-	if not IsConsoleUI() then
+	if not ZO_IsConsoleOrGameCoreUI() then
 
 		MM.vars.quickSelections = MM.vars.quickSelections or { -- seperate to avoid needing to update the menu (also now can remove it when porting to console)
 			text = "",
@@ -245,7 +245,7 @@ function settings.createSettings()
 		end
 	}
 
-	if IsConsoleUI() then
+	if ZO_IsConsoleOrGameCoreUI() then
 
 			refreshLoadedProfile = function()
 				if LibHarvensAddonSettings.list then
@@ -484,6 +484,11 @@ function settings.createSettings()
 			tooltip = "Click this button to open the profile editor!",
 			width = "full",
 			func = function() SCENE_MANAGER:Push('M0RMarkerEditorScene') end,
+		},
+		{
+			type = "description",
+			text = "You can display a marker preview on your world map/mini map by enabling the map filter in your world map!",
+			width = "full",
 		},
 		{
 			type = "divider",
