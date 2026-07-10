@@ -604,6 +604,59 @@ function settings.createSettings()
 
 		{
 			type = "button",
+			name = "Merge Profiles",
+			tooltip = "Merges multiple profiles into one",
+			width = "half",
+			func = function()
+				local editFunc = MM.ShowEditDialogue
+				if IsInGamepadPreferredMode() then editFunc = MM.ShowGPEdit end
+
+				local function callback(profiles)
+					if #profiles == 0 then
+						print("No profiles selected (how did we get here)")
+						return
+					end
+					editFunc("Merging Profiles",
+						"What would you like to name the new profile?",
+						"If the desired name is already a profile, it will be overwritten.",
+						function(name)
+							print("Creating profile with name "..name)
+							MM.createMergedProfile(name, profiles)
+						end
+					)
+				end
+
+				if ZO_IsConsoleOrGameCoreUI() then
+					MM.ShowMultiProfileSelectBase(callback)
+				else
+					ZO_Dialogs_ShowPlatformDialog("M0RMarkerPCProfileSelectMulti", {callbackFunc = callback})
+				end
+			end,
+			
+		},
+
+		{
+			type = "button",
+			name = "Duplicate Profile",
+			tooltip = "Creates a copy of the currently loaded profile",
+			width = "half",
+			func = function()
+				local editFunc = MM.ShowEditDialogue
+				if IsInGamepadPreferredMode() then editFunc = MM.ShowGPEdit end
+				editFunc("Duplicating Profile",
+					"What would you like to name the new profile?",
+					"If the desired name is already a profile, it will be overwritten.",
+					function(name)
+						MM.renameCurrentProfile(name, true)
+						refreshLoadedProfile()
+					end
+				)
+			end,
+			
+		},
+
+		{
+			type = "button",
 			name = "|c0DC1CFShare Profile|r",
 			tooltip = "This button will share the currently loaded profile with everyone in the group, without needing to share a custom string.",
 			width = "half",

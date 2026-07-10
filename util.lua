@@ -185,21 +185,7 @@ ESO_Dialogs["M0RMarkerProfileSelectMulti"] = { -- TODO: Make this select all the
 	},
 	blockDialogReleaseOnPress = true,
 	onHidingCallback = function(dialog)
-		--a = dialog.entryList
-		---[[
-		local profilesToLoad = {}
-		for i,v in pairs(dialog.entryList.dataList) do
-			if v.isActive then
-				--d(v.name)
-				profilesToLoad[#profilesToLoad+1] = v.name
-			end
-		end
-		MM.currentAdditionalProfiles = profilesToLoad
-		MM.loadAdditionalProfiles(profilesToLoad)
-		if LibHarvensAddonSettings.list then
-			LibHarvensAddonSettings.list:RefreshVisible()
-		end
-		--]]
+		dialog.data.callbackFunc(dialog)
 	end,
 	buttons =
 	{
@@ -224,9 +210,35 @@ ESO_Dialogs["M0RMarkerProfileSelectMulti"] = { -- TODO: Make this select all the
 
 --SLASH_COMMANDS['/mmopentest'] = function() ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelectMulti") end
 
-function MM.ShowMultiProfileSelect()
-	ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelectMulti")
+
+
+function MM.ShowMultiProfileSelectBase(yetAnotherCallback)
+	local function callback(dialog)
+		local profilesToLoad = {}
+		for i,v in pairs(dialog.entryList.dataList) do
+			local selectedProfiles = {}
+			if v.isActive then
+				selectedProfiles[#selectedProfiles+1] = v.name
+			end
+			yetAnotherCallback(selectedProfiles)
+		end
+	end
+	ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelectMulti", {callbackFunc = callback})
 end
+
+
+
+function MM.ShowMultiProfileSelect()
+	local function callback(selectedProfiles)
+		MM.currentAdditionalProfiles = selectedProfiles
+		MM.loadAdditionalProfiles(selectedProfiles)
+		if LibHarvensAddonSettings.list then
+			LibHarvensAddonSettings.list:RefreshVisible()
+		end
+	end
+	MM.ShowMultiProfileSelectBase(callback)
+end
+
 
 
 
@@ -616,6 +628,101 @@ if not ZO_IsConsoleOrGameCoreUI() then
 
 	            {
 	                control = getKBProfileListDialog():GetButton(2),
+	                text = SI_DIALOG_EXIT,
+	            }
+	        }
+	    })
+
+
+
+
+
+
+	SLASH_COMMANDS['/testprof'] = function()
+		ZO_Dialogs_ShowPlatformDialog("M0RMarkerPCProfileSelectMulti")
+	end
+
+
+	local g_listMultiDialog
+	local function getKBProfileMultiListDialog()
+	    if not g_listMultiDialog then
+	        local function SetupItemRow(rowControl, slotInfo)
+				local nameControl = rowControl:GetNamedChild("Name")
+                nameControl:SetText(slotInfo.name)
+
+                local unfound = true
+                for i,v in pairs(g_listMultiDialog:GetSelectedItems()) do
+                	if v.name == slotInfo.name then
+                		unfound = false
+                		break
+                	end
+                end
+
+                rowControl:GetNamedChild("Selected"):SetHidden(unfound)
+                if not unfound then
+                    g_listMultiDialog:SetFirstButtonEnabled(true)
+                end
+            end
+	        g_listMultiDialog = ZO_MultiSelectListDialog:New("M0RMarkerProfileSelectDialogItemTemplate", 52, SetupItemRow)
+
+	    end
+
+	    g_listMultiDialog:SetFirstButtonEnabled(false)
+	    return g_listMultiDialog
+	end
+
+
+
+	local function SetupDialogMulti()
+	    local listDialog = getKBProfileMultiListDialog()
+
+	    listDialog:SetAboveText()
+	    listDialog:SetBelowText("Only profiles for the active zone can be seleted.")
+	    listDialog:SetEmptyListText()
+
+	    listDialog:ClearList()
+
+	    local itemList = M0RMarkers.getCurrentZoneProfiles()
+	    table.sort(itemList)
+	    for index, name in ipairs(itemList) do
+	        listDialog:AddListItem({name=name})
+	    end
+
+		local currentZone = GetUnitRawWorldPosition('player')
+	    for i,v in pairs(ZO_ScrollList_GetDataList(listDialog.list)) do
+	    	if (v.data.name ~= nil) and (v.data.name == MM.vars.loadedProfile[currentZone]) then
+	    		ZO_ScrollList_SelectData(listDialog.list, v.data)
+	    	end
+		end
+
+	    listDialog:CommitList()
+	end
+
+	ZO_Dialogs_RegisterCustomDialog("M0RMarkerPCProfileSelectMulti",
+	    {
+	        customControl = function() return getKBProfileMultiListDialog():GetControl() end,
+	        setup = function(dialog, data) SetupDialogMulti() end,
+
+	        title =
+	        {
+	            text = "Select your Profile",
+	        },        
+	        buttons =
+	        {
+	            {
+	                control = getKBProfileMultiListDialog():GetButton(1),
+	                text = SI_GAMEPAD_SELECT_OPTION,
+	                callback = function(dialog)
+	                	local selectedProfiles = {}
+	                	for i,v in pairs(getKBProfileMultiListDialog():GetSelectedItems()) do
+	                		selectedProfiles[#selectedProfiles+1] = v.name
+	                	end
+	                	dialog.data.callbackFunc(selectedProfiles)
+	                end,
+	            },
+
+	            {
+	                control = getKBProfileMultiListDialog():GetButton(2),
 	                text = SI_DIALOG_EXIT,
 	            }
 	        }

@@ -1,3 +1,8 @@
+----- 2.2.0 -----
+Added 2 new preset marker sets: a vRG Oax Posion Safe zone, and HatchetHaro's Jynorah + Skorkhif Markers for vOC. Thank you HatchetHaro for creating them!
+Added a Merge Profiles button to the settings menu
+Added a Duplicate Profile button to the settings menu
+
 ----- 2.1.1 -----
 Added a new preset marker set for night market: NineteenGiraffes' Night Market Quests (Thank you NineteenGiraffes for creating them!).
 (minor) Added text in the settings which points users to the map filters to show the markers on the main map

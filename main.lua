@@ -762,7 +762,7 @@ function MM.deleteCurrentProfile()
 	if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 end
 
-function MM.renameCurrentProfile(newName)
+function MM.renameCurrentProfile(newName, keepOld)
 
 	if newName == nil then
 		MM.ShowNotice("Notice", "Failed to find a name to rename the current profile to.", "")
@@ -775,7 +775,9 @@ function MM.renameCurrentProfile(newName)
 
 	if MM.vars.Profiles[currentZone] and MM.vars.Profiles[currentZone][currentProfileName] then
 		MM.vars.Profiles[currentZone][newName] = ZO_ShallowTableCopy(MM.vars.Profiles[currentZone][currentProfileName])
-		MM.vars.Profiles[currentZone][currentProfileName] = nil
+		if not keepOld then
+			MM.vars.Profiles[currentZone][currentProfileName] = nil
+		end
 
 		print("Renamed profile: "..tostring(currentProfileName).." to: "..tostring(newName))
 		MM.vars.loadedProfile[currentZone] = newName
@@ -785,6 +787,28 @@ function MM.renameCurrentProfile(newName)
 		end
 		if M0RMarkersProfilesCurrentLoadedProfile then M0RMarkersProfilesCurrentLoadedProfile:UpdateValue() end
 	end
+end
+
+function MM.createMergedProfile(newName, selectedProfiles)
+
+	MM.loadProfile(newName)
+	local currentZone = GetUnitRawWorldPosition('player')
+
+	for i,profileName in pairs(selectedProfiles) do
+		if MM.vars.Profiles[currentZone] then
+			local zoneStrings = MM.vars.Profiles[currentZone][profileName]
+			if zoneStrings then
+				zoneString = table.concat(zoneStrings, "")
+			end
+			MM.decompressString(zoneString)
+		end
+	end
+	zoneString = MM.compressLoaded()
+	MM.saveIcons(zoneString)
+	MM.exportString = zoneString
+
+	if M0RMarkersExportEditBox then M0RMarkersExportEditBox:UpdateValue() end
+
 end
 
 
@@ -897,7 +921,7 @@ end
 
 
 
-local latestPresetVersion = 5
+local latestPresetVersion = 6
 
 local updateMessages = {
 	[1] = "|cFFD700More Markers|r: More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. "..
@@ -907,7 +931,9 @@ local updateMessages = {
 	"In addition, various marker profiles have been added for: vMoL (including fang focused), vRG (bahsei portal), and Opulent Ordeal.\n"..
 	"The ability to import profiles from Akamatsu's Marker has also been added!",
 	[3] = "|cFFD700More Markers|r: More markers has updated, adding a new vSE and a Night Market Quests preset, as well as an optional dependancy of LibMapPins to see markers "..
-	"on your main map via a map filter. A remove duplicate markers button has also been added to the editor."
+	"on your main map via a map filter. A remove duplicate markers button has also been added to the editor.",
+	[4] = "|cFFD700More Markers|r: More markers has updated, adding a new vOC preset for Jynorah made by HatchetHaro and a vRG preset for Oax's poison safe zones.\n"..
+	"In addition, a merge profiles button and a duplicate profile button was added to the settings menu."
 }
 
 local playerActivatedUpdateMessage = function()
