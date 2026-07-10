@@ -214,14 +214,13 @@ ESO_Dialogs["M0RMarkerProfileSelectMulti"] = { -- TODO: Make this select all the
 
 function MM.ShowMultiProfileSelectBase(yetAnotherCallback)
 	local function callback(dialog)
-		local profilesToLoad = {}
+		local selectedProfiles = {}
 		for i,v in pairs(dialog.entryList.dataList) do
-			local selectedProfiles = {}
 			if v.isActive then
 				selectedProfiles[#selectedProfiles+1] = v.name
 			end
-			yetAnotherCallback(selectedProfiles)
 		end
+		yetAnotherCallback(selectedProfiles)
 	end
 	ZO_Dialogs_ShowPlatformDialog("M0RMarkerProfileSelectMulti", {callbackFunc = callback})
 end
