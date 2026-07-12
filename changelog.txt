@@ -1,3 +1,6 @@
+----- 2.2.1 -----
+(minor) Forgot to remove a debug script, removed it now. Whoops
+
 ----- 2.2.0 -----
 Added 2 new preset marker sets: a vRG Oax Posion Safe zone, and HatchetHaro's Jynorah + Skorkhif Markers for vOC. Thank you HatchetHaro for creating them!
 Added a Merge Profiles button to the settings menu

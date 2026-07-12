@@ -636,10 +636,11 @@ if not ZO_IsConsoleOrGameCoreUI() then
 
 
 
-
+	--[[
 	SLASH_COMMANDS['/testprof'] = function()
 		ZO_Dialogs_ShowPlatformDialog("M0RMarkerPCProfileSelectMulti")
 	end
+	--]]
 
 
 	local g_listMultiDialog
