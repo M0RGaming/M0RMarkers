@@ -14,6 +14,14 @@ jobs:
         with:
           path: 'M0RMarkers'
 
+      - uses: actions/checkout@v2
+        with:
+          repository: 'Kyzderp/AntiClankerAddonConsortiumUpdateChecker'
+          path: 'M0RMarkers/PC/ACAC'
+
+      - name: List Files in ACAC
+        run: ls M0RMarkers/PC/ACAC
+
       - name: Zip release
         run: 7z a M0RMarkers.zip * -xr!*.git*
 
