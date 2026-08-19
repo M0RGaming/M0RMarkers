@@ -14,9 +14,10 @@ jobs:
         with:
           path: 'M0RMarkers'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           repository: 'Kyzderp/AntiClankerAddonConsortiumUpdateChecker'
+          token: ${{ secrets.ACAC_PAT }}
           path: 'M0RMarkers/PC/ACAC'
 
       - name: List Files in ACAC
