@@ -17,8 +17,14 @@ jobs:
         with:
           path: 'M0RMarkers'
 
+      - uses: actions/checkout@v7
+        with:
+          repository: 'Kyzderp/AntiClankerAddonConsortiumUpdateChecker'
+          token: ${{ secrets.ACAC_PAT }}
+          path: 'M0RMarkers/PC/ACAC'
+
       - name: Zip release
-        run: 7z a M0RMarkers.zip * -xr!*.git*
+        run: 7z a M0RMarkers.zip * -xr!*.git* -x!M0RMarkers/PC/ACAC/README.md
 
       - name: Push to EsoUI
         id: push

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Pushing
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           path: 'M0RMarkers'
 
@@ -20,11 +20,8 @@ jobs:
           token: ${{ secrets.ACAC_PAT }}
           path: 'M0RMarkers/PC/ACAC'
 
-      - name: List Files in ACAC
-        run: ls M0RMarkers/PC/ACAC
-
       - name: Zip release
-        run: 7z a M0RMarkers.zip * -xr!*.git*
+        run: 7z a M0RMarkers.zip * -xr!*.git* -x!M0RMarkers/PC/ACAC/README.md
 
       - name: Generate Changelog Diff
         run: |

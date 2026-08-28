@@ -1,3 +1,8 @@
+----- 2.2.2 -----
+Added a new DSR preset profile: Taleria Clock v2 by Code. This clock is designed to match codes combat alerts (which has more accurate placement of markers) instead of qcells DSR helper.
+Also added a DSR preset: vDSR General v2, which is just the general dsr markers but with the new clock.
+(PC/minor) Added support for ACAC update checker on PC
+
 ----- 2.2.1 -----
 (minor) Forgot to remove a debug script, removed it now. Whoops
 

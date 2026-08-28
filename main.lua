@@ -921,7 +921,7 @@ end
 
 
 
-local latestPresetVersion = 6
+local latestPresetVersion = 7
 
 local updateMessages = {
 	[1] = "|cFFD700More Markers|r: More Markers has updated, introducing 2 new trial marker presets! These have been automatically added to your profile list for their respective zones. "..
@@ -933,7 +933,8 @@ local updateMessages = {
 	[3] = "|cFFD700More Markers|r: More markers has updated, adding a new vSE and a Night Market Quests preset, as well as an optional dependancy of LibMapPins to see markers "..
 	"on your main map via a map filter. A remove duplicate markers button has also been added to the editor.",
 	[4] = "|cFFD700More Markers|r: More markers has updated, adding a new vOC preset for Jynorah made by HatchetHaro and a vRG preset for Oax's poison safe zones.\n"..
-	"In addition, a merge profiles button and a duplicate profile button was added to the settings menu."
+	"In addition, a merge profiles button and a duplicate profile button was added to the settings menu.",
+	[5] = "|cFFD700More Markers|r: More markers has updated, adding 2 new presets for DSR which utilize the more accurate Taleria Clock markers provided by @code65536!"
 }
 
 local playerActivatedUpdateMessage = function()
